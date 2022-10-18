@@ -1,3 +1,4 @@
+
 	<footer class="main-footer">
 		<strong>Copyright &copy; Barnox Dev
 			<script>document.write(new Date().getFullYear());</script>
@@ -25,7 +26,4 @@
 			</div>
 		</div>
 	</div>
-	{{-- <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" aria-label="Scroll to top">
-		<i class="bi bi-arrow-up"></i>
-	</a> --}}
 	

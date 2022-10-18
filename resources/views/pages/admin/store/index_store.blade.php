@@ -18,7 +18,7 @@
                 </div>
             </div>
 		</div>
-
+		
 		<section class="content">
 			<div class="container-fluid p-3">
 				<div class="card" data-aos="fade-up">
@@ -39,10 +39,9 @@
 									<tr class="text-center">
 										<th width="5%"><input type="checkbox" name="main_checkbox"><label></label></th>
 										<th>#</th>
+										<th>Code</th>
 										<th>Name</th>
-										<th>Email</th>
-										<th>Roles</th>
-										<th>Store</th>
+										<th>Location</th>
 										<th>Status</th>
 										<th>Actions</th>
 									</tr>
@@ -73,51 +72,29 @@
 								<input type="hidden" readonly name="type" id="type">
 								<div class="form-group">
 									<label for="name">Name*</label>
-									<input type="text" autofocus name="name" id="name" required class="form-control" maxlength="50" placeholder="Name" value="{{ old('name') }}">
+									<input type="text" autofocus name="name" id="name" required class="form-control" maxlength="255" placeholder="Name" value="{{ old('name') }}">
 									<p class="text-danger error-text name_error"></p>
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label for="email">Email*</label>
-									<input type="email" name="email" id="email" required class="form-control" maxlength="50" placeholder="Email" value="{{ old('email') }}">
-									<p class="text-danger error-text email_error"></p>
+									<label for="store-code">Store Code*</label>
+									<input type="text" name="store_code" id="store-code" required class="form-control" maxlength="50" placeholder="Store Code" value="{{ old('store_code') }}">
+									<p class="text-danger error-text store_code_error"></p>
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label for="password">Password*</label>
-									<input type="password" name="password" id="password" class="form-control" maxlength="50" placeholder="Password" value="{{ old('password') }}">
-									<p class="text-danger error-text password_error"></p>
-									<div id="checkbox-show-password">
-										<input type="checkbox" id="show-password" onclick="showPassword();"> <label for="show-password">Show Password</label>
-									</div>
-									<div style="display: none;" id="checkbox-password">
-										<input type="checkbox" value="ACTIVE" id="change-password"> <label for="change-password">Change Password</label>
-									</div>
+									<label for="location">Location*</label>
+									<input type="text" name="location" id="location" required class="form-control" maxlength="255" placeholder="Location" value="{{ old('location') }}">
+									<p class="text-danger error-text location_error"></p>
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label for="roles">Roles*</label>
-									<select name="roles" class="form-control" id="roles" required>
-										<option value="0" selected disabled>Select Roles</option>
-										<option value="CASHIER" id="cashier">CASHIER</option>
-										<option value="MANAGER" id="manager">MANAGER</option>
-									</select>
-									<p class="text-danger error-text roles_error"></p>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="store-id">Store*</label>
-									<select class="form-control select2" id="store-id" name="store_id" style="width: 100%;">
-										<option value="" selected disabled>Select Store</option>
-										@foreach($stores as $item)
-										<option {{ old('store_id') == $item->id ? "selected" : "" }} value="{{ $item->id }}">{{ $item->name }}</option>
-										@endforeach
-									</select>
-									<p class="text-danger error-text store_id_error"></p>
+									<label for="description">Description</label>
+									<input type="text" name="description" id="description" class="form-control" maxlength="255" placeholder="Description" value="{{ old('description') }}">
+									<p class="text-danger error-text description_error"></p>
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -177,26 +154,25 @@
 						[10, 25, 50, 'All'],
 					],
 					columnDefs: [ {
-						"targets" : [0, 3, 7],
+						"targets" : [0, 3, 6],
 						"orderable" : false,
 						"searchable" : false,
 					} ],
 					ajax : {
-						url : "{{ route('user.index') }}",
+						url : "{{ route('store.index') }}",
 						type : 'GET',
 					},
 					columns: [
 						{ data: 'checkbox', name: 'checkbox', className: "text-center"},
 						{ data: 'DT_RowIndex', name: 'DT_RowIndex', className: "text-center" },
+						{ data: 'storeCode', name: 'storeCode', className: "text-center" },
 						{ data: 'name', name: 'name', className: "text-center" },
-						{ data: 'email', name: 'email', className: "text-center" },
-						{ data: 'roles', name: 'roles', className: "text-center" },
-						{ data: 'store', name: 'store', className: "text-center" },
+						{ data: 'location', name: 'location', className: "text-center" },
 						{ data: 'status', name: 'status', className: "text-center" },
 						{ data: 'action', name: 'action', className: "text-center" },
 					],
 				}).on('draw', function () {
-					$('input[name="user_checkbox"]').each(function (){
+					$('input[name="store_checkbox"]').each(function (){
 						this.checked = false;
 					});
 					$('input[name="main_checkbox"]').prop('checked', false);
@@ -239,10 +215,8 @@
 				$('.modal-title').text("Create Data (* Required)");
 				$('#form-post').trigger("reset");
 				$('#id').val('');
-				$('#password').prop('readonly', false);
 				$('#type').val('create');
 				$(".modal-body").find("p").hide();
-				$('#checkbox-password').attr("style", "display: none;");
 			});
 
 			if ($("#form-post").length > 0) {
@@ -260,7 +234,7 @@
 								if (result.isConfirmed) {
 									$(".modal-body").find("p").show();
 									$.ajax({
-										url: "{{ route('user.store') }}",
+										url: "{{ route('store.store') }}",
 										data: formData,
 										type: 'POST',
 										dataType: 'json',
@@ -301,10 +275,8 @@
 			// method edit data
 			$(document).on('click', '.editPost', function () {
 				let dataId = $(this).data('id');
-				$('#checkbox-password').attr("style", "display: auto;");
-				$('#password').prop('readonly', true);
 				$(".modal-body").find("p").hide();
-				$.get('user/' + dataId + '/edit', function (data) {
+				$.get('store/' + dataId + '/edit', function (data) {
 					$('#modal-post').modal('show');
 					$(document).ready(function() {
 						$("#store-id").select2({
@@ -316,15 +288,9 @@
 					$('#type').val('edit');
 					$('#id').val(data.id);
 					$('#name').val(data.name);
-					$('#email').val(data.email);
-					$('#password').val(data.password);
-					$('#store-id').val(data.store_id);
-					// roles
-					if (data.roles == "MANAGER") {
-						$('#manager').prop('selected', true);
-					} else if (data.roles == "CASHIER") {
-						$('#cashier').prop('selected', true);
-					}
+					$('#store-code').val(data.store_code);
+					$('#location').val(data.location);
+					$('#description').val(data.description);
 					// status
 					if (data.status == "ACTIVE") {
 						$('#active').prop('checked', true);
@@ -348,7 +314,7 @@
 					}).then((result) => {
 						if (result.isConfirmed) {
 							$.ajax({
-								url: "user/" + dataId,
+								url: "store/" + dataId,
 								type: 'DELETE',
 							success: function (data) {
 								$('#delete-modal').modal('hide');
@@ -369,19 +335,19 @@
 
 			$(document).on('click', 'input[name="main_checkbox"]', function() {
 				if (this.checked) {
-					$('input[name="user_checkbox"]').each(function () {
+					$('input[name="store_checkbox"]').each(function () {
 						this.checked = true;
 					});
 				} else {
-					$('input[name="user_checkbox"]').each(function () {
+					$('input[name="store_checkbox"]').each(function () {
 						this.checked = false;
 					});	
 				}
 				toggleDeleteAllBtn();
 			});
 
-			$(document).on('change', 'input[name="user_checkbox"]', function() {
-				if ($('input[name="user_checkbox"]').length == $('input[name="user_checkbox"]:checked').length) {
+			$(document).on('change', 'input[name="store_checkbox"]', function() {
+				if ($('input[name="store_checkbox"]').length == $('input[name="store_checkbox"]:checked').length) {
 					$('input[name="main_checkbox"]').prop('checked', true);
 				} else {
 					$('input[name="main_checkbox"]').prop('checked', false);
@@ -390,8 +356,8 @@
 			});
 
 			function toggleDeleteAllBtn() {
-				if ($('input[name="user_checkbox"]:checked').length > 0) {
-					$('#delete-all-btn').text('Delete ('+ $('input[name="user_checkbox"]:checked').length +')').removeClass('d-none');
+				if ($('input[name="store_checkbox"]:checked').length > 0) {
+					$('#delete-all-btn').text('Delete ('+ $('input[name="store_checkbox"]:checked').length +')').removeClass('d-none');
 				} else {
 					$('#delete-all-btn').addClass('d-none');
 				}
@@ -399,16 +365,16 @@
 			// method delete end
 
 			$('#delete-all-btn').click(function () {
-				let checkedUser = [];
-				$('input[name="user_checkbox"]:checked').each(function () {
-					checkedUser.push($(this).data('id'));
+				let checkedStore = [];
+				$('input[name="store_checkbox"]:checked').each(function () {
+					checkedStore.push($(this).data('id'));
 				});
 				
-				const url = "{{ route('delete-selected-user') }}";
-				if (checkedUser.length > 0) {
+				const url = "{{ route('delete-selected-store') }}";
+				if (checkedStore.length > 0) {
 					Swal.fire({
 						title: 'Are you sure?',
-						html: `You want to delete <b>(${checkedUser.length})</b> user`,
+						html: `You want to delete <b>(${checkedStore.length})</b> store`,
 						icon: 'info',
 						showCancelButton: true,
 						confirmButtonColor: '#3085d6',
@@ -417,7 +383,7 @@
 						allowOutsideClick: false,
 					}).then((result) => {
 						if (result.value) {
-							$.post(url, {id:checkedUser}, function (data) {
+							$.post(url, {id:checkedStore}, function (data) {
 								if (data.code == 1) {
 									Swal.fire(
 										'Saved!',
@@ -431,28 +397,8 @@
 					});
 				}
 			});
-
-			$('#change-password').click(function() {
-				if( $(this).is(':checked')) {
-					$('#password').prop({readonly : false, required : true, minlength: "6"});
-					$('#checkbox-show-password').show();
-				} else {
-					$('#password').val('');
-					$('#password').prop({readonly : true, required : false});
-					$('#password').removeAttr("minlength", "6");
-					$('#checkbox-show-password').hide();
-				}
-			});
 		});
 
-		function showPassword() {
-			let x = document.getElementById("password");
-			if (x.type === "password") {
-				x.type = "text";
-			} else {
-				x.type = "password";
-			}
-		}
 	</script>
 
 @endpush

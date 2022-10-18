@@ -12,16 +12,17 @@
     </head>
     <body class="hold-transition sidebar-mini layout-navbar-fixed">
         <div class="wrapper">
-            <!-- Preloader -->
-            <div class="preloader flex-column justify-content-center align-items-center">
-                {{-- <img class="animation__shake" src="{{ ('dist/img/AdminLTELogo.png') }}" alt="AdminLTELogo" height="60" width="60"> --}}
-                <i class="animation__shake fa-duotone fa-loader"></i>
-            </div>
+            
             @include('includes.navbar')
+            
             @include('includes.sidebar')
-            @yield('admin_content')
+
+                @yield('admin_content')
+
             @include('includes.footer')
+
         </div>
         @include('includes.script')
+
     </body>
 </html>

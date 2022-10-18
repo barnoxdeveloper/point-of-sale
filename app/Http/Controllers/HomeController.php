@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\{Store, User, Category};
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -23,6 +24,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('pages.dashboard');
+        $users = User::whereNotIn('roles', ['ADMINISTRATOR'])->count();
+        $stores = Store::count();
+        $categories = Category::count();
+        return view('pages.dashboard', compact('users', 'stores', 'categories'));
     }
 }
