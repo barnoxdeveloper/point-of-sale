@@ -20,6 +20,12 @@ class Category extends Model
     //inisialisasi primarykey pada tabel
     protected $primaryKey = 'id';
 
+    // accessor untuk mengganti url photo di API
+	public function getPhotoAttribute($value)
+	{
+		return url('storage/' . $value);
+	}
+
     public function store()
     {
         return $this->belongsTo(Store::class, 'store_id', 'id');

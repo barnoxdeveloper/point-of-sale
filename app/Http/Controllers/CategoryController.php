@@ -18,46 +18,40 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         $title = "Data Category";
-        $items = Category::orderBy('period', 'DESC')->get();
-        $users = DB::table('users')->whereNotIn('roles', ['ADMINISTRATOR', 'HRD', 'FINANCE', 'DIRECTOR'])
-                                    ->orderBy('name', 'ASC')
-                                    ->get();
-        // return $items;
+        $items = Category::with('store')->get();
+        $stores = DB::table('stores')->orderBy('name', 'ASC')->get();
         if($request->ajax()){
             return datatables()->of($items)
                                 ->addColumn('checkbox', function($data) {
                                     return '<input type="checkbox" name="category_checkbox" data-id="'.$data['id'].'"><label></label>';
                                 })
-                                ->addColumn('nip', function ($data) {
-                                    return Str::upper($data->nip);
-                                })
                                 ->addColumn('name', function ($data) {
-                                    if ($data->user == NULL) {
-                                        return 'Not Found';
-                                    } else {
-                                        return Str::upper($data->user->name);
+                                    return $data->name;
+                                })
+                                ->addColumn('storeName', function ($data) {
+                                    if ($data->store !== NULL) {
+                                        return $data->store->name;
                                     }
                                 })
-                                ->addColumn('period', function ($data) {
-                                    return Str::upper(date("M-Y", strtotime($data->period)));
-                                })
-                                ->addColumn('document', function ($data) {
-                                    return '<a href="'.$data->document.'" title="'.$data->document.'" target="_blank">Document</a>';
+                                ->addColumn('photo', function ($data) {
+                                    if ($data->getRawOriginal('photo') !== NULL) {
+                                        return '<a href="'.$data->photo.'" title="'.$data->photo.'" target="_blank><img src="'.$data->photo.'" alt="'.$data->photo.'" style="width: 100px; height: 100px;"><img src="'.$data->photo.'" alt="'.$data->photo.'" style="width: 100px; height: 100px;"></a>';    
+                                    }
                                 })
                                 ->addColumn('status', function($data){
                                     return $data->status;
                                 })
                                 ->addColumn('action', function($data){
-                                    $button = '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="btn btn-warning btn-md editPost"><i class="bi bi-pencil-square"></i></a>';
+                                    $button = '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="bi bi-trash3"></i></a>';
+                                    $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
-                                ->rawColumns(['checkbox', 'nip', 'name', 'period', 'document', 'status', 'action'])
+                                ->rawColumns(['checkbox', 'name', 'storeName', 'photo', 'status', 'action'])
                                 ->addIndexColumn()
                                 ->make(true);
         }
-        return view('pages.admin.category.index_category', compact('title', 'users'));
+        return view('pages.admin.category.index_category', compact('title', 'stores'));
     }
 
     /**
@@ -79,9 +73,9 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make( $request->all(),[
-            'nip.*' => 'required|max:20|exists:users,nip|not_in:0',
-            'period.*' => 'required|max:20',
-            'document.*' => 'required|mimes:pdf|max:1000',
+            'store_id.*' => 'required|exists:stores,id|not_in:0',
+            'name.*' => 'required|max:255',
+            'photo.*' => 'nullable|mimes:png,jpg,jpeg,svg|max:10000',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -90,18 +84,20 @@ class CategoryController extends Controller
                     'messages' => $validator->errors(),
                 ]);    
         } else {
-            if ($request->hasfile('document')) {
-                $date = Carbon::now();
-                foreach ($request->file('document') as $key => $item) {
-                    $data[$key]['nip'] = $request->nip[$key];
-                    $data[$key]['period'] = $request->period[$key];
-                    $namaFile = $date.'-'.$request->nip[$key].'-'.$item->getClientOriginalName();
-                    $data[$key]['document'] = $item->storeAs('assets/category',$namaFile,'public');
+            // if ($request->hasfile('photo')) {
+                $slug = str_replace(' ', '-', array_map('strtolower', $request->name));
+                foreach ($request->name as $key => $item) {
+                    $data[$key]['store_id'] = $request->store_id[$key];
+                    $data[$key]['name'] = $request->name[$key];
+                    $data[$key]['slug'] = $slug[$key];
+                    $photo[$key] = $request->file('photo');
+                    $namaFile = $photo[$key]->getClientOriginalName();
+                    $data[$key]['photo'] = $photo[$key]->storeAs('assets/category',$namaFile,'public');
                     $data[$key]['status'] = "NON-ACTIVE";
                     $data[$key]['created_at'] = Carbon::now();
                     $data[$key]['updated_at'] = Carbon::now();
                 }
-            }
+            // }
             Category::insert($data);
             return response()->json([
                 'code' => 200,
@@ -145,9 +141,9 @@ class CategoryController extends Controller
     {
         $item = Category::findOrFail($id);
         $validator = Validator::make( $request->all(),[
-            'nip' => 'required|max:20',
-            'period' => 'required|max:20',
-            'document' => 'nullable|mimes:pdf|max:1000',
+            'store_id.*' => 'required|exists:stores,id|not_in:0',
+            'name' => 'required|max:255',
+            'photo' => 'nullable|mimes:png,jpg,jpeg,svg|max:1000',
             'status' => 'required|in:ACTIVE,NON-ACTIVE',
         ]);
         if ($validator->fails()) {
@@ -158,31 +154,26 @@ class CategoryController extends Controller
                 ]);    
         } else {
             $data = $request->all();
-            $document = $request->file('document');
-            //jika document tidak di rubah
-            if($document == ""){
-                $data['document'] = $item->getRawOriginal('document');
+            $photo = $request->file('photo');
+            //jika photo tidak di rubah
+            if($photo == ""){
+                $data['photo'] = $item->getRawOriginal('photo');
                 $item->update($data);
-                return response()->json([
-                    'code' => 200,
-                    'notif' => "Saved!",
-                    'messages' => "Your Data has been Updated!",
-                ]);
             }
-            else if ($document !== ""){
+            else if ($photo !== ""){
                 $data = $request->all();
-                // jika document di rubah, maka unlink document yang lama
-                File::delete('storage/'. $item->getRawOriginal('document'));
+                // jika photo di rubah, maka unlink photo yang lama
+                File::delete('storage/'. $item->getRawOriginal('photo'));
                 $date = Carbon::now();
-                $fileName = $date.'-'.$document->getClientOriginalName();
-                $data['document'] = $document->storeAs('assets/category',$fileName,'public');
+                $fileName = $date.'-'.$photo->getClientOriginalName();
+                $data['photo'] = $photo->storeAs('assets/category',$fileName,'public');
                 $item->update($data);
-                return response()->json([
-                    'code' => 200,
-                    'notif' => "Updated!",
-                    'messages' => "Your Data has been Updated!",
-                ]);
             }
+            return response()->json([
+                'code' => 200,
+                'notif' => "Updated!",
+                'messages' => "Your Data has been Updated!",
+            ]);
         }
     }
 
@@ -195,7 +186,7 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         $item = Category::find($id);
-        File::delete('storage/'. $item->getRawOriginal('document'));
+        File::delete('storage/'. $item->getRawOriginal('photo'));
         $item->delete();
         return response()->json(['code' => 1]);
     }
@@ -205,7 +196,7 @@ class CategoryController extends Controller
         $id = $request->id;
         $items = Category::whereIn('id', $id)->get();
         foreach ($items as $key => $item) {
-            File::delete('storage/'. $item->getRawOriginal('document'));
+            File::delete('storage/'. $item->getRawOriginal('photo'));
             Category::whereIn('id', $id)->delete();
         }
         return response()->json(['code' => 1]);

@@ -245,8 +245,8 @@
 										$(document).find('p.error-text').text('');
 									},
 									success: function (data) {
-										if (data.status == 0) {
-											$.each(data.errors, function(prefix, val) {
+										if (data.code == 0) {
+											$.each(data.messages, function(prefix, val) {
 												$('p.'+prefix+'_error').text(val[0]);
 											});
 										} else {
@@ -261,7 +261,7 @@
 										}
 									},
 									error: function (data) {
-										$.each(data.errors, function(prefix, val) {
+										$.each(data.messages, function(prefix, val) {
 											$('p.'+prefix+'_error').text(val[0]);
 										});
 									}

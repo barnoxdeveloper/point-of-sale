@@ -18,7 +18,7 @@ class StoreController extends Controller
     public function index(Request $request)
     {
         $title = "Data Store";
-        $items = Store::orderBy('id', 'ASC')->get();
+        $items = Store::orderBy('name', 'ASC')->get();
         if($request->ajax()){
             return datatables()->of($items)
                                 ->addColumn('checkbox', function($data) {
@@ -68,33 +68,23 @@ class StoreController extends Controller
     public function store(Request $request)
     {
         $id = $request->id;
-        $type = $request->type;
-        $check = Store::find($id);
+        // $type = $request->type;
+        // $check = Store::find($id);
 
-        if ($type == 'edit') {
-            $validator = Validator::make( $request->all(),[
-                'name' => 'required|max:255',
-                'store_code' => 'required', 'max:50', Rule::unique('stores')->ignore($check->id),
-                'location' => 'required|max:255',
-                'description' => 'nullable|max:255',
-                'status' => 'required|in:ACTIVE,NON-ACTIVE',
-            ]);
-        } elseif ($type == 'create') {
-            $validator = Validator::make( $request->all(),[
-                'name' => 'required|max:255',
-                'store_code' => 'required|max:50|unique:stores,store_code',
-                'location' => 'required|max:255',
-                'description' => 'nullable|max:255',
-                'status' => 'required|in:ACTIVE,NON-ACTIVE',
-            ]);
-        }
+        $validator = Validator::make( $request->all(),[
+            'name' => 'required|max:255',
+            'store_code' => 'required|max:50|unique:stores,store_code',
+            'location' => 'required|max:255',
+            'description' => 'nullable|max:255',
+            'status' => 'required|in:ACTIVE,NON-ACTIVE',
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
-                    'code' => 0,
-                    'notif' => "Error!",
-                    'messages' => $validator->errors(),
-                ]);    
+                'code' => 0,
+                'notif' => "Error!",
+                'messages' => $validator->errors(),
+            ]);
         } else {
             Store::updateOrCreate(['id' => $id],
             [

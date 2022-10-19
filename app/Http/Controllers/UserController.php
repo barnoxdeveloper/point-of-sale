@@ -52,7 +52,6 @@ class UserController extends Controller
                                     $button .= '&nbsp;&nbsp;';
                                     $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
-                                    
                                 })
                                 ->rawColumns(['checkbox', 'name', 'email', 'roles', 'status', 'action'])
                                 ->addIndexColumn()
@@ -112,7 +111,11 @@ class UserController extends Controller
         }
 
         if ($validator->fails()) {
-            return response()->json(['status' => 0, 'errors' => $validator->errors(), 422]);
+            return response()->json([
+                'code' => 0,
+                'notif' => "Error!",
+                'messages' => $validator->errors(),
+            ]);
         } else {
             User::updateOrCreate(['id' => $id],
                     [
@@ -123,7 +126,11 @@ class UserController extends Controller
                         'roles' => $request->roles,
                         'status' => $request->status,
                     ]); 
-            return response()->json(['status', 'Success'], 200);
+            return response()->json([
+                'code' => 200,
+                'notif' => "Saved!",
+                'messages' => "Your Data has been Saved!",
+            ]);
         }
     }
 

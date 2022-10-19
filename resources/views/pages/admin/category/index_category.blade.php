@@ -3,23 +3,22 @@
 @section('admin_content')
 
 	<div class="content-wrapper">
-		<section class="content-header">
+		<div class="content-header">
 			<div class="container-fluid">
-				<div class="row">
-					<div class="col-md-6">
-						<h1>{{ $title }}</h1>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-sm-6">
-						<ol class="breadcrumb">
-							<li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-							<li class="breadcrumb-item active">{{ $title }}</li>
-						</ol>
-					</div>
-				</div>
-			</div>
-		</section>
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">{{ $title }}</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                            <li class="breadcrumb-item active">{{ $title }}</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+		</div>
+
 		<section class="content">
 			<div class="container-fluid p-3">
 				<div class="card" data-aos="fade-up">
@@ -28,11 +27,6 @@
 							<div class="col-6">
 								<a href="javascript:void(0)" class="btn btn-sm btn-success" id="btn-create">+ Create Data</a>
 								<button class="btn btn-sm btn-danger d-none deleteAllBtn" id="delete-all-btn">Delete All</button>
-							</div>
-							<div class="col-6">
-								<a href="javascript:void(0)" class="btn btn-sm btn-success" id="btn-modal-updated-all-attendance">
-									<i class="bi bi-check-all"></i> Updated Status
-								</a>
 							</div>
 						</div>
 					</div>
@@ -43,10 +37,9 @@
 									<tr class="text-center">
 										<th width="5%"><input type="checkbox" name="main_checkbox"><label></label></th>
 										<th>#</th>
-										<th>NIP</th>
 										<th>Name</th>
-										<th>Period</th>
-										<th>Document</th>
+										<th>Store</th>
+										<th>Photo</th>
 										<th>Status</th>
 										<th>Actions</th>
 									</tr>
@@ -69,33 +62,33 @@
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					<form action="" enctype="multipart/form-data" id="form-post">
+					<form action="" enctype="multipart/form-data" method="POST" id="form-post">
 						@csrf
 						<div class="table-responsive">
-							<table class="table table-bordered table-striped w-100" id="dynamicTable">
+							<table class="table table-bordered table-striped w-100" id="dynamic-table">
 								<thead>
 									<tr class="text-center">
-										<th width="30%">NIP</th>
-										<th width="10%">Period</th>
-										<th>Document</th>
-										<th>Action</th>
+										<th width="35%">Store</th>
+										<th width="35%">Name</th>
+										<th width="20%">Photo</th>
+										<th width="10%">Action</th>
 									</tr>
 								</thead>
 								<tbody>
 									<tr class="text-center">
 										<td>
-											<select class="form-control select2 nip" required name="nip[]" style="width: 100%;">
-												<option value="0" selected disabled>Empty</option>
-												@foreach($users as $item)
-												<option {{ old('nip') == $item->nip ? "selected" : "" }} value="{{ $item->nip }}">{{ $item->nip }} | {{ $item->name }}</option>
+											<select class="form-control select2 store_id" required name="store_id[]" style="width: 100%;">
+												<option value="" selected disabled>Select Store</option>
+												@foreach($stores as $item)
+												<option {{ old('store_id') == $item->id ? "selected" : "" }} value="{{ $item->id }}">{{ $item->store_code }} | {{ $item->name }}</option>
 												@endforeach
 											</select>
 										</td>
 										<td>
-											<input type="month" name="period[]" required class="form-control" placeholder="Period">
+											<input type="text" name="name[]" required class="form-control" placeholder="Name">
 										</td>
 										<td>
-											<input type="file" accept="application/pdf" name="document[]" required class="form-control">
+											<input type="file" accept="image/*" name="photo[]" class="form-control">
 										</td>
 										<td>
 											<button type="button" name="add" id="add" class="btn btn-success">+</button>
@@ -106,7 +99,7 @@
 						</div>
 						<div class="form-group text-center">
 							<button type="submit" class="btn btn-primary" id="btn-save">
-								<i class="bi bi-send-check"></i>
+								<i class="far fa-paper-plane"></i>
 								Save
 							</button>
 						</div>
@@ -135,28 +128,28 @@
 						<div class="row">
 							<div class="col-md-6">
 								<div class="form-group">
-									<label for="nip-edit">Name*</label>
-									<select class="form-control select2" required id="nip-edit" name="nip" style="width: 100%;">
-										<option value="0" selected disabled>Empty</option>
-										@foreach($users as $item)
-										<option {{ old('nip') == $item->nip ? "selected" : "" }} value="{{ $item->nip }}">{{ $item->nip }} | {{ $item->name }}</option>
+									<label for="store-id-edit">Name*</label>
+									<select class="form-control select2" name="store_id" id="store-id-edit" required style="width: 100%;">
+										<option value="" selected disabled>Select Store</option>
+										@foreach($stores as $item)
+										<option {{ old('store_id') == $item->id ? "selected" : "" }} value="{{ $item->id }}">{{ $item->store_code }} | {{ $item->name }}</option>
 										@endforeach
 									</select>
-									<p class="text-danger error-text nip_error"></p>
+									<p class="text-danger error-text store_id_error"></p>
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label for="period">Period</label>
-									<input type="month" name="period" id="period-edit" required class="form-control" placeholder="Period">
-									<p class="text-danger error-text period_error"></p>
+									<label for="name">Name</label>
+									<input type="text" name="name" id="name-edit" required class="form-control" placeholder="Name">
+									<p class="text-danger error-text name_error"></p>
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label for="document">Document <span id="document-preview"></span></label>
-									<input type="file" accept="application/pdf" name="document" id="document" class="form-control">
-									<p class="text-danger error-text document_error"></p>
+									<label for="photo">Photo <span id="photo-preview"></span></label>
+									<input type="file" accept="image/*" name="photo" id="photo" class="form-control">
+									<p class="text-danger error-text photo_error"></p>
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -176,57 +169,7 @@
 						</div>
 						<div class="form-group text-center">
 							<button type="submit" class="btn btn-primary" id="btn-save">
-								<i class="bi bi-send-check"></i>
-								Save
-							</button>
-						</div>
-					</form>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">X</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	{{-- modal Activated All Attendance --}}
-	<div class="modal fade" id="modal-updated-all-attendance" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modal-updated-all-attendance-label" aria-hidden="true">
-		<div class="modal-dialog modal-md">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="modal-updated-all-attendance-label"></h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<form action="" id="form-updated-all-attendance">
-						@csrf
-						{{-- @method('PUT') --}}
-						<div class="row">
-							<div class="col-md-12">
-								<div class="form-group">
-									<label for="period">Period*</label>
-									<input type="month" name="period" id="period-updated-all-attendance" required class="form-control" placeholder="Period">
-									<p class="text-danger error-text period_error"></p>
-								</div>
-							</div>
-							<div class="col-md-12">
-								<div class="form-group">
-									<label>Status*</label> <br>
-									<div class="custom-control custom-radio custom-control-inline">
-										<input type="radio" id="active-activated-all" name="status" class="custom-control-input status" value="ACTIVE">
-										<label class="custom-control-label" for="active-activated-all">ACTIVE</label>
-									</div>
-									<div class="custom-control custom-radio custom-control-inline">
-										<input type="radio" id="non-active-activated-all" name="status" class="custom-control-input status" value="NON-ACTIVE">
-										<label class="custom-control-label" for="non-active-activated-all">NON-ACTIVE</label>
-									</div>
-									<p class="text-danger error-text status_error"></p>
-								</div>
-							</div>
-						</div>
-						<div class="form-group text-center">
-							<button type="submit" class="btn btn-primary" id="btn-save">
-								<i class="bi bi-send-check"></i>
+								<i class="far fa-paper-plane"></i>
 								Save
 							</button>
 						</div>
@@ -242,61 +185,68 @@
 @endsection
 
 @push('style-table')
-	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.12.1/rr-1.2.8/datatables.min.css"/>
-	<style>
-		.table th, td{
-			font-size: 12px;
-		}
-	</style>
+
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css"/>
+		<style>
+			.table th, td{
+				font-size: 12px;
+			}
+		</style>
 @endpush
 
-@push('data-table')
-    
-	<script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.12.1/rr-1.2.8/datatables.min.js"></script>
-	<script type="text/javascript">
-		$(document).ready(function (){
-			$('#table-data').DataTable({
-				processing : true,
-				serverSide : true,
-				pageLength : 25,
-				columnDefs : [ {
-					"targets" : [0, 5],
-					"orderable" : false,
-					"searchable" : false,
-				} ],
-				ajax : {
-					url : "{{ route('attendance.index') }}",
-					type : 'GET',
-				},
-				columns: [
-					{ data: 'checkbox', name: 'checkbox', className: "text-center"},
-					{ data: 'DT_RowIndex', name: 'DT_RowIndex', className: "text-center" },
-					{ data: 'nip', name: 'nip', className: "text-center" },
-					{ data: 'name', name: 'name', className: "text-center" },
-					{ data: 'period', name: 'period', className: "text-center" },
-					{ data: 'document', name: 'document', className: "text-center" },
-					{ data: 'status', name: 'status', className: "text-center" },
-					{ data: 'action', name: 'action', className: "text-center" },
-				],
-			}).on('draw', function () {
-				$('input[name="attendance_checkbox"]').each(function (){
-					this.checked = false;
+@push('script-table')
+
+		<script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function (){
+				$('#table-data').DataTable({
+					processing : true,
+					serverSide : true,
+					pageLength : 25,
+					order: [[3, 'asc']],
+					lengthMenu: [
+						[10, 25, 50, -1],
+						[10, 25, 50, 'All'],
+					],
+					columnDefs : [ {
+						"targets" : [0, 4, 6],
+						"orderable" : false,
+						"searchable" : false,
+					} ],
+					ajax : {
+						url : "{{ route('category.index') }}",
+						type : 'GET',
+					},
+					columns: [
+						{ data: 'checkbox', name: 'checkbox', className: "text-center"},
+						{ data: 'DT_RowIndex', name: 'DT_RowIndex', className: "text-center" },
+						{ data: 'name', name: 'name', className: "text-center" },
+						{ data: 'storeName', name: 'storeName', className: "text-center" },
+						{ data: 'photo', name: 'photo', className: "text-center" },
+						{ data: 'status', name: 'status', className: "text-center" },
+						{ data: 'action', name: 'action', className: "text-center" },
+					],
+				}).on('draw', function () {
+					$('input[name="category_checkbox"]').each(function (){
+						this.checked = false;
+					});
+					$('input[name="main_checkbox"]').prop('checked', false);
+					$('#delete-all-btn').addClass('d-none');
 				});
-				$('input[name="main_checkbox"]').prop('checked', false);
-				$('#delete-all-btn').addClass('d-none');
 			});
-		});
-	</script>
+		</script>
 @endpush
 
-@push('style-form')
-	<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+@push('style-select2')
+
+		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 	
 @endpush
 
-@push('script-form')
-	<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+@push('script-select2')
 
+		<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 @endpush
 
 @push('modal-post')
@@ -313,23 +263,23 @@
 			const myModal = new bootstrap.Modal(document.getElementById('modal-post'));
 			$('#btn-create').click(function () {
 				myModal.show();
+				$("#form-post").attr( "enctype", "multipart/form-data" );
 				$(document).ready(function() {
-					$(".nip").select2({
+					$(".store_id").select2({
 						dropdownParent: $("#modal-post")
 					});
 				});
 				$('.modal-title').text("Create Data (* Required)");
 				$('#form-post').trigger("reset");
-				$('#id').val('');
 				$(".modal-body").find("p").hide();
 
 				$('#add').click(function() {
 					$(document).ready(function() {
-						$(".nip").select2({
+						$(".store_id").select2({
 							dropdownParent: $("#modal-post")
 						});
 					});
-					$("#dynamicTable").append(`<tr class="text-center"><td><select class="form-control select2 nip" required name="nip[]" style="width: 100%;"><option value="0" selected disabled>Empty</option>@foreach($users as $item)<option {{ old('nip') == $item->nip ? "selected" : "" }} value="{{ $item->nip }}">{{ $item->nip }} | {{ $item->name }}</option>@endforeach</select></td><td><input type="month" name="period[]" required class="form-control" placeholder="Period"></td><td><input type="file" accept="application/pdf" name="document[]" required class="form-control"></td><td><button type="button" class="btn btn-danger remove-tr">-</button></td></tr>`);
+					$("#dynamic-table").append(`<tr class="text-center"><td><select class="form-control select2 store_id" required name="store_id[]" style="width: 100%;"><option value="" selected disabled>Select Store</option>@foreach($stores as $item)<option {{ old('store_id') == $item->id ? "selected" : "" }} value="{{ $item->id }}">{{ $item->store_code }} | {{ $item->name }}</option>@endforeach</select></td><td><input type="text" name="name[]" required class="form-control" placeholder="Name"></td><td><input type="file" accept="image/*" multiple="multiple" name="photo[]" class="form-control"></td><td><button type="button" class="btn btn-danger remove-tr">-</button></td></tr>`);
 				});
 			
 				$(document).on('click', '.remove-tr', function(){  
@@ -340,7 +290,7 @@
 			if ($("#form-post").length > 0) {
 				$("#form-post").validate({
 					submitHandler: function (form) {
-						let formData = new FormData(document.getElementById('form-post')); 
+						let formData = new FormData($("#form-post")[0]); 
 						Swal.fire({
 							title: 'Are you sure?',
 							icon: 'info',
@@ -352,10 +302,10 @@
 								if (result.isConfirmed) {
 									$(".modal-body").find("p").show();
 									$.ajax({
-										url: "{{ route('attendance.store') }}",
-										data: formData,
+										url: "{{ route('category.store') }}",
 										type: 'POST',
 										dataType: 'json',
+										data: formData,
 										cache: false,
 										contentType: false,
 										processData: false,
@@ -403,19 +353,19 @@
 			$(document).on('click', '.editPost', function () {
 				let dataId = $(this).data('id');
 				$(".modal-body").find("p").hide();
-				$.get('attendance/' + dataId + '/edit', function (data) {
+				$.get('category/' + dataId + '/edit', function (data) {
 					$('#modal-edit').modal('show');
 					$(document).ready(function() {
-						$("#nip-edit").select2({
+						$("#store_id-edit").select2({
 							dropdownParent: $("#modal-edit")
 						});
 					});
 					$('.modal-title').text("Edit Data (* Required)");
 					// set value masing-masing id berdasarkan data yg diperoleh dari ajax get request diatas
 					$('#id').val(data.id);
-					$('#nip-edit').val(data.nip);
-					$('#period-edit').val(data.period);
-					$('#document-preview').html(`<a href="${data.document}" title="${data.document}" target="_blank"> : Preview Document</a>`);
+					$('#store-id-edit').val(data.store_id);
+					$('#name-edit').val(data.name);
+					$('#photo-preview').html(`<a href="${data.photo}" title="${data.photo}" target="_blank"><img src="${data.photo}" alt="${data.photo}" style="width: 100px; height: 100px;"></a>`);
 					// status
 					if (data.status == "ACTIVE") {
 						$('#active').prop('checked', true);
@@ -440,7 +390,7 @@
 								if (result.isConfirmed) {
 									$(".modal-body").find("p").show();
 									let id = $("input[name=id]").val();
-									let url = "{{ route('attendance.update', ":id") }}";
+									let url = "{{ route('category.update', ":id") }}";
 									url = url.replace(':id', id);
 									$.ajax({
 										type: 'POST',
@@ -491,75 +441,6 @@
 			}
 			// method edit end
 
-			// method update status start
-			$('#btn-modal-updated-all-attendance').click(function () {
-				$('#modal-updated-all-attendance').modal('show');
-				$('.modal-title').text("Update Data (* Required)");
-				$('#form-updated-all-attendance').trigger("reset");
-				$(".modal-body").find("p").hide();
-			});
-
-			if ($("#form-updated-all-attendance").length > 0) {
-				$("#form-updated-all-attendance").validate({
-					submitHandler: function (form) {
-						let formData = new FormData(document.getElementById('form-updated-all-attendance'));
-						Swal.fire({
-							title: 'Are you sure?',
-							icon: 'info',
-							showCancelButton: true,
-							confirmButtonColor: '#3085d6',
-							cancelButtonColor: '#d33',
-							confirmButtonText: 'Yes, Save it!'
-							}).then((result) => {
-								if (result.isConfirmed) {
-									$(".modal-body").find("p").show();
-									$.ajax({
-										type: 'POST',
-										url: "{{ route('activated-all-attendance') }}",
-										data: formData,
-										dataType: 'json',
-										cache: false,
-										contentType: false,
-										processData: false,
-									beforeSend: function(){
-										$(document).find('p.error-text').text('');
-									},
-									success: function (data) {
-										if (data.code == 0) {
-											$.each(data.messages, function(prefix, val) {
-												Swal.fire(
-													`Error!`,
-													`${val}`,
-													'error'
-												);
-											});
-										} else if (data.code == 200){
-											$('#form-updated-all-attendance').trigger("reset");
-											$('#modal-updated-all-attendance').modal('hide');
-											$('#table-data').DataTable().ajax.reload();
-											Swal.fire(
-												`${data.notif}`,
-												`${data.messages}`,
-												'success'
-											);
-										}
-									},
-									error: function (data) {
-										$.each(data.messages, function(prefix, val) {
-											Swal.fire(
-												`Error!`,
-												`${val}`,
-												'error'
-											);
-										});
-									}
-								});
-							}
-						});
-					}
-				});
-			}
-			// method update status end
 
 			// method delete start
 			$(document).on('click', '.delete', function () {
@@ -575,7 +456,7 @@
 					}).then((result) => {
 						if (result.isConfirmed) {
 							$.ajax({
-								url: "attendance/" + dataId,
+								url: "category/" + dataId,
 								type: 'DELETE',
 							success: function (data) {
 								$('#delete-modal').modal('hide');
@@ -596,19 +477,19 @@
 
 			$(document).on('click', 'input[name="main_checkbox"]', function() {
 				if (this.checked) {
-					$('input[name="attendance_checkbox"]').each(function () {
+					$('input[name="category_checkbox"]').each(function () {
 						this.checked = true;
 					});
 				} else {
-					$('input[name="attendance_checkbox"]').each(function () {
+					$('input[name="category_checkbox"]').each(function () {
 						this.checked = false;
 					});	
 				}
 				toggleDeleteAllBtn();
 			});
 
-			$(document).on('change', 'input[name="attendance_checkbox"]', function() {
-				if ($('input[name="attendance_checkbox"]').length == $('input[name="attendance_checkbox"]:checked').length) {
+			$(document).on('change', 'input[name="category_checkbox"]', function() {
+				if ($('input[name="category_checkbox"]').length == $('input[name="category_checkbox"]:checked').length) {
 					$('input[name="main_checkbox"]').prop('checked', true);
 				} else {
 					$('input[name="main_checkbox"]').prop('checked', false);
@@ -617,24 +498,24 @@
 			});
 
 			function toggleDeleteAllBtn() {
-				if ($('input[name="attendance_checkbox"]:checked').length > 0) {
-					$('#delete-all-btn').text('Delete ('+ $('input[name="attendance_checkbox"]:checked').length +')').removeClass('d-none');
+				if ($('input[name="category_checkbox"]:checked').length > 0) {
+					$('#delete-all-btn').text('Delete ('+ $('input[name="category_checkbox"]:checked').length +')').removeClass('d-none');
 				} else {
 					$('#delete-all-btn').addClass('d-none');
 				}
 			}
 
 			$('#delete-all-btn').click(function () {
-				let checkedAttendance = [];
-				$('input[name="attendance_checkbox"]:checked').each(function () {
-					checkedAttendance.push($(this).data('id'));
+				let checkedCategory = [];
+				$('input[name="category_checkbox"]:checked').each(function () {
+					checkedCategory.push($(this).data('id'));
 				});
 				
-				const url = "{{ route('delete-selected-attendance') }}";
-				if (checkedAttendance.length > 0) {
+				const url = "{{ route('delete-selected-category') }}";
+				if (checkedCategory.length > 0) {
 					Swal.fire({
 						title: 'Are you sure?',
-						html: `You want to delete <b>(${checkedAttendance.length})</b> attendance`,
+						html: `You want to delete <b>(${checkedCategory.length})</b> category`,
 						icon: 'info',
 						showCancelButton: true,
 						confirmButtonColor: '#3085d6',
@@ -643,7 +524,7 @@
 						allowOutsideClick: false,
 					}).then((result) => {
 						if (result.value) {
-							$.post(url, {id:checkedAttendance}, function (data) {
+							$.post(url, {id:checkedCategory}, function (data) {
 								if (data.code == 1) {
 									Swal.fire(
 										'Deleted!',
