@@ -88,7 +88,7 @@
 											<input type="text" name="name[]" required class="form-control" placeholder="Name">
 										</td>
 										<td>
-											<input type="file" accept="image/*" name="photo[]" class="form-control">
+											<input type="file" accept="image/*" name="photo[]" required class="form-control">
 										</td>
 										<td>
 											<button type="button" name="add" id="add" class="btn btn-success">+</button>
@@ -279,7 +279,7 @@
 							dropdownParent: $("#modal-post")
 						});
 					});
-					$("#dynamic-table").append(`<tr class="text-center"><td><select class="form-control select2 store_id" required name="store_id[]" style="width: 100%;"><option value="" selected disabled>Select Store</option>@foreach($stores as $item)<option {{ old('store_id') == $item->id ? "selected" : "" }} value="{{ $item->id }}">{{ $item->store_code }} | {{ $item->name }}</option>@endforeach</select></td><td><input type="text" name="name[]" required class="form-control" placeholder="Name"></td><td><input type="file" accept="image/*" multiple="multiple" name="photo[]" class="form-control"></td><td><button type="button" class="btn btn-danger remove-tr">-</button></td></tr>`);
+					$("#dynamic-table").append(`<tr class="text-center"><td><select class="form-control select2 store_id" required name="store_id[]" style="width: 100%;"><option value="" selected disabled>Select Store</option>@foreach($stores as $item)<option {{ old('store_id') == $item->id ? "selected" : "" }} value="{{ $item->id }}">{{ $item->store_code }} | {{ $item->name }}</option>@endforeach</select></td><td><input type="text" name="name[]" required class="form-control" placeholder="Name"></td><td><input type="file" accept="image/*" name="photo[]" required class="form-control"></td><td><button type="button" class="btn btn-danger remove-tr">-</button></td></tr>`);
 				});
 			
 				$(document).on('click', '.remove-tr', function(){  

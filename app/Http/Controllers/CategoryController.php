@@ -30,7 +30,7 @@ class CategoryController extends Controller
                                 })
                                 ->addColumn('storeName', function ($data) {
                                     if ($data->store !== NULL) {
-                                        return $data->store->name;
+                                        return $data->store->store_code.' | '.$data->store->name;
                                     }
                                 })
                                 ->addColumn('photo', function ($data) {
@@ -75,8 +75,9 @@ class CategoryController extends Controller
         $validator = Validator::make( $request->all(),[
             'store_id.*' => 'required|exists:stores,id|not_in:0',
             'name.*' => 'required|max:255',
-            'photo.*' => 'nullable|mimes:png,jpg,jpeg,svg|max:10000',
+            'photo.*' => 'required|mimes:png,jpg,jpeg,svg|max:1000',
         ]);
+        // return $request->file('photo');
         if ($validator->fails()) {
             return response()->json([
                     'code' => 0,
@@ -84,20 +85,19 @@ class CategoryController extends Controller
                     'messages' => $validator->errors(),
                 ]);    
         } else {
-            // if ($request->hasfile('photo')) {
+            if ($request->hasfile('photo')) {
                 $slug = str_replace(' ', '-', array_map('strtolower', $request->name));
-                foreach ($request->name as $key => $item) {
+                foreach ($request->file('photo') as $key => $item) {
                     $data[$key]['store_id'] = $request->store_id[$key];
                     $data[$key]['name'] = $request->name[$key];
-                    $data[$key]['slug'] = $slug[$key];
-                    $photo[$key] = $request->file('photo');
-                    $namaFile = $photo[$key]->getClientOriginalName();
-                    $data[$key]['photo'] = $photo[$key]->storeAs('assets/category',$namaFile,'public');
+                    $data[$key]['slug'] = $slug[$key];;
+                    $fileName = Str::random(6).'-'.$item->getClientOriginalName();
+                    $data[$key]['photo'] = $item->storeAs('assets/category',$fileName,'public');
                     $data[$key]['status'] = "NON-ACTIVE";
                     $data[$key]['created_at'] = Carbon::now();
                     $data[$key]['updated_at'] = Carbon::now();
                 }
-            // }
+            }
             Category::insert($data);
             return response()->json([
                 'code' => 200,
@@ -141,7 +141,7 @@ class CategoryController extends Controller
     {
         $item = Category::findOrFail($id);
         $validator = Validator::make( $request->all(),[
-            'store_id.*' => 'required|exists:stores,id|not_in:0',
+            'store_id' => 'required|exists:stores,id|not_in:0',
             'name' => 'required|max:255',
             'photo' => 'nullable|mimes:png,jpg,jpeg,svg|max:1000',
             'status' => 'required|in:ACTIVE,NON-ACTIVE',
@@ -165,7 +165,7 @@ class CategoryController extends Controller
                 // jika photo di rubah, maka unlink photo yang lama
                 File::delete('storage/'. $item->getRawOriginal('photo'));
                 $date = Carbon::now();
-                $fileName = $date.'-'.$photo->getClientOriginalName();
+                $fileName = Str::random(6).'-'.$photo->getClientOriginalName();
                 $data['photo'] = $photo->storeAs('assets/category',$fileName,'public');
                 $item->update($data);
             }
