@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{HomeController, UserController, StoreController, CategoryController};
+use App\Http\Controllers\{HomeController, UserController, StoreController, CategoryController, ProductController};
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +18,8 @@ Route::get('/', function () {
     return view('auth.login');
 });
 
-Route::middleware(['auth', 'verified'])->group(function()
+Route::middleware(['auth', 'verified', 'active', 'admin', 'revalidate'])
+	->group(function()
 {
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
 
@@ -36,6 +37,11 @@ Route::middleware(['auth', 'verified'])->group(function()
     Route::resource('category', CategoryController::class);
     Route::controller(CategoryController::class)->group(function () {
 		Route::post('delete-selected-category', 'deleteSelectedCategory')->name('delete-selected-category');
+	});
+    // route for product
+    Route::resource('product', ProductController::class);
+    Route::controller(ProductController::class)->group(function () {
+		Route::post('delete-selected-product', 'deleteSelectedProduct')->name('delete-selected-product');
 	});
 });
 

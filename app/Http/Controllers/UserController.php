@@ -38,9 +38,7 @@ class UserController extends Controller
                                     return $data->roles;
                                 })
                                 ->addColumn('store', function($data){
-                                    if ($data->store == NULL) {
-                                        return 'Not Found';
-                                    } else {
+                                    if ($data->store !== NULL) {
                                         return Str::upper($data->store->name);
                                     }
                                 })
@@ -78,7 +76,6 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        // return $request->all();
         $id = $request->id;
         $type = $request->type;
         $password = $request->password;
