@@ -15,9 +15,9 @@
 		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 		
 		{{-- @stack('chart-js') --}}
-		{{-- @stack('daterangepicker') --}}
 		<!-- daterangepicker -->
 		<script src="{{ url('backend/plugins/moment/moment.min.js') }}"></script>
+		@stack('script-daterange')
 		<!-- Tempusdominus Bootstrap 4 -->
 		<script src="{{ url('backend/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}"></script>
 		<!-- overlayScrollbars -->

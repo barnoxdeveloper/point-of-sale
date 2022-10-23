@@ -13,5 +13,7 @@
         <!-- Theme style -->
         <link rel="stylesheet" href="{{ url('backend/dist/css/adminlte.min.css') }}">
         <link rel="stylesheet" href="{{ url('backend/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
+        <!-- Daterange picker -->
+        @stack('style-daterange')
         {{-- <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"> --}}
         <link rel="icon" type="image/png" href="{{ url('backend/images/logo.png') }}"/>

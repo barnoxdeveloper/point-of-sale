@@ -147,7 +147,7 @@
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label for="photo">Photo <span id="photo-preview"></span></label>
+									<label for="photo">Photo(1mb) <span id="photo-preview"></span></label>
 									<input type="file" accept="image/*" name="photo" id="photo" class="form-control">
 									<p class="text-danger error-text photo_error"></p>
 								</div>

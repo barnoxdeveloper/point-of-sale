@@ -18,16 +18,14 @@
                 </div>
             </div>
 		</div>
-		
+
 		<section class="content">
 			<div class="container-fluid p-3">
 				<div class="card" data-aos="fade-up">
 					<div class="card-header">
 						<div class="row">
 							<div class="col-6">
-								<a href="javascript:void(0)" class="btn btn-sm btn-success" id="btn-create">
-									+ Create Data
-								</a>
+								<a href="javascript:void(0)" class="btn btn-sm btn-success" id="btn-create">+ Create Data</a>
 								<button class="btn btn-sm btn-danger d-none deleteAllBtn" id="delete-all-btn">Delete All</button>
 							</div>
 						</div>
@@ -39,9 +37,11 @@
 									<tr class="text-center">
 										<th width="5%"><input type="checkbox" name="main_checkbox"><label></label></th>
 										<th>#</th>
-										<th>Code</th>
 										<th>Name</th>
-										<th>Location</th>
+										<th>Product</th>
+										<th>Price</th>
+										<th>Stock</th>
+										<th>Photo</th>
 										<th>Status</th>
 										<th>Actions</th>
 									</tr>
@@ -69,7 +69,7 @@
 						<div class="row">
 							<div class="col-md-6">
 								<input type="hidden" readonly name="id" id="id">
-								<input type="hidden" readonly name="type" id="type">
+								<input type="hidden" readonly name="metode" id="metode">
 								<div class="form-group">
 									<label for="name">Name*</label>
 									<input type="text" autofocus name="name" id="name" required class="form-control" maxlength="255" placeholder="Name" value="{{ old('name') }}">
@@ -78,16 +78,57 @@
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label for="store-code">Store Code*</label>
-									<input type="text" name="store_code" id="store-code" required class="form-control" maxlength="50" placeholder="Store Code" value="{{ old('store_code') }}">
-									<p class="text-danger error-text store_code_error"></p>
+									<label for="category-id">Category*</label>
+									<select class="form-control select2" name="category_id" id="category-id" required style="width: 100%;">
+										<option value="" selected disabled>Select Category</option>
+										@foreach($categories as $item)
+										<option {{ old('category_id') == $item->id ? "selected" : "" }} value="{{ $item->id }}">{{ $item->name }}</option>
+										@endforeach
+									</select>
+									<p class="text-danger error-text category_id_error"></p>
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label for="location">Location*</label>
-									<input type="text" name="location" id="location" required class="form-control" maxlength="255" placeholder="Location" value="{{ old('location') }}">
-									<p class="text-danger error-text location_error"></p>
+									<label for="old-price">Old Price*</label>
+									<input type="number" name="old_price" id="old-price" required class="form-control" placeholder="Old Price" value="{{ old('old_price') }}">
+									<p class="text-danger error-text old_price_error"></p>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label for="new-price">New Price*</label>
+									<input type="number" name="new_price" id="new-price" required class="form-control" placeholder="New Price" value="{{ old('new_price') }}">
+									<p class="text-danger error-text new_price_error"></p>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label for="limit-stock">Limit Stock*</label>
+									<input type="number" name="limit_stock" id="limit-stock" required class="form-control" placeholder="Limit Stock" value="{{ old('limit_stock') }}">
+									<p class="text-danger error-text limit_stock_error"></p>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label for="stock">Stock*</label>
+									<input type="number" name="stock" id="stock" required class="form-control" placeholder="Stock" value="{{ old('stock') }}">
+									<p class="text-danger error-text stock_error"></p>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label for="type">Type*</label>
+									<select class="form-control" name="type" id="type" required style="width: 100%;">
+										<option value="" selected disabled>Select Type</option>
+										<option value="PCS" id="pcs">PCS</option>
+										<option value="PACK" id="pack">PACK</option>
+										<option value="KILOGRAM" id="kilogram">KILOGRAM</option>
+										<option value="LITER" id="liter">LITER</option>
+										<option value="ROLL" id="roll">ROLL</option>
+										<option value="METER" id="meter">METER</option>
+									</select>
+									<p class="text-danger error-text type_error"></p>
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -95,6 +136,13 @@
 									<label for="description">Description</label>
 									<input type="text" name="description" id="description" class="form-control" maxlength="255" placeholder="Description" value="{{ old('description') }}">
 									<p class="text-danger error-text description_error"></p>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label for="photo">Photo(1mb) : <span id="photo-preview"></span></label>
+									<input type="file" accept="image/*" name="photo" id="photo" class="form-control">
+									<p class="text-danger error-text photo_error"></p>
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -127,7 +175,7 @@
 			</div>
 		</div>
 	</div>
-	
+
 @endsection
 
 @push('style-table')
@@ -150,30 +198,33 @@
 					processing : true,
 					serverSide : true,
 					pageLength : 25,
+					order: [[3, 'asc']],
 					lengthMenu: [
 						[10, 25, 50, -1],
 						[10, 25, 50, 'All'],
 					],
-					columnDefs: [ {
-						"targets" : [0, 3, 6],
+					columnDefs : [ {
+						"targets" : [0, 4, 6],
 						"orderable" : false,
 						"searchable" : false,
 					} ],
 					ajax : {
-						url : "{{ route('store.index') }}",
+						url : "{{ route('product.index') }}",
 						type : 'GET',
 					},
 					columns: [
 						{ data: 'checkbox', name: 'checkbox', className: "text-center"},
 						{ data: 'DT_RowIndex', name: 'DT_RowIndex', className: "text-center" },
-						{ data: 'storeCode', name: 'storeCode', className: "text-center" },
 						{ data: 'name', name: 'name', className: "text-center" },
-						{ data: 'location', name: 'location', className: "text-center" },
+						{ data: 'category', name: 'category', className: "text-center" },
+						{ data: 'price', name: 'price', className: "text-center" },
+						{ data: 'stock', name: 'stock', className: "text-center" },
+						{ data: 'photo', name: 'photo', className: "text-center" },
 						{ data: 'status', name: 'status', className: "text-center" },
 						{ data: 'action', name: 'action', className: "text-center" },
 					],
 				}).on('draw', function () {
-					$('input[name="store_checkbox"]').each(function (){
+					$('input[name="product_checkbox"]').each(function (){
 						this.checked = false;
 					});
 					$('input[name="main_checkbox"]').prop('checked', false);
@@ -205,19 +256,20 @@
 			});
 
 			$.fn.modal.Constructor.prototype.enforceFocus = function() {};
-			const myModal = new bootstrap.Modal(document.getElementById('modal-post'));
+			const myModal = new bootstrap.Modal($('#modal-post'));
 			$('#btn-create').click(function () {
 				myModal.show();
 				$(document).ready(function() {
-					$("#store-id").select2({
+					$("#category-id").select2({
 						dropdownParent: $("#modal-post")
 					});
 				});
 				$('.modal-title').text("Create Data (* Required)");
 				$('#form-post').trigger("reset");
 				$('#id').val('');
-				$('#type').val('create');
+				$('#metode').val('create');
 				$(".modal-body").find("p").hide();
+				$('#name').focus();
 			});
 
 			if ($("#form-post").length > 0) {
@@ -235,11 +287,11 @@
 								if (result.isConfirmed) {
 									$(".modal-body").find("p").show();
 									$.ajax({
-										url: "{{ route('store.store') }}",
+										url: "{{ route('product.store') }}",
 										data: formData,
 										type: 'POST',
 										dataType: 'json',
-										cache:false,
+										cache: false,
 										contentType: false,
 										processData: false,
 									beforeSend:function(){
@@ -255,9 +307,9 @@
 											$('#modal-post').modal('hide');
 											$('#table-data').DataTable().ajax.reload();
 											Swal.fire(
-												'Saved!',
-												'Your Data has been Saved.',
-												'success'
+												data.notif,
+												data.messages,
+												data.icon,
 											);
 										}
 									},
@@ -277,21 +329,33 @@
 			$(document).on('click', '.editPost', function () {
 				let dataId = $(this).data('id');
 				$(".modal-body").find("p").hide();
-				$.get('store/' + dataId + '/edit', function (data) {
+				$('#metode').val('edit');
+				$('.modal-title').text("Edit Data (* Required)");
+				$.get('product/' + dataId + '/edit', function (data) {
 					$('#modal-post').modal('show');
 					$(document).ready(function() {
-						$("#store-id").select2({
+						$("#category-id").select2({
 							dropdownParent: $("#modal-post")
 						});
 					});
-					$('.modal-title').text("Edit Data (* Required)");
 					// set value masing-masing id berdasarkan data yg diperoleh dari ajax get request diatas               
-					$('#type').val('edit');
 					$('#id').val(data.id);
 					$('#name').val(data.name);
-					$('#store-code').val(data.store_code);
-					$('#location').val(data.location);
+					$('#category-id').val(data.category_id);
+					$('#old-price').val(data.old_price);
+					$('#new-price').val(data.new_price);
+					$('#limit-stock').val(data.limit_stock);
+					$('#stock').val(data.stock);
+					$('#type').val(data.type);
 					$('#description').val(data.description);
+					if (data.photo == window.location.protocol+"//"+window.location.hostname+":"+window.location.port+"/storage") {
+						$('#photo-preview').html('Photo Not Found');
+					} else {
+						$('#photo-preview').html(`<a href="${data.photo}" title="${data.photo}" target="_blank"><img src="${data.photo}" alt="${data.photo}" style="width: 100px; height: 100px;"></a>`);
+					}
+
+					console.info("ini photo :" + data.photo);
+					console.info("ini adalah : "+window.location.protocol+"//"+window.location.hostname+":"+window.location.port+"/storage");
 					// status
 					if (data.status == "ACTIVE") {
 						$('#active').prop('checked', true);
@@ -315,12 +379,12 @@
 					}).then((result) => {
 						if (result.isConfirmed) {
 							$.ajax({
-								url: "store/" + dataId,
+								url: "product/" + dataId,
 								type: 'DELETE',
 							success: function (data) {
 								$('#delete-modal').modal('hide');
 								Swal.fire(
-									'Saved!',
+									'Deleted!',
 									'Your Data has been Deleted.',
 									'success'
 								);
@@ -336,19 +400,19 @@
 
 			$(document).on('click', 'input[name="main_checkbox"]', function() {
 				if (this.checked) {
-					$('input[name="store_checkbox"]').each(function () {
+					$('input[name="product_checkbox"]').each(function () {
 						this.checked = true;
 					});
 				} else {
-					$('input[name="store_checkbox"]').each(function () {
+					$('input[name="product_checkbox"]').each(function () {
 						this.checked = false;
 					});	
 				}
 				toggleDeleteAllBtn();
 			});
 
-			$(document).on('change', 'input[name="store_checkbox"]', function() {
-				if ($('input[name="store_checkbox"]').length == $('input[name="store_checkbox"]:checked').length) {
+			$(document).on('change', 'input[name="product_checkbox"]', function() {
+				if ($('input[name="product_checkbox"]').length == $('input[name="product_checkbox"]:checked').length) {
 					$('input[name="main_checkbox"]').prop('checked', true);
 				} else {
 					$('input[name="main_checkbox"]').prop('checked', false);
@@ -357,8 +421,8 @@
 			});
 
 			function toggleDeleteAllBtn() {
-				if ($('input[name="store_checkbox"]:checked').length > 0) {
-					$('#delete-all-btn').text('Delete ('+ $('input[name="store_checkbox"]:checked').length +')').removeClass('d-none');
+				if ($('input[name="product_checkbox"]:checked').length > 0) {
+					$('#delete-all-btn').text('Delete ('+ $('input[name="product_checkbox"]:checked').length +')').removeClass('d-none');
 				} else {
 					$('#delete-all-btn').addClass('d-none');
 				}
@@ -366,16 +430,16 @@
 			// method delete end
 
 			$('#delete-all-btn').click(function () {
-				let checkedStore = [];
-				$('input[name="store_checkbox"]:checked').each(function () {
-					checkedStore.push($(this).data('id'));
+				let checkedProduct = [];
+				$('input[name="product_checkbox"]:checked').each(function () {
+					checkedProduct.push($(this).data('id'));
 				});
 				
-				const url = "{{ route('delete-selected-store') }}";
-				if (checkedStore.length > 0) {
+				const url = "{{ route('delete-selected-product') }}";
+				if (checkedProduct.length > 0) {
 					Swal.fire({
 						title: 'Are you sure?',
-						html: `You want to delete <b>(${checkedStore.length})</b> store`,
+						html: `You want to delete <b>(${checkedProduct.length})</b> product`,
 						icon: 'info',
 						showCancelButton: true,
 						confirmButtonColor: '#3085d6',
@@ -384,7 +448,7 @@
 						allowOutsideClick: false,
 					}).then((result) => {
 						if (result.value) {
-							$.post(url, {id:checkedStore}, function (data) {
+							$.post(url, {id:checkedProduct}, function (data) {
 								if (data.code == 1) {
 									Swal.fire(
 										'Saved!',

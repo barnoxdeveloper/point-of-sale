@@ -9,10 +9,10 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable =['name', 'slug', 'category_id', 'store_id', 'old_price', 'new_price', 'limit_stock', 'stock', 'description', 'photo', 'status'];
+    protected $fillable =['product_code', 'name', 'slug', 'category_id', 'store_id', 'old_price', 'new_price', 'limit_stock', 'stock', 'type', 'description', 'photo', 'status'];
     
     // inisalisasi nama tabel
-    protected $table = 'categories';
+    protected $table = 'products';
     
     // mengisi timestaps (created _at dan update_at) di data base
     public $timestamps = true;

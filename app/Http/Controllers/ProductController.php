@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
+use App\Models\{Product, Category};
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\{DB, Validator, File};
 
 class ProductController extends Controller
 {
@@ -14,8 +16,8 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $title = "Data Product";
-        $items = Product::with('store', 'category')->orderBy('roles', 'ASC')->get();
+        $title = "Data Products";
+        $items = Product::with('store', 'category')->get();
         $categories = DB::table('categories')->orderBy('name', 'ASC')->get();
         if($request->ajax()){
             return datatables()->of($items)
@@ -31,10 +33,15 @@ class ProductController extends Controller
                                     }
                                 })
                                 ->addColumn('price', function($data) {
-                                    return '<del>'.$data->old_price.'</del> | '.$data->new_price.'';
+                                    return '<del>'.number_format($data->old_price,0,",",".").'</del> | '.number_format($data->new_price,0,",",".").'';
                                 })
                                 ->addColumn('stock', function($data) {
-                                    return '<span class="text-danger">'.$data->limit_stock.'</span> | <span class="text-danger">'.$data->stock.'</span>';
+                                    return '<span class="text-danger">'.$data->limit_stock.'</span> | <span class="text-success">'.$data->stock.'</span>';
+                                })
+                                ->addColumn('photo', function ($data) {
+                                    if ($data->getRawOriginal('photo') !== NULL) {
+                                        return '<a href="'.$data->photo.'" title="'.$data->photo.'" target="_blank><img src="'.$data->photo.'" alt="'.$data->photo.'" style="width: 100px; height: 100px;"><img src="'.$data->photo.'" alt="'.$data->photo.'" style="width: 100px; height: 100px;"></a>';    
+                                    }
                                 })
                                 ->addColumn('status', function($data) {
                                     return $data->status;
@@ -45,7 +52,7 @@ class ProductController extends Controller
                                     $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
-                                ->rawColumns(['checkbox', 'name', 'category', 'price', 'stock', 'status', 'action'])
+                                ->rawColumns(['checkbox', 'name', 'category', 'price', 'stock', 'photo', 'status', 'action'])
                                 ->addIndexColumn()
                                 ->make(true);
         }
@@ -71,15 +78,18 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $id = $request->id;
+        $type = $request->metode;
+        $productCheck = Product::find($id);
         $validator = Validator::make( $request->all(),[
             'name' => 'required|max:50',
             'category_id' => 'required|exists:categories,id',
-            'old_price' => 'required|digits:11',
-            'new_price' => 'required|digits:11',
-            'limit_stock' => 'required|digits:11',
-            'stock' => 'required|digits:11',
-            'description' => 'required|max:255',
-            'photo' => 'nullable|max:255',
+            'old_price' => 'required|digits_between:0,11',
+            'new_price' => 'required|digits_between:0,11',
+            'limit_stock' => 'required|digits_between:0,11',
+            'stock' => 'required|digits_between:0,11',
+            'type' => 'required|in:PCS,PACK,KILOGRAM,LITER,ROLL,METER',
+            'description' => 'nullable|max:255',
+            'photo' => 'nullable|max:1000',
             'status' => 'required|in:ACTIVE,NON-ACTIVE',
         ]);
 
@@ -91,46 +101,45 @@ class ProductController extends Controller
             ]);
         } else {
             $file = $request->file('photo');
-            $nama_file = $file->getClientOriginalName();
-            $check = File::exists('storage/assets/category/'.$nama_file);
             if ($type == "create" && $request->photo !== NULL) { // create with photo
-                if ($check) {
-                    $photo = NULL;
-                    $message = "Photo is Already Exists, Please Change Photo!";
-                } else {
-                    $photo = $file->storeAs('assets/category',$nama_file,'public');
-                    $message = "Data Create Successfully!";
-                }
-            } else if ($type == 'edit' && $request->photo !== NULL) { // edit with photo
-                if ($check) {
-                    $photo = $categoryProductCheck->getRawOriginal('photo');
-                    $message = "Photo is Already Exists, Please Change Photo!";
-                } else {
-                    File::delete('storage/'. $categoryProductCheck->getRawOriginal('photo'));
-                    $photo = $file->storeAs('assets/category',$nama_file,'public');
-                    $message = "Data Updated With Photo Successfully!";
-                }
+                $fileName = Str::random(6).'-'.$file->getClientOriginalName();
+                $photo = $file->storeAs('assets/product',$fileName,'public');
+                $messages = "Data Saved Successfully!";
+            } else if ($type == "edit" && $request->photo !== NULL) { // create /edit with photo
+                File::delete('storage/'. $productCheck->getRawOriginal('photo'));
+                $fileName = Str::random(6).'-'.$file->getClientOriginalName();
+                $photo = $file->storeAs('assets/product',$fileName,'public');
+                $messages = "Data Saved Successfully!";
+            } else if ($type == "create" && $request->photo == NULL) { // edit without photo
+                $photo = NULL;
+                $messages = "Data Saved Without Photo Successfully!";
             } else if ($type == "edit" && $request->photo == NULL) { // edit without photo
-                $photo = $categoryProductCheck->getRawOriginal('photo');
-                $message = "Data Updated Without Photo Successfully!";
+                $photo = $productCheck->getRawOriginal('photo');
+                $messages = "Data Updated Without Photo Successfully!";
             }
-            
+
+            $category = Category::where('id', $request->category_id)->first();
             Product::updateOrCreate(['id' => $id],
                     [
+                        'product_code' => 'PRD-'.Str::random(6),
                         'name' => $request->name,
+                        'slug' => Str::slug($request->name),
                         'category_id' => $request->category_id,
-                        'store_id' => $request->category()->store_id,
+                        'store_id' => $category->store_id,
                         'old_price' => $request->old_price,
                         'new_price' => $request->new_price,
                         'limit_stock' => $request->limit_stock,
                         'stock' => $request->stock,
+                        'type' => $request->type,
                         'description' => $request->description,
+                        'photo' => $photo,
                         'status' => $request->status,
                     ]); 
             return response()->json([
                 'code' => 200,
-                'notif' => "Saved!",
-                'messages' => "Your Data has been Saved!",
+                'icon' => "success",
+                'notif' => "Success!",
+                'messages' => $messages,
             ]);
         }
     }
@@ -179,13 +188,19 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $item = Product::find($id);
+        File::delete('storage/'. $item->getRawOriginal('photo'));
         $item->delete();
-        return response()->json($item);
+        return response()->json(['code' => 1]);
     }
 
     public function deleteSelectedProduct(Request $request)
     {
         $id = $request->id;
-        Product::whereIn('id', $id)->delete();
+        $items = Product::whereIn('id', $id)->get();
+        foreach ($items as $key => $item) {
+            File::delete('storage/'. $item->getRawOriginal('photo'));
+            Product::whereIn('id', $id)->delete();
+        }
         return response()->json(['code' => 1]);
     }
+}
