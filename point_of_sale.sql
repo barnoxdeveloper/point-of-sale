@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Oct 23, 2022 at 05:23 PM
+-- Generation Time: Oct 24, 2022 at 06:38 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.1.6
 
@@ -102,9 +102,20 @@ CREATE TABLE `orders` (
   `order_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `total` int(11) NOT NULL,
   `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `date` date NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`id`, `user_id`, `order_id`, `total`, `description`, `date`, `created_at`, `updated_at`) VALUES
+(1, 1, 'PRD-ABCDEF', 100000, NULL, '2022-10-23', '2022-10-23 14:03:14', '2022-10-23 14:03:14'),
+(2, 1, 'PRD-123456', 200000, NULL, '2022-10-24', '2022-10-24 14:03:14', '2022-10-24 14:03:14'),
+(3, 1, 'PRD-111222', 300000, NULL, '2022-10-25', '2022-10-25 14:05:49', '2022-10-25 14:05:49'),
+(4, 1, 'PRD-222333', 50000, NULL, '2022-10-26', '2022-10-26 14:05:49', '2022-10-26 14:05:49');
 
 -- --------------------------------------------------------
 
@@ -364,7 +375,7 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `order_details`

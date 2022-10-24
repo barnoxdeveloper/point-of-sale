@@ -9,7 +9,7 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $fillable =['user_id', 'order_id', 'total', 'description'];
+    protected $fillable =['user_id', 'order_id', 'total', 'description', 'date'];
     
     // inisalisasi nama tabel
     protected $table = 'orders';

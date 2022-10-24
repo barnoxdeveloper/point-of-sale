@@ -31,17 +31,35 @@
 								<button class="btn btn-sm btn-danger d-none deleteAllBtn" id="delete-all-btn">Delete All</button>
 							</div>
 							<div class="col-md-6">
-								  <!-- Date range -->
-								<div class="form-group">
-									<div class="input-group">
-										<div class="input-group-prepend">
-											<span class="input-group-text">
-												<i class="far fa-calendar-alt"></i>
-											</span>
+								<!-- Date range -->
+								{{-- <form action="" id="daterange-form"> --}}
+									<div class="row justify-content-end">
+										<div class="col-8">
+											<div class="form-group">
+												<div class="input-group">
+													<div class="input-group-prepend">
+														<span class="input-group-text">
+															<i class="far fa-calendar-alt"></i>
+														</span>
+													</div>
+													<input type="text" class="form-control float-right" required name="reservation" id="reservation">
+													<input type="hidden" name="start_date" id="start-date" readonly>
+													<input type="hidden" name="end_date" id="end-date" readonly>
+												</div>
+											</div>
 										</div>
-										<input type="text" class="form-control float-right" id="reservation">
+										<div class="col-4">
+											<div class="form-group">
+												<button type="button" name="filter" id="filter" class="btn btn-primary" title="Get Data">
+													<i class="far fa-paper-plane"></i>
+												</button>
+												<button type="button" name="refresh" id="refresh" class="btn btn-warning" title="Reset">
+													<i class="fas fa-sync"></i>
+												</button>
+											</div>
+										</div>
 									</div>
-								</div>
+								{{-- </form> --}}
 							</div>
 						</div>
 					</div>
@@ -52,6 +70,7 @@
 									<tr class="text-center">
 										<th width="5%"><input type="checkbox" name="main_checkbox"><label></label></th>
 										<th>#</th>
+										<th>Date</th>
 										<th>ID</th>
 										<th>User</th>
 										<th>Descp</th>
@@ -62,8 +81,8 @@
                                 <tbody></tbody>
                                 <tfoot>
 									<tr>
-										<th colspan="5">Total</th>
-										<th>Rp. 10.000</th>
+										<th colspan="6">Total</th>
+										<th id="total-all"></th>
 										<th>-</th>
 									</tr>
 								</tfoot>
@@ -90,58 +109,100 @@
 
 		<script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 		<script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.12.1/api/sum().js"></script>
 		<script type="text/javascript">
 			$(document).ready(function (){
-				$('#table-data').DataTable({
-					processing : true,
-					serverSide : true,
-					pageLength : 25,
-					// fixedHeader: {
-					// 	header: true,
-					// 	footer: true
-					// },
-					lengthMenu: [
-						[10, 25, 50, -1],
-						[10, 25, 50, 'All'],
-					],
-					columnDefs: [ {
-						"targets" : [0, 4],
-						"orderable" : false,
-						"searchable" : false,
-					} ],
-					ajax : {
-						url : "{{ route('order.index') }}",
-						type : 'GET',
-					},
-					columns: [
-						{ data: 'checkbox', name: 'checkbox', className: "text-center"},
-						{ data: 'DT_RowIndex', name: 'DT_RowIndex', className: "text-center" },
-						{ data: 'orderId', name: 'orderId', className: "text-center" },
-						{ data: 'user', name: 'user', className: "text-center" },
-						{ data: 'total', name: 'total', className: "text-center" },
-						{ data: 'description', name: 'description', className: "text-center" },
-						{ data: 'action', name: 'action', className: "text-center" },
-					],
-				}).on('draw', function () {
-					$('input[name="order_checkbox"]').each(function (){
-						this.checked = false;
+				$.ajaxSetup({
+					headers: {
+						'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+					}
+				});
+				// load_data();
+				function load_data(startDate = '', endDate = '') {
+					$('#table-data').DataTable({
+						processing : true,
+						serverSide : true,
+						pageLength : 25,
+						ajax : {
+							url : "{{ route('order.index') }}",
+							data : {startDate, endDate},
+							type : 'GET',
+							dataType:"json",
+						},
+						columns: [
+							{ data: 'checkbox', name: 'checkbox', className: "text-center"},
+							{ data: 'DT_RowIndex', name: 'DT_RowIndex', className: "text-center" },
+							{ data: 'date', name: 'date', className: "text-center" },
+							{ data: 'orderId', name: 'orderId', className: "text-center" },
+							{ data: 'user', name: 'user', className: "text-center" },
+							{ data: 'description', name: 'description', className: "text-center" },
+							{ data: 'total', name: 'total', className: "text-center", "render": $.fn.dataTable.render.number( '.', ',', 0, 'Rp ' ) },
+							{ data: 'action', name: 'action', className: "text-center" },
+						],
+						columnDefs: [ {
+							"targets" : [0, 2, 4],
+							"orderable" : false,
+							"searchable" : false,
+						}],
+						// fixedHeader: {
+						// 	header: true,
+						// 	footer: true
+						// },
+						lengthMenu: [
+							[10, 25, 50, -1],
+							[10, 25, 50, 'All'],
+						],
+						drawCallback: function () {
+							let sum = $('#table-data').DataTable().column(6).data().sum();
+							$('#total-all').html(`Rp. ${sum.toLocaleString('id-ID')}`);
+						}	
+					}).on('draw', function () {
+						$('input[name="order_checkbox"]').each(function (){
+							this.checked = false;
+						});
+						$('input[name="main_checkbox"]').prop('checked', false);
+						$('#delete-all-btn').addClass('d-none');
 					});
-					$('input[name="main_checkbox"]').prop('checked', false);
-					$('#delete-all-btn').addClass('d-none');
+				}
+
+				$('#filter').click(function() {
+					let startDate = $('#start-date').val();
+					let endDate = $('#end-date').val();	
+					console.info(startDate + " - " + endDate );
+					if (startDate !== '' && endDate !== '') {
+						$('#table-data').DataTable().destroy();
+						load_data(startDate, endDate);
+					} else {
+						Swal.fire({
+							icon: 'error',
+							title: 'Oops...',
+							text: 'Both Date is Required!'
+						});
+					}
+				});
+	
+				$('#refresh').click(function() {
+					$('#reservation').val('');
+					$('#start-date').val('');
+					$('#end-date').val('');
+					$('#reservation').data('daterangepicker').setStartDate({});
+					$('#reservation').data('daterangepicker').setEndDate({});
+					$('#table-data').DataTable().destroy();
+					load_data();
 				});
 			});
+
 		</script>
 @endpush
 
 @push('style-select2')
 
 		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-	
 @endpush
 
 @push('style-daterange')
+
 		<link rel="stylesheet" href="{{ url('backend/plugins/daterangepicker/daterangepicker.css') }}">
-	
 @endpush
 
 @push('script-select2')
@@ -150,15 +211,14 @@
 @endpush
 
 @push('script-daterange')
-		<script	script src="{{ url('backend/plugins/daterangepicker/daterangepicker.js') }}"></script>
 
+		<script	script src="{{ url('backend/plugins/daterangepicker/daterangepicker.js') }}"></script>
 @endpush
 
 @push('modal-post')
 	<script>
 		// method create
 		$(function() {
-			$('#reservation').val('');
 			$.ajaxSetup({
 				headers: {
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
@@ -166,6 +226,7 @@
 			});
 			// Date range picker
 			$('#reservation').daterangepicker({
+				// autoUpdateInput: false,
 				locale: {
 					format: 'YYYY-MM-DD',
 					separator: " to ",
@@ -176,6 +237,16 @@
 			$('#reservation').on('cancel.daterangepicker', function(ev, picker) {
 				//do something, like clearing an input
 				$('#reservation').val('');
+			});
+
+			$('#reservation').change(function() {
+				let awal = $('#reservation').data('daterangepicker').startDate;
+				let akhir = $('#reservation').data('daterangepicker').endDate;
+				// format it 
+				let start = awal.format('YYYY-MM-DD');
+				let end = akhir.format('YYYY-MM-DD');
+				$('#start-date').val(start);
+				$('#end-date').val(end);
 			});
 
 			// method delete start

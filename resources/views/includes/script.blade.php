@@ -13,10 +13,10 @@
 		{{-- Select2 --}}
 		@stack('script-select2')
 		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-		
 		{{-- @stack('chart-js') --}}
 		<!-- daterangepicker -->
-		<script src="{{ url('backend/plugins/moment/moment.min.js') }}"></script>
+		{{-- <script src="{{ url('backend/plugins/moment/moment.min.js') }}"></script> --}}
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 		@stack('script-daterange')
 		<!-- Tempusdominus Bootstrap 4 -->
 		<script src="{{ url('backend/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}"></script>

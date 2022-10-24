@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('order_id');
             $table->integer('total');
             $table->string('description')->nullable();
+            $table->date('date');
             $table->timestamps();
         });
     }

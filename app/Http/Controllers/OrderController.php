@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\{Hash, Validator, DB};
+use Illuminate\Support\Facades\{Validator};
 
 class OrderController extends Controller
 {
@@ -17,11 +16,20 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $title = "Data Order";
-        $items = Order::with('user')->get();
         if($request->ajax()){
+            if (!empty($request->start_date)) {
+                $items = Order::with('user')
+                                ->whereBetween('date', [$request->start_date, $request->end_date])
+                                ->get();
+            } else {
+                $items = Order::with('user')->get();
+            }
             return datatables()->of($items)
                                 ->addColumn('checkbox', function($data) {
                                     return '<input type="checkbox" name="order_checkbox" data-id="'.$data['id'].'"><label></label>';
+                                })
+                                ->addColumn('date', function ($data) {
+                                    return date("d-M-Y", strtotime($data->date));
                                 })
                                 ->addColumn('orderId', function($data){
                                     return $data->order_id;
@@ -32,7 +40,8 @@ class OrderController extends Controller
                                     }
                                 })
                                 ->addColumn('total', function($data){
-                                    return 'Rp. '.number_format($data->total,0,",",".");
+                                    // return 'Rp. '.number_format($data->total,0,",",".");
+                                    return $data->total;
                                 })
                                 ->addColumn('description', function($data){
                                     return $data->description;
@@ -43,7 +52,7 @@ class OrderController extends Controller
                                     $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
-                                ->rawColumns(['checkbox', 'orderId', 'user', 'total', 'description', 'action'])
+                                ->rawColumns(['checkbox', 'date', 'orderId', 'user', 'total', 'description', 'action'])
                                 ->addIndexColumn()
                                 ->make(true);
         }
