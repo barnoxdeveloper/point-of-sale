@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OrderTemporary;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\{OrderTemporary};
 
 class OrderTemporaryController extends Controller
 {
@@ -14,7 +15,7 @@ class OrderTemporaryController extends Controller
      */
     public function index()
     {
-        //
+        // 
     }
 
     /**
@@ -24,7 +25,9 @@ class OrderTemporaryController extends Controller
      */
     public function create()
     {
-        //
+        $title = "Create Order";
+        $products = DB::table('products')->where('status', 'ACTIVE')->where('stock','!=', 0)->get(['product_code', 'name']);
+        return view('pages.admin.order_temporary.create_order_temporary', compact('title', 'products'));
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\{Validator};
 
 class OrderController extends Controller
@@ -17,13 +18,14 @@ class OrderController extends Controller
     {
         $title = "Data Order";
         if($request->ajax()){
-            if (!empty($request->start_date)) {
+            if (!empty($request->startDate)) {
                 $items = Order::with('user')
                                 ->whereBetween('date', [$request->start_date, $request->end_date])
                                 ->get();
             } else {
-                $items = Order::with('user')->get();
+                $items = Order::with('user')->orderBy('date', 'DESC')->get();
             }
+            // return response()->json($a);
             return datatables()->of($items)
                                 ->addColumn('checkbox', function($data) {
                                     return '<input type="checkbox" name="order_checkbox" data-id="'.$data['id'].'"><label></label>';
@@ -66,7 +68,9 @@ class OrderController extends Controller
      */
     public function create()
     {
-        //
+        $title = "Create Order";
+        $products = DB::table('products')->where('status', 'ACTIVE')->where('stock','!=', 0)->get(['product_code', 'name']);
+        return view('pages.admin.order_temporary.create_order_temporary', compact('title', 'products'));
     }
 
     /**

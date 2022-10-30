@@ -62,7 +62,7 @@
                         </li>
                         <div class="dropdown-divider"></div>
                         <li class="nav-item {{ (request()->is('order')) ? 'active' : '' }}">
-                            <a href="{{ route('order.index') }}" class="nav-link {{ (request()->is('order')) ? 'active' : '' }}">
+                            <a href="{{ route('order.index') }}" class="nav-link {{ (request()->is('order*')) ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-cash-register"></i>
                                 <p>Orders</p>
                             </a>

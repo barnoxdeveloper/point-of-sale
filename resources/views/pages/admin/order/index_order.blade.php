@@ -25,7 +25,7 @@
 					<div class="card-header">
 						<div class="row">
 							<div class="col-md-6">
-								<a href="{{ route('order-temporary.create') }}" class="btn btn-sm btn-success" id="btn-create">
+								<a href="{{ route('order.create') }}" class="btn btn-sm btn-success" id="btn-create">
 									+ Create Order
 								</a>
 								<button class="btn btn-sm btn-danger d-none deleteAllBtn" id="delete-all-btn">Delete All</button>
@@ -36,23 +36,24 @@
 									<div class="row justify-content-end">
 										<div class="col-8">
 											<div class="form-group">
-												<div class="input-group">
+												{{-- <div class="input-group">
 													<div class="input-group-prepend">
 														<span class="input-group-text">
 															<i class="far fa-calendar-alt"></i>
 														</span>
 													</div>
 													<input type="text" class="form-control float-right" required name="reservation" id="reservation">
-													<input type="hidden" name="start_date" id="start-date" readonly>
-													<input type="hidden" name="end_date" id="end-date" readonly>
-												</div>
+
+												</div> --}}
+												<input type="date" name="start_date" id="start-date">
+												<input type="date" name="end_date" id="end-date">
 											</div>
 										</div>
 										<div class="col-4">
 											<div class="form-group">
-												<button type="button" name="filter" id="filter" class="btn btn-primary" title="Get Data">
+												<a name="filter" id="filter" class="btn btn-primary" title="Get Data">
 													<i class="far fa-paper-plane"></i>
-												</button>
+												</a>
 												<button type="button" name="refresh" id="refresh" class="btn btn-warning" title="Reset">
 													<i class="fas fa-sync"></i>
 												</button>
@@ -117,8 +118,8 @@
 						'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
 					}
 				});
-				// load_data();
-				function load_data(startDate = '', endDate = '') {
+				loadData();
+				function loadData(startDate = '', endDate = '') {
 					$('#table-data').DataTable({
 						processing : true,
 						serverSide : true,
@@ -168,10 +169,11 @@
 				$('#filter').click(function() {
 					let startDate = $('#start-date').val();
 					let endDate = $('#end-date').val();	
-					console.info(startDate + " - " + endDate );
 					if (startDate !== '' && endDate !== '') {
+						console.info(startDate + " - " + endDate );
 						$('#table-data').DataTable().destroy();
-						load_data(startDate, endDate);
+						loadData(startDate, endDate);
+						// console.info(loadData());
 					} else {
 						Swal.fire({
 							icon: 'error',
@@ -188,7 +190,7 @@
 					$('#reservation').data('daterangepicker').setStartDate({});
 					$('#reservation').data('daterangepicker').setEndDate({});
 					$('#table-data').DataTable().destroy();
-					load_data();
+					loadData();
 				});
 			});
 
