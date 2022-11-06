@@ -55,9 +55,9 @@ Route::middleware(['auth', 'verified', 'active', 'admin', 'revalidate'])
 	});
     // route for Order Temporary
     Route::resource('order-temporary', OrderTemporaryController::class);
-    Route::controller(OrderTemporaryController::class)->group(function () {
-		Route::post('delete-selected-order-temporary', 'deleteSelectedOrderTemporary')->name('delete-selected-order-temporary');
-	});
+    // Route::controller(OrderTemporaryController::class)->group(function () {
+	// 	Route::post('delete-selected-order-temporary', 'deleteSelectedOrderTemporary')->name('delete-selected-order-temporary');
+	// });
 });
 
 require __DIR__.'/auth.php';

@@ -12,7 +12,7 @@ class OrderTemporary extends Model
     protected $fillable =['user_id', 'product_name', 'product_code', 'price', 'quantity', 'sub_total', 'description'];
     
     // inisalisasi nama tabel
-    protected $table = 'orders';
+    protected $table = 'order_temporaries';
     
     // mengisi timestaps (created _at dan update_at) di data base
     public $timestamps = true;
@@ -23,5 +23,10 @@ class OrderTemporary extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_code', 'product_code');
     }
 }

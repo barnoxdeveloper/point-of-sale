@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Oct 24, 2022 at 06:38 PM
+-- Generation Time: Nov 06, 2022 at 05:13 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.1.6
 
@@ -153,6 +153,14 @@ CREATE TABLE `order_temporaries` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `order_temporaries`
+--
+
+INSERT INTO `order_temporaries` (`id`, `user_id`, `product_name`, `product_code`, `price`, `quantity`, `sub_total`, `created_at`, `updated_at`) VALUES
+(18, 1, 'Rokok', '8998989100120', 1500, 1, 1500, '2022-11-06 16:12:58', '2022-11-06 16:12:58'),
+(19, 1, 'HEADSET', '6936678405431', 1000, 1, 1000, '2022-11-06 16:13:07', '2022-11-06 16:13:07');
+
 -- --------------------------------------------------------
 
 --
@@ -215,6 +223,14 @@ CREATE TABLE `products` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `products`
+--
+
+INSERT INTO `products` (`id`, `product_code`, `name`, `slug`, `category_id`, `store_id`, `old_price`, `new_price`, `limit_stock`, `stock`, `type`, `description`, `photo`, `status`, `created_at`, `updated_at`) VALUES
+(6, '6936678405431', 'HEADSET', 'headset', 58, 3, 2000, 1000, 10, 100, 'PCS', 'Rerum impedit magna expedita minus iure', NULL, 'ACTIVE', '2022-10-30 15:59:47', '2022-11-06 16:05:38'),
+(10, '8998989100120', 'Rokok', 'rokok', 58, 3, 2000, 1500, 10, 100, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-06 15:56:49', '2022-11-06 16:05:51');
 
 -- --------------------------------------------------------
 
@@ -387,7 +403,7 @@ ALTER TABLE `order_details`
 -- AUTO_INCREMENT for table `order_temporaries`
 --
 ALTER TABLE `order_temporaries`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
@@ -399,7 +415,7 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `stores`

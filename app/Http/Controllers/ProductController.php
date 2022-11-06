@@ -25,7 +25,7 @@ class ProductController extends Controller
                                     return '<input type="checkbox" name="product_checkbox" data-id="'.$data['id'].'"><label></label>';
                                 })
                                 ->addColumn('name', function($data) {
-                                    return $data->name;
+                                    return $data->product_code.' - '.$data->name;
                                 })
                                 ->addColumn('category', function($data){
                                     if ($data->category !== NULL) {
@@ -81,6 +81,7 @@ class ProductController extends Controller
         $type = $request->metode;
         $productCheck = Product::find($id);
         $validator = Validator::make( $request->all(),[
+            'product_code' => 'nullable|max:255',
             'name' => 'required|max:50',
             'category_id' => 'required|exists:categories,id',
             'old_price' => 'required|digits_between:0,11',
@@ -119,9 +120,14 @@ class ProductController extends Controller
             }
 
             $category = Category::where('id', $request->category_id)->first();
+            if ($request->product_code == "") {
+                $productCode = 'PRD-'.Str::random(6);
+            } else {
+                $productCode = $request->product_code;
+            }
             Product::updateOrCreate(['id' => $id],
                     [
-                        'product_code' => 'PRD-'.Str::random(6),
+                        'product_code' => $productCode,
                         'name' => $request->name,
                         'slug' => Str::slug($request->name),
                         'category_id' => $request->category_id,

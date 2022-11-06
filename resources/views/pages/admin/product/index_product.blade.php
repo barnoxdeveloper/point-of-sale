@@ -38,7 +38,7 @@
 										<th width="5%"><input type="checkbox" name="main_checkbox"><label></label></th>
 										<th>#</th>
 										<th>Name</th>
-										<th>Product</th>
+										<th>Catrgory</th>
 										<th>Price</th>
 										<th>Stock</th>
 										<th>Photo</th>
@@ -71,8 +71,15 @@
 								<input type="hidden" readonly name="id" id="id">
 								<input type="hidden" readonly name="metode" id="metode">
 								<div class="form-group">
+									<label for="product-code">Product Code</label>
+									<input type="text" autofocus name="product_code" id="product-code" class="form-control" maxlength="255" placeholder="Product Code" value="{{ old('product_code') }}">
+									<p class="text-danger error-text product_code_error"></p>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
 									<label for="name">Name*</label>
-									<input type="text" autofocus name="name" id="name" required class="form-control" maxlength="255" placeholder="Name" value="{{ old('name') }}">
+									<input type="text" name="name" id="name" required class="form-control" maxlength="255" placeholder="Name" value="{{ old('name') }}">
 									<p class="text-danger error-text name_error"></p>
 								</div>
 							</div>
@@ -340,6 +347,7 @@
 					});
 					// set value masing-masing id berdasarkan data yg diperoleh dari ajax get request diatas               
 					$('#id').val(data.id);
+					$('#product-code').val(data.product_code);
 					$('#name').val(data.name);
 					$('#category-id').val(data.category_id);
 					$('#old-price').val(data.old_price);

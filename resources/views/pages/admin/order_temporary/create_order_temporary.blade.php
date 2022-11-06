@@ -32,7 +32,7 @@
 					</div>
 					<div class="card-body">
 						<div class="text-center mb-3 mt-3">
-							<form action="#" method="POST">
+							<form action="{{ route('order-temporary.store') }}" method="POST">
 								@csrf
 								<div class="row justify-content-center">
 									<div class="col-md-4">
@@ -60,42 +60,57 @@
 							</div>
 							<div class="col-12">
 								<div class="table-responsive">
-									<table class="table table-bordered table-striped w-100">
+									<table class="table table-bordered table-striped w-100" id="table-data">
 										<thead>
 											<tr class="text-center">
 												<th>#</th>
 												<th>Product</th>
 												<th>Harga</th>
-												<th width="15%">QTY</th>
+												<th width="20%">QTY</th>
 												<th>Sub Total</th>
 												<th>Hapus</th>
 											</tr>
 										</thead>
 										<tbody>
-											<tr class="text-center">
-												<td>1</td>
-												<td>ABC</td>
-												<td>Rp. 1000</td>
-												<td>
-													<form action="">
-														@csrf
-														@method('PUT')
-														<div class="row">
-															<div class="col-8">
-																<input type="number" name="quantity" value="2" class="form-control">
+											@foreach ($items as $item)
+												<tr class="text-center">
+													<td>{{ $i++ }}</td>
+													<td>{{ $item->product_name }}</td>
+													<td>Rp. {{ number_format($item->price,0,",",".") }}</td>
+													<td>
+														<form action="{{ route('order-temporary.update', encrypt($item->id)) }}" method="POST">
+															@csrf
+															@method('PUT')
+															<div class="row">
+																<div class="col-md-6">
+																	<input type="number" name="quantity" required class="form-control" value="{{ $item->quantity }}">
+																</div>
+																<div class="col-md-2">
+																	<button type="submit" title="Update" class="btn btn-sm btn-success">
+																		<i class="fa fa-2xs fa-plus"></i>
+																	</button>
+																</div>
 															</div>
-															<div class="col-2">
-																<button type="submit" class="btn btn-success">
-																	<i class="fas fa-plus"></i>
-																</button>
-															</div>
-														</div>
-													</form>
-												</td>
-												<td>Rp. 2000</td>
-												<td><a href="#" class="btn btn-danger">X</a></td>
-											</tr>
+														</form>
+													</td>
+													<td>Rp. {{ number_format($item->sub_total,0,",",".") }}</td>
+													<td>
+														<form action="{{ route('order-temporary.destroy', encrypt($item->id)) }}" method="POST">
+															@csrf
+															@method('DELETE')
+															<button type="submit" title="Hapus" class="btn btn-sm btn-danger"><i class="far fa-2xs fa-trash-alt"></i></button>
+														</form>
+													</td>
+												</tr>
+											@endforeach
 										</tbody>
+										<tfoot>
+											<tr class="text-center">
+												<td colspan="4">Grand total</td>
+												<td>Rp. {{ number_format($grandTotal,0,",",".") }}</td>
+												<td></td>
+											</tr>
+										</tfoot>
 									</table>
 								</div>
 							</div>
@@ -108,19 +123,20 @@
 									<div class="col-md-3">
 										<div class="form-group">
 											<label for="grand-total">Grand Total</label>
-											<p class="form-control">Rp. 2.000</p>
+											<p class="form-control">Rp. {{ number_format($grandTotal,0,",",".") }}</p>
 										</div>
 									</div>
 									<div class="col-md-3">
 										<div class="form-group">
-											<label for="totalBayar">Total Bayar</label>
-											<input type="number" name="totalBayar" id="total-bayar" required class="form-control" placeholder="Total Bayar" value="5000">
+											<label for="totalBayar">Total Bayar*</label>
+											<input type="text" name="totalBayar" id="total-bayar" required class="form-control" placeholder="Total Bayar" value="0">
 										</div>
 									</div>
 									<div class="col-md-3">
 										<div class="form-group">
 											<label for="kembalian">Kembalian</label>
-											<p class="form-control">Rp. 3.000</p>
+											<input type="hidden" id="kembalian" readonly>
+											<p class="form-control" id="kembalian-preview">Rp. 0</p>
 										</div>
 									</div>
 									<div class="col-md-3">
@@ -147,14 +163,79 @@
 @endsection
 
 @push('style-table')
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css"/>
 		<style>
 			.table th, td{
 				font-size: 12px;
+				text-align: center;
 			}
 		</style>
 @endpush
 
 @push('script-table')
-		<script type="text/javascript">
+			<script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+			<script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+			<script type="text/javascript">
+				$(document).ready(function (){
+					$('#table-data').DataTable({
+						lengthChange: false,
+						searching: false,
+						paging: false,
+					});
+
+					@if (session('success'))
+						Swal.fire({
+							position: 'top-end',
+							icon: 'success',
+							title: '{{ session('success') }}',
+							timer: 1500
+						});
+					@endif
+
+					@if (session('failed'))
+						Swal.fire({
+							position: 'top-end',
+							icon: 'error',
+							title: '{{ session('failed') }}',
+							timer: 1500
+						});
+					@endif
+
+					function updateTextView(_obj) {
+						let num = getNumber(_obj.val());
+						if (num == 0) {
+							_obj.val("");
+						} else {
+							_obj.val(num.toLocaleString());
+						}
+					}
+
+					function getNumber(_str) {
+						let arr = _str.split("");
+						let out = new Array();
+						for (let cnt = 0; cnt < arr.length; cnt++) {
+							if (isNaN(arr[cnt]) == false) {
+								out.push(arr[cnt]);
+							}
+						}
+						return Number(out.join(""));
+					}
+
+					$("input[type=text]").on("keyup", function () {
+						updateTextView($(this));
+					});
+
+					// onkeyup pendapatan
+					$('#total-bayar').on("keyup", function () {
+						let totalBayar = $('#total-bayar').val();
+						let grandTotal = {{ $grandTotal }};
+						let kembalian = $('#kembalian').val();
+						let total = parseInt(totalBayar.replaceAll(",", "")) - parseInt(grandTotal);
+						if (!isNaN(total)) {
+							$('#kembalian-preview').text(total.toLocaleString());
+							$('#kembalian').val(total.toLocaleString());
+						}
+					});
+				});
 		</script>
 @endpush

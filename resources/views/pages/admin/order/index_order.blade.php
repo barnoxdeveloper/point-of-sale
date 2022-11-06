@@ -25,7 +25,7 @@
 					<div class="card-header">
 						<div class="row">
 							<div class="col-md-6">
-								<a href="{{ route('order.create') }}" class="btn btn-sm btn-success" id="btn-create">
+								<a href="{{ route('order-temporary.create') }}" class="btn btn-sm btn-success" id="btn-create">
 									+ Create Order
 								</a>
 								<button class="btn btn-sm btn-danger d-none deleteAllBtn" id="delete-all-btn">Delete All</button>
