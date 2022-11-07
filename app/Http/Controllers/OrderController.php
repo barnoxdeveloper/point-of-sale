@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Order;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\{Validator};
+use App\Models\OrderTemporary;
+use Illuminate\Support\Facades\{Auth, DB};
 
 class OrderController extends Controller
 {
@@ -68,9 +69,7 @@ class OrderController extends Controller
      */
     public function create()
     {
-        $title = "Create Order";
-        $products = DB::table('products')->where('status', 'ACTIVE')->where('stock','!=', 0)->get(['product_code', 'name']);
-        return view('pages.admin.order_temporary.create_order_temporary', compact('title', 'products'));
+        //
     }
 
     /**
@@ -81,38 +80,63 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        $id = $request->id;
-        
-        $validator = Validator::make( $request->all(),[
-            'name' => 'required|max:50',
-            'email' => 'required|email|max:50|unique:users,email',
-            'store_id' => 'nullable|exists:stores,id',
-            'password' => 'max:50',
-            'roles' => 'required|not_in:0|in:ADMINISTRATOR,MANAGER,CASHIER',
-            'status' => 'required|in:ACTIVE,NON-ACTIVE',
+        $this->validate($request, [
+            'discount' => 'nullable|digits_between:1,11',
+            'total_bayar' => 'required|digits_between:1,11'
         ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'code' => 0,
-                'notif' => "Error!",
-                'messages' => $validator->errors(),
-            ]);
-        } else {
-            Order::updateOrCreate(['id' => $id],
-                    [
-                        'name' => $request->name,
-                        'email' => $request->email,
-                        'store_id' => $request->store_id,
-                        'roles' => $request->roles,
-                        'status' => $request->status,
-                    ]); 
-            return response()->json([
-                'code' => 200,
-                'notif' => "Saved!",
-                'messages' => "Your Data has been Saved!",
-            ]);
+        $userId = Auth::user()->id;
+        // Get Grand Total
+        $grandTotal = DB::table('order_temporaries')->sum('sub_total');
+        // Get Invoice
+        $date = Carbon::now();
+        $orderId = 'INV'.'-'.$date;
+        // Get Total Bayar & Kembalian
+        $totalBayar = $request->total_bayar;
+        $kembalian = $request->kembalian;
+        // Return Back If Total Bayar Kurang
+        if ($totalBayar < $grandTotal) {
+            return redirect()->back()->with('gagal', 'Uang yang dibayarkan Kurang!!');
         }
+        $data['user_id'] = $userId;
+        $data['order_id'] = $orderId;
+        $data['total'] = $grandTotal;
+        $data['date'] = $date;
+        $data['discount'] = $request->discount;
+        // $data['descriptions'] = $request->descriptions;
+        $success = Order::create($data);
+        if ($success) {
+            $items = DB::table('order_temporaries')->where('user_id', $userId)->get();
+            // return $items;
+            foreach ($items as $item) {
+                $data = array();
+                $data['invoice'] = $success->invoice;
+                $data['product_id'] = $item->product_id;
+                $data['price'] = $item->product->price;
+                $data['quantity'] = $item->quantity;
+                $data['created_at'] = Carbon::now();
+                $data['updated_at'] = Carbon::now();
+                OrderDetail::insert($data);
+
+            // update qty product
+                $products = Product::where('product_id', [$item->product_id] )->get();
+                foreach ($products as $product) {
+                    $prd['stock'] = $product->stock - $item->quantity;
+                    $product->update($prd);
+                }
+
+            // delete data di temprorary
+                $items->each->delete();
+            }
+
+        }
+
+        // return redirect()->route('admin-order-success')->with('bayar', 'Transaksi Berhasil, Jumlah bayar : '.'Rp. '. number_format($totalBayar,0,",",".") .' dan kembalian : '.'Rp.'.number_format($kembalian,0,",","."));
+        // 
+        $id =  $success->invoice;
+        $customer_name =  $request->customer_name;
+        $data = OrderDetail::where('invoice', $orderId)->get();
+        $store = Store::where('id', 1)->first();
+        return view('admin.pages.orders.success', compact('totalBayar','kembalian', 'data', 'success','customer_name','store'));
     }
 
     /**

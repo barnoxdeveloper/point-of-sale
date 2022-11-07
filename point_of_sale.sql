@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 06, 2022 at 05:13 PM
+-- Generation Time: Nov 07, 2022 at 04:08 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.1.6
 
@@ -103,6 +103,7 @@ CREATE TABLE `orders` (
   `total` int(11) NOT NULL,
   `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `date` date NOT NULL,
+  `discount` int(11) NOT NULL DEFAULT 0,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -111,11 +112,11 @@ CREATE TABLE `orders` (
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `user_id`, `order_id`, `total`, `description`, `date`, `created_at`, `updated_at`) VALUES
-(1, 1, 'PRD-ABCDEF', 100000, NULL, '2022-10-23', '2022-10-23 14:03:14', '2022-10-23 14:03:14'),
-(2, 1, 'PRD-123456', 200000, NULL, '2022-10-24', '2022-10-24 14:03:14', '2022-10-24 14:03:14'),
-(3, 1, 'PRD-111222', 300000, NULL, '2022-10-25', '2022-10-25 14:05:49', '2022-10-25 14:05:49'),
-(4, 1, 'PRD-222333', 50000, NULL, '2022-10-26', '2022-10-26 14:05:49', '2022-10-26 14:05:49');
+INSERT INTO `orders` (`id`, `user_id`, `order_id`, `total`, `description`, `date`, `discount`, `created_at`, `updated_at`) VALUES
+(1, 1, 'PRD-ABCDEF', 100000, NULL, '2022-10-23', 0, '2022-10-23 14:03:14', '2022-10-23 14:03:14'),
+(2, 1, 'PRD-123456', 200000, NULL, '2022-10-24', 0, '2022-10-24 14:03:14', '2022-10-24 14:03:14'),
+(3, 1, 'PRD-111222', 300000, NULL, '2022-10-25', 0, '2022-10-25 14:05:49', '2022-10-25 14:05:49'),
+(4, 1, 'PRD-222333', 50000, NULL, '2022-10-26', 0, '2022-10-26 14:05:49', '2022-10-26 14:05:49');
 
 -- --------------------------------------------------------
 
@@ -158,8 +159,8 @@ CREATE TABLE `order_temporaries` (
 --
 
 INSERT INTO `order_temporaries` (`id`, `user_id`, `product_name`, `product_code`, `price`, `quantity`, `sub_total`, `created_at`, `updated_at`) VALUES
-(18, 1, 'Rokok', '8998989100120', 1500, 1, 1500, '2022-11-06 16:12:58', '2022-11-06 16:12:58'),
-(19, 1, 'HEADSET', '6936678405431', 1000, 1, 1000, '2022-11-06 16:13:07', '2022-11-06 16:13:07');
+(18, 1, 'Rokok', '8998989100120', 1500, 2, 3000, '2022-11-06 16:12:58', '2022-11-07 12:48:23'),
+(19, 1, 'HEADSET', '6936678405431', 1000, 70, 70000, '2022-11-06 16:13:07', '2022-11-07 12:48:40');
 
 -- --------------------------------------------------------
 
@@ -245,6 +246,7 @@ CREATE TABLE `stores` (
   `store_code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `location` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `discount` int(11) NOT NULL DEFAULT 0,
   `status` enum('ACTIVE','NON-ACTIVE') COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -254,10 +256,11 @@ CREATE TABLE `stores` (
 -- Dumping data for table `stores`
 --
 
-INSERT INTO `stores` (`id`, `name`, `slug`, `store_code`, `location`, `description`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'Quentin Gonzalez', 'quentin-gonzalez', 'STORE-3', 'Consequatur Consequuntur tenetur nostrum officia neque ipsum quae dolor magna labore minima deleniti', 'Et qui iusto exercitation fugiat ipsa cupiditate labore sapiente et enim et', 'NON-ACTIVE', '2022-10-18 08:29:23', '2022-10-19 06:41:11'),
-(2, 'Igor Jacobs', 'igor-jacobs', 'STORE-1', 'Molestiae sunt accusamus voluptas magnam reiciendis a aut est sit consequuntur a aut aliquip hic', 'Molestias dolores sit sit quis dolore molestias veniam fuga Ipsam voluptas temporibus non blanditiis in in inventore consequatur', 'NON-ACTIVE', '2022-10-18 08:29:28', '2022-10-19 06:32:51'),
-(3, 'Quentin Gamble', 'quentin-gamble', 'STORE-2', 'Quia maxime aperiam molestiae obcaecati consectetur nobis minim nihil obcaecati occaecat non aliquip nisi blanditiis', 'Dolores ex illo doloribus dolores deserunt', 'ACTIVE', '2022-10-18 08:29:31', '2022-10-19 06:41:04');
+INSERT INTO `stores` (`id`, `name`, `slug`, `store_code`, `location`, `description`, `discount`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'Quentin Gonzalez', 'quentin-gonzalez', 'STORE-3', 'Consequatur Consequuntur tenetur nostrum officia neque ipsum quae dolor magna labore minima deleniti', 'Et qui iusto exercitation fugiat ipsa cupiditate labore sapiente et enim et', 0, 'NON-ACTIVE', '2022-10-18 08:29:23', '2022-10-19 06:41:11'),
+(2, 'Igor Jacobs', 'igor-jacobs', 'STORE-1', 'Molestiae sunt accusamus voluptas magnam reiciendis a aut est sit consequuntur a aut aliquip hic', 'Molestias dolores sit sit quis dolore molestias veniam fuga Ipsam voluptas temporibus non blanditiis in in inventore consequatur', 0, 'NON-ACTIVE', '2022-10-18 08:29:28', '2022-10-19 06:32:51'),
+(3, 'Quentin Gamble', 'quentin-gamble', 'STORE-2', 'Quia maxime aperiam molestiae obcaecati consectetur nobis minim nihil obcaecati occaecat non aliquip nisi blanditiis', 'Dolores ex illo doloribus dolores deserunt', 1500, 'ACTIVE', '2022-10-18 08:29:31', '2022-11-07 13:57:52'),
+(4, 'Magee Figueroa', 'magee-figueroa', 'EX QUIBUSDAM POSSIMUS CORRUPTI OFFICIA MOLLITIA', 'Soluta magni in consectetur animi sunt eius quo odio necessitatibus commodi ducimus et sint tempora quia rerum aspernatur nulla', 'Dolores omnis et soluta hic occaecat beatae nulla magna ipsam hic', 1000, 'ACTIVE', '2022-11-07 13:48:44', '2022-11-07 13:48:44');
 
 -- --------------------------------------------------------
 
@@ -421,7 +424,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `stores`
 --
 ALTER TABLE `stores`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `users`

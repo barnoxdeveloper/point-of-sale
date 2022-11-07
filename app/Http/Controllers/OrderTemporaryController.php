@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Models\OrderTemporary;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\{DB, Validator};
+use Illuminate\Support\Facades\{Auth, DB};
 
 class OrderTemporaryController extends Controller
 {

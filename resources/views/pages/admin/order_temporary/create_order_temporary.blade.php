@@ -60,9 +60,9 @@
 							</div>
 							<div class="col-12">
 								<div class="table-responsive">
-									<table class="table table-bordered table-striped w-100" id="table-data">
+									<table class="table table-bordered table-striped text-center w-100" id="table-data">
 										<thead>
-											<tr class="text-center">
+											<tr>
 												<th>#</th>
 												<th>Product</th>
 												<th>Harga</th>
@@ -73,7 +73,7 @@
 										</thead>
 										<tbody>
 											@foreach ($items as $item)
-												<tr class="text-center">
+												<tr>
 													<td>{{ $i++ }}</td>
 													<td>{{ $item->product_name }}</td>
 													<td>Rp. {{ number_format($item->price,0,",",".") }}</td>
@@ -93,7 +93,7 @@
 															</div>
 														</form>
 													</td>
-													<td>Rp. {{ number_format($item->sub_total,0,",",".") }}</td>
+													<td>Rp. {{ number_format($item->sub_total,0,",",",") }}</td>
 													<td>
 														<form action="{{ route('order-temporary.destroy', encrypt($item->id)) }}" method="POST">
 															@csrf
@@ -105,9 +105,9 @@
 											@endforeach
 										</tbody>
 										<tfoot>
-											<tr class="text-center">
+											<tr>
 												<td colspan="4">Grand total</td>
-												<td>Rp. {{ number_format($grandTotal,0,",",".") }}</td>
+												<td>Rp. {{ number_format($grandTotal,0,",",",") }}</td>
 												<td></td>
 											</tr>
 										</tfoot>
@@ -116,45 +116,49 @@
 							</div>
 						</div>
 						<div class="dropdown-divider"></div>
-						<div class="row">
-							<form action="">
-								@csrf
-								<div class="row">
-									<div class="col-md-3">
-										<div class="form-group">
-											<label for="grand-total">Grand Total</label>
-											<p class="form-control">Rp. {{ number_format($grandTotal,0,",",".") }}</p>
-										</div>
-									</div>
-									<div class="col-md-3">
-										<div class="form-group">
-											<label for="totalBayar">Total Bayar*</label>
-											<input type="text" name="totalBayar" id="total-bayar" required class="form-control" placeholder="Total Bayar" value="0">
-										</div>
-									</div>
-									<div class="col-md-3">
-										<div class="form-group">
-											<label for="kembalian">Kembalian</label>
-											<input type="hidden" id="kembalian" readonly>
-											<p class="form-control" id="kembalian-preview">Rp. 0</p>
-										</div>
-									</div>
-									<div class="col-md-3">
-										<div class="form-group">
-											<label for="descriptions">Descriptions</label>
-											<input type="text" name="descriptions" class="form-control" placeholder="Descriptions">
-										</div>
+						<form action="{{ route('order.store') }}" method="POST">
+							@csrf
+							<div class="row">
+								<div class="col-md-3">
+									<div class="form-group">
+										<label for="grand-total">Grand Total</label>
+										<p class="form-control">Rp. {{ number_format($grandTotal,0,",",",") }}</p>
 									</div>
 								</div>
-								<div class="row justify-content-center">
-									<div class="col-md-3">
-										<div class="form-group">
-											<button type="submit" class="btn btn-success btn-block"><i class="fas fa-money-check"></i>&nbsp; Bayar</button>
-										</div>
+								<div class="col-md-3">
+									<div class="form-group">
+										<label for="discount">Discount</label>
+										<input type="text" name="discount" id="discount" class="form-control" maxlength="11" placeholder="Discount" value="0">
 									</div>
 								</div>
-							</form>
-						</div>
+								<div class="col-md-3">
+									<div class="form-group">
+										<label for="total-bayar">Total Bayar*</label>
+										<input type="text" name="total_bayar" id="total-bayar" required class="form-control" placeholder="Total Bayar" value="0">
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="form-group">
+										<label for="kembalian">Kembalian</label>
+										<input type="hidden" id="kembalian" readonly>
+										<p class="form-control" id="kembalian-preview">Rp. 0</p>
+									</div>
+								</div>
+								{{-- <div class="col-md-3">
+									<div class="form-group">
+										<label for="description">Descriptions</label>
+										<input type="text" name="description" class="form-control" placeholder="Descriptions">
+									</div>
+								</div> --}}
+							</div>
+							<div class="row justify-content-center">
+								<div class="col-md-3">
+									<div class="form-group">
+										<button type="submit" class="btn btn-success btn-block"><i class="fas fa-money-check"></i>&nbsp; Bayar</button>
+									</div>
+								</div>
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>
@@ -201,6 +205,22 @@
 						});
 					@endif
 
+					// sweet alert success start
+					@if(session('success-invoices'))
+						Swal.fire({
+							icon: 'success',
+							title: 'Your Data has been Saved!',
+							showCancelButton: true,
+							confirmButtonText: 'Data Orders',
+							cancelButtonText: `Stay Here`,
+						}).then((result) => {
+							if (result.isConfirmed) {
+								window.location = "{{ route('order.index') }}";
+							}
+						});
+					@endif
+					// sweet alert success end
+
 					function updateTextView(_obj) {
 						let num = getNumber(_obj.val());
 						if (num == 0) {
@@ -228,12 +248,13 @@
 					// onkeyup pendapatan
 					$('#total-bayar').on("keyup", function () {
 						let totalBayar = $('#total-bayar').val();
+						let discount = $('#discount').val();
 						let grandTotal = {{ $grandTotal }};
 						let kembalian = $('#kembalian').val();
-						let total = parseInt(totalBayar.replaceAll(",", "")) - parseInt(grandTotal);
+						let total = parseInt(totalBayar.replaceAll(",", "")) - (parseInt(grandTotal) - parseInt(discount.replaceAll(",", "")));
 						if (!isNaN(total)) {
-							$('#kembalian-preview').text(total.toLocaleString());
-							$('#kembalian').val(total.toLocaleString());
+							$('#kembalian-preview').text('Rp. '+total.toLocaleString());
+							$('#kembalian').val(total);
 						}
 					});
 				});

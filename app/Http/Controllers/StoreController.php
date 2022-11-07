@@ -28,10 +28,13 @@ class StoreController extends Controller
                                     return $data->store_code;
                                 })
                                 ->addColumn('name', function ($data) {
-                                    return Str::ucfirst($data->name);
+                                    return $data->name;
                                 })
                                 ->addColumn('location', function($data){
                                     return $data->location;
+                                })
+                                ->addColumn('discount', function($data){
+                                    return 'Rp. '.number_format($data->discount,0,",",",");
                                 })
                                 ->addColumn('status', function($data){
                                     return $data->status;
@@ -42,7 +45,7 @@ class StoreController extends Controller
                                     $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
-                                ->rawColumns(['checkbox', 'storeCode', 'name', 'location', 'status', 'action'])
+                                ->rawColumns(['checkbox', 'storeCode', 'name', 'location', 'discount', 'status', 'action'])
                                 ->addIndexColumn()
                                 ->make(true);
         }
@@ -68,16 +71,26 @@ class StoreController extends Controller
     public function store(Request $request)
     {
         $id = $request->id;
-        // $type = $request->type;
-        // $check = Store::find($id);
-
-        $validator = Validator::make( $request->all(),[
-            'name' => 'required|max:255',
-            'store_code' => 'required|max:50|unique:stores,store_code',
-            'location' => 'required|max:255',
-            'description' => 'nullable|max:255',
-            'status' => 'required|in:ACTIVE,NON-ACTIVE',
-        ]);
+        $storeCheck = Store::find($id);
+        if ($request->type == 'edit') {
+            $validator = Validator::make( $request->all(),[
+                'name' => 'required|max:255',
+                'store_code' => ['required', 'max:50', Rule::unique('stores')->ignore($storeCheck->id)],
+                'location' => 'required|max:255',
+                'discount' => 'nullable|max:11',
+                'description' => 'nullable|max:255',
+                'status' => 'required|in:ACTIVE,NON-ACTIVE',
+            ]);
+        } else if ($request->type == 'create') {
+            $validator = Validator::make( $request->all(),[
+                'name' => 'required|max:255',
+                'store_code' => 'required|max:50|unique:stores,store_code',
+                'location' => 'required|max:255',
+                'discount' => 'nullable|max:11',
+                'description' => 'nullable|max:255',
+                'status' => 'required|in:ACTIVE,NON-ACTIVE',
+            ]);
+        }
 
         if ($validator->fails()) {
             return response()->json([
@@ -92,6 +105,7 @@ class StoreController extends Controller
                 'slug' => Str::slug($request->name),
                 'store_code' => Str::upper($request->store_code),
                 'location' => $request->location,
+                'discount' => str_replace(",","", $request->discount),
                 'description' => $request->description,
                 'status' => $request->status,
             ]); 

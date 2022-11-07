@@ -9,7 +9,7 @@ class Store extends Model
 {
     use HasFactory;
 
-    protected $fillable =['name', 'slug', 'store_code', 'location', 'description', 'status'];
+    protected $fillable =['name', 'slug', 'store_code', 'location', 'description', 'discount', 'status'];
     
     //inisalisasi nama tabel
     protected $table = 'stores';

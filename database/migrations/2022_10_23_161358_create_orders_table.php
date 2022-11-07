@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('user_id');
             $table->string('order_id');
             $table->integer('total');
+            $table->integer('discount')->default(0);
             $table->string('description')->nullable();
             $table->date('date');
             $table->timestamps();

@@ -32,7 +32,7 @@ class UserController extends Controller
                                     return $data->name;
                                 })
                                 ->addColumn('email', function($data){
-                                     return '<a href="mailto:'.$data->email.'">'.$data->email.'</a>';
+                                    return '<a href="mailto:'.$data->email.'">'.$data->email.'</a>';
                                 })
                                 ->addColumn('roles', function($data){
                                     return $data->roles;

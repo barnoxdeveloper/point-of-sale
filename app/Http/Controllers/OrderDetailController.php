@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OrderDetails;
+use App\Models\OrderDetail;
 use Illuminate\Http\Request;
 
-class OrderDetailsController extends Controller
+class OrderDetailController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -41,10 +41,10 @@ class OrderDetailsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\OrderDetails  $orderDetails
+     * @param  \App\Models\OrderDetail  $orderDetail
      * @return \Illuminate\Http\Response
      */
-    public function show(OrderDetails $orderDetails)
+    public function show(OrderDetail $orderDetail)
     {
         //
     }
@@ -52,10 +52,10 @@ class OrderDetailsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\OrderDetails  $orderDetails
+     * @param  \App\Models\OrderDetail  $orderDetail
      * @return \Illuminate\Http\Response
      */
-    public function edit(OrderDetails $orderDetails)
+    public function edit(OrderDetail $orderDetail)
     {
         //
     }
@@ -64,10 +64,10 @@ class OrderDetailsController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\OrderDetails  $orderDetails
+     * @param  \App\Models\OrderDetail  $orderDetail
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, OrderDetails $orderDetails)
+    public function update(Request $request, OrderDetail $orderDetail)
     {
         //
     }
@@ -75,10 +75,10 @@ class OrderDetailsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\OrderDetails  $orderDetails
+     * @param  \App\Models\OrderDetail  $orderDetail
      * @return \Illuminate\Http\Response
      */
-    public function destroy(OrderDetails $orderDetails)
+    public function destroy(OrderDetail $orderDetail)
     {
         //
     }

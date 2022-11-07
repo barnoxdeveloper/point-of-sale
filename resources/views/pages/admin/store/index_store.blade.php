@@ -42,6 +42,7 @@
 										<th>Code</th>
 										<th>Name</th>
 										<th>Location</th>
+										<th>Discount</th>
 										<th>Status</th>
 										<th>Actions</th>
 									</tr>
@@ -88,6 +89,13 @@
 									<label for="location">Location*</label>
 									<input type="text" name="location" id="location" required class="form-control" maxlength="255" placeholder="Location" value="{{ old('location') }}">
 									<p class="text-danger error-text location_error"></p>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label for="discount">Discount</label>
+									<input type="text" name="discount" id="discount" class="form-control" maxlength="11" placeholder="Discount" value="{{ old('discount') }}">
+									<p class="text-danger error-text discount_error"></p>
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -155,7 +163,7 @@
 						[10, 25, 50, 'All'],
 					],
 					columnDefs: [ {
-						"targets" : [0, 3, 6],
+						"targets" : [0, 4, 5, 7],
 						"orderable" : false,
 						"searchable" : false,
 					} ],
@@ -169,6 +177,7 @@
 						{ data: 'storeCode', name: 'storeCode', className: "text-center" },
 						{ data: 'name', name: 'name', className: "text-center" },
 						{ data: 'location', name: 'location', className: "text-center" },
+						{ data: 'discount', name: 'discount', className: "text-center" },
 						{ data: 'status', name: 'status', className: "text-center" },
 						{ data: 'action', name: 'action', className: "text-center" },
 					],
@@ -204,15 +213,34 @@
 				}
 			});
 
+			function updateTextView(_obj) {
+				let num = getNumber(_obj.val());
+				if (num == 0) {
+					_obj.val("");
+				} else {
+					_obj.val(num.toLocaleString());
+				}
+			}
+
+			function getNumber(_str) {
+				let arr = _str.split("");
+				let out = new Array();
+				for (let cnt = 0; cnt < arr.length; cnt++) {
+					if (isNaN(arr[cnt]) == false) {
+						out.push(arr[cnt]);
+					}
+				}
+				return Number(out.join(""));
+			}
+
+			$("input[type=text]").on("keyup", function () {
+				updateTextView($(this));
+			});
+
 			$.fn.modal.Constructor.prototype.enforceFocus = function() {};
 			const myModal = new bootstrap.Modal(document.getElementById('modal-post'));
 			$('#btn-create').click(function () {
 				myModal.show();
-				$(document).ready(function() {
-					$("#store-id").select2({
-						dropdownParent: $("#modal-post")
-					});
-				});
 				$('.modal-title').text("Create Data (* Required)");
 				$('#form-post').trigger("reset");
 				$('#id').val('');
@@ -239,7 +267,7 @@
 										data: formData,
 										type: 'POST',
 										dataType: 'json',
-										cache:false,
+										cache: false,
 										contentType: false,
 										processData: false,
 									beforeSend:function(){
@@ -279,18 +307,14 @@
 				$(".modal-body").find("p").hide();
 				$.get('store/' + dataId + '/edit', function (data) {
 					$('#modal-post').modal('show');
-					$(document).ready(function() {
-						$("#store-id").select2({
-							dropdownParent: $("#modal-post")
-						});
-					});
 					$('.modal-title').text("Edit Data (* Required)");
 					// set value masing-masing id berdasarkan data yg diperoleh dari ajax get request diatas               
-					$('#type').val('edit');
 					$('#id').val(data.id);
+					$('#type').val('edit');
 					$('#name').val(data.name);
 					$('#store-code').val(data.store_code);
 					$('#location').val(data.location);
+					$('#discount').val(data.discount);
 					$('#description').val(data.description);
 					// status
 					if (data.status == "ACTIVE") {

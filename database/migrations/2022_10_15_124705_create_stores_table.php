@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('slug');
             $table->string('store_code')->unique();
             $table->string('location');
+            $table->integer('discount')->default(0);
             $table->string('description')->nullable();
             $table->enum('status', ['ACTIVE', 'NON-ACTIVE']);
             $table->timestamps();
