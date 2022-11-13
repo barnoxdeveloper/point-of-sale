@@ -116,6 +116,15 @@
 							</div>
 						</div>
 						<div class="dropdown-divider"></div>
+						@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 						<form action="{{ route('order.store') }}" method="POST">
 							@csrf
 							<div class="row">
@@ -129,18 +138,19 @@
 									<div class="form-group">
 										<label for="discount">Discount</label>
 										<input type="text" name="discount" id="discount" class="form-control" maxlength="11" placeholder="Discount" value="0">
+										@error('discount')<div class="text-danger">{{ $message }}</div>@enderror
 									</div>
 								</div>
 								<div class="col-md-3">
 									<div class="form-group">
 										<label for="total-bayar">Total Bayar*</label>
 										<input type="text" name="total_bayar" id="total-bayar" required class="form-control" placeholder="Total Bayar" value="0">
+										@error('total-bayar')<div class="text-danger">{{ $message }}</div>@enderror
 									</div>
 								</div>
 								<div class="col-md-3">
 									<div class="form-group">
 										<label for="kembalian">Kembalian</label>
-										<input type="hidden" id="kembalian" readonly>
 										<p class="form-control" id="kembalian-preview">Rp. 0</p>
 									</div>
 								</div>
@@ -245,17 +255,30 @@
 						updateTextView($(this));
 					});
 
-					// onkeyup pendapatan
 					$('#total-bayar').on("keyup", function () {
+						
+					});
+					// onkeyup pendapatan
+					$('#total-bayar, #discount').on("keyup", function () {
 						let totalBayar = $('#total-bayar').val();
-						let discount = $('#discount').val();
 						let grandTotal = {{ $grandTotal }};
-						let kembalian = $('#kembalian').val();
-						let total = parseInt(totalBayar.replaceAll(",", "")) - (parseInt(grandTotal) - parseInt(discount.replaceAll(",", "")));
-						if (!isNaN(total)) {
-							$('#kembalian-preview').text('Rp. '+total.toLocaleString());
-							$('#kembalian').val(total);
+						let discount = $('#discount').val();
+						
+						if (totalBayar == '') {
+							newTotalBayar = $('#total-bayar').val("0,0");
+							$('#kembalian-preview').text("Rp. 0");
 						}
+
+						if (discount == '') {
+							newDiscount = $('#discount').val("0,0");
+						}
+
+						let total = parseInt($('#total-bayar').val().replaceAll(",", "")) - (parseInt(grandTotal) - parseInt($('#discount').val().replaceAll(",", "")));
+						if($('#total-bayar').val() == '0,0') {
+							$('#kembalian-preview').text("Rp. 0");
+						} else if (!isNaN(total)) {
+							$('#kembalian-preview').text("Rp. "+total.toLocaleString());
+						} 
 					});
 				});
 		</script>

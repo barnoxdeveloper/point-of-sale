@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use App\Models\Order;
+use App\Models\{Product, Order, OrderDetail};
 use Illuminate\Http\Request;
-use App\Models\OrderTemporary;
 use Illuminate\Support\Facades\{Auth, DB};
 
 class OrderController extends Controller
@@ -26,7 +25,6 @@ class OrderController extends Controller
             } else {
                 $items = Order::with('user')->orderBy('date', 'DESC')->get();
             }
-            // return response()->json($a);
             return datatables()->of($items)
                                 ->addColumn('checkbox', function($data) {
                                     return '<input type="checkbox" name="order_checkbox" data-id="'.$data['id'].'"><label></label>';
@@ -81,27 +79,33 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'discount' => 'nullable|digits_between:1,11',
-            'total_bayar' => 'required|digits_between:1,11'
+            'discount' => 'nullable|max:11',
+            'total_bayar' => 'required|max:11'
         ]);
         $userId = Auth::user()->id;
         // Get Grand Total
-        $grandTotal = DB::table('order_temporaries')->sum('sub_total');
+        $grandTotal = DB::table('order_temporaries')->where('user_id', $userId)->sum('sub_total');
+        // Get Total Bayar & Kembalian
+        $totalBayar = str_replace(",","", $request->total_bayar);
+        $discount = str_replace(",","", $request->discount);
+        $kembalian = $totalBayar - ($grandTotal - $discount);
+        // return $totalBayar;
+        
+        // Return Back If Total Bayar Kurang
+        if ($totalBayar < ($grandTotal - $discount)) {
+            return redirect()->back()->with('failed', 'Uang yang dibayarkan Kurang!!');
+        }
+
         // Get Invoice
         $date = Carbon::now();
         $orderId = 'INV'.'-'.$date;
-        // Get Total Bayar & Kembalian
-        $totalBayar = $request->total_bayar;
-        $kembalian = $request->kembalian;
-        // Return Back If Total Bayar Kurang
-        if ($totalBayar < $grandTotal) {
-            return redirect()->back()->with('gagal', 'Uang yang dibayarkan Kurang!!');
-        }
         $data['user_id'] = $userId;
         $data['order_id'] = $orderId;
         $data['total'] = $grandTotal;
         $data['date'] = $date;
-        $data['discount'] = $request->discount;
+        $data['discount'] = $discount;
+        $data['total_bayar'] = $totalBayar;
+        $data['kembalian'] = $kembalian;
         // $data['descriptions'] = $request->descriptions;
         $success = Order::create($data);
         if ($success) {
@@ -109,34 +113,28 @@ class OrderController extends Controller
             // return $items;
             foreach ($items as $item) {
                 $data = array();
-                $data['invoice'] = $success->invoice;
-                $data['product_id'] = $item->product_id;
-                $data['price'] = $item->product->price;
-                $data['quantity'] = $item->quantity;
-                $data['created_at'] = Carbon::now();
-                $data['updated_at'] = Carbon::now();
-                OrderDetail::insert($data);
+                $orderDetail['order_id'] = $success->order_id;
+                $orderDetail['product_name'] = $item->product_name;
+                $orderDetail['product_code'] = $item->product_code;
+                $orderDetail['price'] = $item->product->price;
+                $orderDetail['quantity'] = $item->quantity;
+                $orderDetail['sub_total'] = $item->sub_total;
+                $orderDetail['created_at'] = Carbon::now();
+                $orderDetail['updated_at'] = Carbon::now();
+                OrderDetail::insert($orderDetail);
 
-            // update qty product
-                $products = Product::where('product_id', [$item->product_id] )->get();
+                // update qty product
+                // $products = Product::where('product_code', [$item->product_code])->get();
+                $products = DB::table('products')->where('product_code', [$item->product_code])->get();
                 foreach ($products as $product) {
                     $prd['stock'] = $product->stock - $item->quantity;
                     $product->update($prd);
                 }
-
-            // delete data di temprorary
+                // delete data di temprorary
                 $items->each->delete();
             }
-
         }
-
-        // return redirect()->route('admin-order-success')->with('bayar', 'Transaksi Berhasil, Jumlah bayar : '.'Rp. '. number_format($totalBayar,0,",",".") .' dan kembalian : '.'Rp.'.number_format($kembalian,0,",","."));
-        // 
-        $id =  $success->invoice;
-        $customer_name =  $request->customer_name;
-        $data = OrderDetail::where('invoice', $orderId)->get();
-        $store = Store::where('id', 1)->first();
-        return view('admin.pages.orders.success', compact('totalBayar','kembalian', 'data', 'success','customer_name','store'));
+        return redirect()->back()->with('success', 'Transaction Success!');
     }
 
     /**

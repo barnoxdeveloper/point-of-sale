@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 07, 2022 at 04:08 PM
+-- Generation Time: Nov 13, 2022 at 04:16 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.1.6
 
@@ -104,6 +104,8 @@ CREATE TABLE `orders` (
   `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `date` date NOT NULL,
   `discount` int(11) NOT NULL DEFAULT 0,
+  `total_bayar` int(11) NOT NULL,
+  `kembalian` int(11) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -112,11 +114,12 @@ CREATE TABLE `orders` (
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `user_id`, `order_id`, `total`, `description`, `date`, `discount`, `created_at`, `updated_at`) VALUES
-(1, 1, 'PRD-ABCDEF', 100000, NULL, '2022-10-23', 0, '2022-10-23 14:03:14', '2022-10-23 14:03:14'),
-(2, 1, 'PRD-123456', 200000, NULL, '2022-10-24', 0, '2022-10-24 14:03:14', '2022-10-24 14:03:14'),
-(3, 1, 'PRD-111222', 300000, NULL, '2022-10-25', 0, '2022-10-25 14:05:49', '2022-10-25 14:05:49'),
-(4, 1, 'PRD-222333', 50000, NULL, '2022-10-26', 0, '2022-10-26 14:05:49', '2022-10-26 14:05:49');
+INSERT INTO `orders` (`id`, `user_id`, `order_id`, `total`, `description`, `date`, `discount`, `total_bayar`, `kembalian`, `created_at`, `updated_at`) VALUES
+(1, 1, 'PRD-ABCDEF', 100000, NULL, '2022-10-23', 0, 0, 0, '2022-10-23 14:03:14', '2022-10-23 14:03:14'),
+(2, 1, 'PRD-123456', 200000, NULL, '2022-10-24', 0, 0, 0, '2022-10-24 14:03:14', '2022-10-24 14:03:14'),
+(3, 1, 'PRD-111222', 300000, NULL, '2022-10-25', 0, 0, 0, '2022-10-25 14:05:49', '2022-10-25 14:05:49'),
+(4, 1, 'PRD-222333', 50000, NULL, '2022-10-26', 0, 0, 0, '2022-10-26 14:05:49', '2022-10-26 14:05:49'),
+(5, 1, 'INV-2022-11-13 22:16:06', 73000, NULL, '2022-11-13', 0, 200000, 127000, '2022-11-13 15:16:06', '2022-11-13 15:16:06');
 
 -- --------------------------------------------------------
 
@@ -160,7 +163,8 @@ CREATE TABLE `order_temporaries` (
 
 INSERT INTO `order_temporaries` (`id`, `user_id`, `product_name`, `product_code`, `price`, `quantity`, `sub_total`, `created_at`, `updated_at`) VALUES
 (18, 1, 'Rokok', '8998989100120', 1500, 2, 3000, '2022-11-06 16:12:58', '2022-11-07 12:48:23'),
-(19, 1, 'HEADSET', '6936678405431', 1000, 70, 70000, '2022-11-06 16:13:07', '2022-11-07 12:48:40');
+(19, 1, 'HEADSET', '6936678405431', 1000, 70, 70000, '2022-11-06 16:13:07', '2022-11-07 12:48:40'),
+(20, 2, 'KABEL USB', '6957303861330', 2500, 1, 2500, '2022-11-13 14:40:13', '2022-11-13 14:40:13');
 
 -- --------------------------------------------------------
 
@@ -231,7 +235,8 @@ CREATE TABLE `products` (
 
 INSERT INTO `products` (`id`, `product_code`, `name`, `slug`, `category_id`, `store_id`, `old_price`, `new_price`, `limit_stock`, `stock`, `type`, `description`, `photo`, `status`, `created_at`, `updated_at`) VALUES
 (6, '6936678405431', 'HEADSET', 'headset', 58, 3, 2000, 1000, 10, 100, 'PCS', 'Rerum impedit magna expedita minus iure', NULL, 'ACTIVE', '2022-10-30 15:59:47', '2022-11-06 16:05:38'),
-(10, '8998989100120', 'Rokok', 'rokok', 58, 3, 2000, 1500, 10, 100, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-06 15:56:49', '2022-11-06 16:05:51');
+(10, '8998989100120', 'Rokok', 'rokok', 58, 3, 2000, 1500, 10, 100, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-06 15:56:49', '2022-11-06 16:05:51'),
+(12, '6957303861330', 'KABEL USB', 'kabel-usb', 59, 1, 5000, 2500, 10, 100, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-13 14:40:05', '2022-11-13 14:40:05');
 
 -- --------------------------------------------------------
 
@@ -394,7 +399,7 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `order_details`
@@ -406,7 +411,7 @@ ALTER TABLE `order_details`
 -- AUTO_INCREMENT for table `order_temporaries`
 --
 ALTER TABLE `order_temporaries`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
@@ -418,7 +423,7 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `stores`
