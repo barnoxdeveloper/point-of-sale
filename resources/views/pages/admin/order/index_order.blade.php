@@ -36,24 +36,23 @@
 									<div class="row justify-content-end">
 										<div class="col-8">
 											<div class="form-group">
-												{{-- <div class="input-group">
+												<div class="input-group">
 													<div class="input-group-prepend">
 														<span class="input-group-text">
 															<i class="far fa-calendar-alt"></i>
 														</span>
 													</div>
 													<input type="text" class="form-control float-right" required name="reservation" id="reservation">
-
-												</div> --}}
-												<input type="date" name="start_date" id="start-date">
-												<input type="date" name="end_date" id="end-date">
+												</div>
+												<input type="hidden" name="startDate" id="start-date">
+												<input type="hidden" name="endDate" id="end-date">
 											</div>
 										</div>
 										<div class="col-4">
 											<div class="form-group">
-												<a name="filter" id="filter" class="btn btn-primary" title="Get Data">
+												<button type="button" name="filter" id="filter" class="btn btn-primary" title="Get Data">
 													<i class="far fa-paper-plane"></i>
-												</a>
+												</button>
 												<button type="button" name="refresh" id="refresh" class="btn btn-warning" title="Reset">
 													<i class="fas fa-sync"></i>
 												</button>
@@ -74,7 +73,6 @@
 										<th>Date</th>
 										<th>ID</th>
 										<th>User</th>
-										<th>Descp</th>
 										<th>Total</th>
 										<th>Actions</th>
 									</tr>
@@ -82,8 +80,8 @@
                                 <tbody></tbody>
                                 <tfoot>
 									<tr>
-										<th colspan="6">Total</th>
-										<th id="total-all"></th>
+										<th colspan="5">Total</th>
+										<th>{{ 'Rp. '.number_format($total,0,",",".") }}</th>
 										<th>-</th>
 									</tr>
 								</tfoot>
@@ -94,6 +92,29 @@
 			</div>
 		</section>
 	</div>
+
+	{{-- modal detail --}}
+	<div class="modal fade" id="detail-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="static-backdrop-label" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="static-backdrop-label"></h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p id="detail-date"></p>
+					<p id="detail-user"></p>
+					<p id="detail-order-id"></p>
+					<p id="detail-total"></p>
+					<p id="detail-discount"></p>
+					<p id="detail-total-bayar"></p>
+					<p id="detail-kembalian"></p>
+					<p id="detail-order"></p>
+				</div>
+			</div>
+		</div>
+	</div>
+
 @endsection
 
 @push('style-table')
@@ -106,13 +127,23 @@
 		</style>
 @endpush
 
+@push('style-daterange')
+
+		<link rel="stylesheet" href="{{ url('backend/plugins/daterangepicker/daterangepicker.css') }}">
+@endpush
+
+@push('script-daterange')
+
+		<script	script src="{{ url('backend/plugins/daterangepicker/daterangepicker.js') }}"></script>
+@endpush
+
 @push('script-table')
 
 		<script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 		<script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
-		<script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.12.1/api/sum().js"></script>
 		<script type="text/javascript">
-			$(document).ready(function (){
+			$(document).ready(function () {
+				$('#reservation').removeAttr('value');
 				$.ajaxSetup({
 					headers: {
 						'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
@@ -128,37 +159,27 @@
 							url : "{{ route('order.index') }}",
 							data : {startDate, endDate},
 							type : 'GET',
-							dataType:"json",
 						},
-						columns: [
+						columns : [
 							{ data: 'checkbox', name: 'checkbox', className: "text-center"},
 							{ data: 'DT_RowIndex', name: 'DT_RowIndex', className: "text-center" },
 							{ data: 'date', name: 'date', className: "text-center" },
 							{ data: 'orderId', name: 'orderId', className: "text-center" },
 							{ data: 'user', name: 'user', className: "text-center" },
-							{ data: 'description', name: 'description', className: "text-center" },
-							{ data: 'total', name: 'total', className: "text-center", "render": $.fn.dataTable.render.number( '.', ',', 0, 'Rp ' ) },
+							{ data: 'total', name: 'total', className: "text-center" },
 							{ data: 'action', name: 'action', className: "text-center" },
 						],
-						columnDefs: [ {
-							"targets" : [0, 2, 4],
+						columnDefs : [ {
+							"targets" : [0, 3 ,6],
 							"orderable" : false,
 							"searchable" : false,
 						}],
-						// fixedHeader: {
-						// 	header: true,
-						// 	footer: true
-						// },
-						lengthMenu: [
+						lengthMenu : [
 							[10, 25, 50, -1],
 							[10, 25, 50, 'All'],
-						],
-						drawCallback: function () {
-							let sum = $('#table-data').DataTable().column(6).data().sum();
-							$('#total-all').html(`Rp. ${sum.toLocaleString('id-ID')}`);
-						}	
+						]
 					}).on('draw', function () {
-						$('input[name="order_checkbox"]').each(function (){
+						$('input[name="order_checkbox"]').each(function () {
 							this.checked = false;
 						});
 						$('input[name="main_checkbox"]').prop('checked', false);
@@ -166,14 +187,36 @@
 					});
 				}
 
+				$('#reservation').daterangepicker({
+					// autoUpdateInput: false,
+					locale: {
+						format: 'YYYY-MM-DD',
+						separator: " to ",
+						cancelLabel: 'Clear'
+					}
+				});
+
+				$('#reservation').on('cancel.daterangepicker', function(ev, picker) {
+					//do something, like clearing an input
+					$('#reservation').val('');
+				});
+
+				$('#reservation').change(function() {
+					let awal = $('#reservation').data('daterangepicker').startDate;
+					let akhir = $('#reservation').data('daterangepicker').endDate;
+					// format it 
+					let start = awal.format('YYYY-MM-DD');
+					let end = akhir.format('YYYY-MM-DD');
+					$('#start-date').val(start);
+					$('#end-date').val(end);
+				});
+
 				$('#filter').click(function() {
 					let startDate = $('#start-date').val();
 					let endDate = $('#end-date').val();	
 					if (startDate !== '' && endDate !== '') {
-						console.info(startDate + " - " + endDate );
 						$('#table-data').DataTable().destroy();
 						loadData(startDate, endDate);
-						// console.info(loadData());
 					} else {
 						Swal.fire({
 							icon: 'error',
@@ -197,26 +240,6 @@
 		</script>
 @endpush
 
-@push('style-select2')
-
-		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-@endpush
-
-@push('style-daterange')
-
-		<link rel="stylesheet" href="{{ url('backend/plugins/daterangepicker/daterangepicker.css') }}">
-@endpush
-
-@push('script-select2')
-
-		<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-@endpush
-
-@push('script-daterange')
-
-		<script	script src="{{ url('backend/plugins/daterangepicker/daterangepicker.js') }}"></script>
-@endpush
-
 @push('modal-post')
 	<script>
 		// method create
@@ -226,29 +249,27 @@
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
 				}
 			});
-			// Date range picker
-			$('#reservation').daterangepicker({
-				// autoUpdateInput: false,
-				locale: {
-					format: 'YYYY-MM-DD',
-					separator: " to ",
-					cancelLabel: 'Clear'
-				}
-			});
 
-			$('#reservation').on('cancel.daterangepicker', function(ev, picker) {
-				//do something, like clearing an input
-				$('#reservation').val('');
-			});
-
-			$('#reservation').change(function() {
-				let awal = $('#reservation').data('daterangepicker').startDate;
-				let akhir = $('#reservation').data('daterangepicker').endDate;
-				// format it 
-				let start = awal.format('YYYY-MM-DD');
-				let end = akhir.format('YYYY-MM-DD');
-				$('#start-date').val(start);
-				$('#end-date').val(end);
+			// method detail
+			$(document).on('click', '.btn-detail', function () {
+				let dataId = $(this).data('id');
+				$.get('/order/' + dataId, function (data) {
+					$('#detail-modal').modal('show');
+					$('.modal-title').text("Detail Data");
+					const event = new Date(data.date);
+					const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+					$('#detail-date').text(`Date : ${event.toLocaleDateString('id-ID', options)}`);
+					$('#detail-user').text(`User : ${data.user.name}`);
+					$('#detail-order-id').text(`Grand Total : ${data.order_id}`);
+					$('#detail-total').text(`Total : Rp. ${data.total.toLocaleString()}`);
+					$('#detail-discount').text(`Discount : Rp. ${data.discount.toLocaleString()}`);
+					$('#detail-total-bayar').text(`Total Bayar : Rp. ${data.total_bayar.toLocaleString()}`);
+					$('#detail-kembalian').text(`Kembalian : Rp. ${data.kembalian.toLocaleString()}`);
+					let html = '<table class="table table-bordered table-striped w-100"><thead><tr class="text-center"><th>#</th><th>Product</th><th>Price</th><th>QTY</th><th>Sub Total</th></tr></thead><tbody>';
+					data.order_detail.forEach((element, index) => html += '<tr class="text-center">' + '<td>' + (index + 1) + '</td>' + '<td>' + element.product_name + '</td>' + '<td>' + element.price + '</td>' + '<td>' + element.quantity + '</td>' + '<td>' + element.sub_total + '</td>' + '</tr>');
+					html += '</tbody></table>';
+					$('#detail-order').html(html);
+				});
 			});
 
 			// method delete start

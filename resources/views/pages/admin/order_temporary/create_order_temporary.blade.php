@@ -116,15 +116,15 @@
 							</div>
 						</div>
 						<div class="dropdown-divider"></div>
-						@if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+						{{-- @if ($errors->any())
+							<div class="alert alert-danger">
+								<ul>
+									@foreach ($errors->all() as $error)
+										<li>{{ $error }}</li>
+									@endforeach
+								</ul>
+							</div>
+						@endif --}}
 						<form action="{{ route('order.store') }}" method="POST">
 							@csrf
 							<div class="row">
@@ -144,8 +144,8 @@
 								<div class="col-md-3">
 									<div class="form-group">
 										<label for="total-bayar">Total Bayar*</label>
-										<input type="text" name="total_bayar" id="total-bayar" required class="form-control" placeholder="Total Bayar" value="0">
-										@error('total-bayar')<div class="text-danger">{{ $message }}</div>@enderror
+										<input type="text" name="total_bayar" id="total-bayar" required class="form-control @error('total_bayar') is-invalid @enderror" placeholder="Total Bayar" value="0">
+										@error('total_bayar')<div class="text-danger">{{ $message }}</div>@enderror
 									</div>
 								</div>
 								<div class="col-md-3">
@@ -164,7 +164,7 @@
 							<div class="row justify-content-center">
 								<div class="col-md-3">
 									<div class="form-group">
-										<button type="submit" class="btn btn-success btn-block"><i class="fas fa-money-check"></i>&nbsp; Bayar</button>
+										<button type="submit" class="btn btn-success btn-block" onclick="bayar();"><i class="fas fa-money-check"></i>&nbsp; Bayar</button>
 									</div>
 								</div>
 							</div>
@@ -219,10 +219,10 @@
 					@if(session('success-invoices'))
 						Swal.fire({
 							icon: 'success',
-							title: 'Your Data has been Saved!',
+							title: 'Transaksi Berhasil!',
 							showCancelButton: true,
-							confirmButtonText: 'Data Orders',
-							cancelButtonText: `Stay Here`,
+							confirmButtonText: 'Data Order',
+							cancelButtonText: `Tetap Disini`,
 						}).then((result) => {
 							if (result.isConfirmed) {
 								window.location = "{{ route('order.index') }}";
@@ -230,6 +230,8 @@
 						});
 					@endif
 					// sweet alert success end
+
+
 
 					function updateTextView(_obj) {
 						let num = getNumber(_obj.val());
@@ -280,6 +282,17 @@
 							$('#kembalian-preview').text("Rp. "+total.toLocaleString());
 						} 
 					});
+
+					function bayar() {
+						if ({{ $grandTotal }} == 0) {
+							Swal.fire({
+								position: 'top-end',
+								icon: 'error',
+								title: 'Transaksi Kosong!',
+								timer: 1500
+							});
+						}
+					}
 				});
 		</script>
 @endpush
