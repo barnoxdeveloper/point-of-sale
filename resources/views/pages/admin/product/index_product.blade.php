@@ -169,9 +169,46 @@
 						</div>
 
 						<div class="form-group text-center">
-							<button type="submit" class="btn btn-primary" id="btn-save" value="create">
+							<button type="submit" class="btn btn-primary" id="btn-save">
 								<i class="far fa-paper-plane"></i>
 								Save
+							</button>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">X</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{{-- modal print barcode --}}
+	<div class="modal fade" id="modal-print-barcode" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="static-backdrop-label-print-barcode" aria-hidden="true">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title-print-barcode" id="static-backdrop-label-print-barcode"></h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form action="{{ route('print-barcode') }}" id="form-post-print-barcode" target="_blank" method="POST">
+						@csrf
+						<div class="row">
+							<input type="hidden" readonly name="product_id" id="product-id">
+							<div class="col-md-12">
+								<div class="form-group">
+									<label for="quantity-barcode">Qty Barcode*</label>
+									<input type="number" name="quantity_barcode" id="quantity-barcode" required class="form-control" placeholder="Qty Barcode" value="">
+									<p class="text-danger error-text quantity_barcode_error"></p>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group text-center">
+							<button type="submit" class="btn btn-primary" id="btn-save">
+								<i class="fas fa-print"></i>
+								Print
 							</button>
 						</div>
 					</form>
@@ -263,6 +300,53 @@
 			});
 
 			$.fn.modal.Constructor.prototype.enforceFocus = function() {};
+			// function print barcode start
+			const modalPrintBarcode = new bootstrap.Modal($('#modal-print-barcode'));
+			$(document).on('click', '.btn-barcode', function () {
+				modalPrintBarcode.show();
+				$('.modal-title-print-barcode').text("Quantity Barcode (* Required)");
+				$('#product-id').val($(this).data('id'));
+				$(".modal-body").find("p").hide();
+				$('#quantity-barcode').focus();
+			});
+
+			// if ($("#form-post-print-barcode").length > 0) {
+			// 	$("#form-post-print-barcode").validate({
+			// 		submitHandler: function (form) {
+			// 			let formData = new FormData(document.getElementById('form-post-print-barcode'));
+			// 			$(".modal-body").find("p").show();
+			// 			$.ajax({
+			// 				type: 'POST',
+			// 				url: "{{ route('print-barcode') }}",
+			// 				data: formData,
+			// 				dataType: 'json',
+			// 				cache: false,
+			// 				contentType: false,
+			// 				processData: false,
+			// 			beforeSend:function() {
+			// 				$(document).find('p.error-text').text('');
+			// 			},
+			// 			success: function (data) {
+			// 				if (data.code == 0) {
+			// 					$.each(data.messages, function(prefix, val) {
+			// 						$('p.'+prefix+'_error').text(val[0]);
+			// 					});
+			// 				} else {
+			// 					$('#form-post-print-barcode').trigger("reset");
+			// 					$('#modal-print-barcode').modal('hide');
+			// 				}
+			// 			},
+			// 			error: function (data) {
+			// 				$.each(data.messages, function(prefix, val) {
+			// 					$('p.'+prefix+'_error').text(val[0]);
+			// 				});
+			// 			}
+			// 		});
+			// 		}
+			// 	});
+			// }
+			// function print barcode end
+
 			const myModal = new bootstrap.Modal($('#modal-post'));
 			$('#btn-create').click(function () {
 				myModal.show();

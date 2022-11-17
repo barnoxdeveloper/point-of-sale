@@ -64,8 +64,7 @@ class OrderTemporaryController extends Controller
                         ->first();        
             if ($check) {
                 return redirect()->back()->with('success', 'Product Sudah ada di keranjang, silahkan update quantity');
-            }
-            elseif ($product->stock < 10) {
+            } elseif ($product->stock < 10) {
                 $data['user_id'] = Auth::user()->id;
                 $data['product_code'] = $product->product_code;
                 $data['product_name'] = $product->name;
@@ -74,8 +73,7 @@ class OrderTemporaryController extends Controller
                 $data['sub_total'] = $product->new_price * 1;
                 OrderTemporary::create($data);
                 return redirect()->back()->with('success', 'Stock Product di bawah 10');   
-            }
-            else{
+            } else{
                 $data['user_id'] = Auth::user()->id;
                 $data['product_code'] = $product->product_code;
                 $data['product_name'] = $product->name;

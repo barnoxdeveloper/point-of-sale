@@ -81,7 +81,7 @@
                                 <tfoot>
 									<tr>
 										<th colspan="5">Total</th>
-										<th>{{ 'Rp. '.number_format($total,0,",",".") }}</th>
+										<th id="total-all"></th>
 										<th>-</th>
 									</tr>
 								</tfoot>
@@ -107,6 +107,7 @@
 					<p id="detail-order-id"></p>
 					<p id="detail-total"></p>
 					<p id="detail-discount"></p>
+					<p id="detail-grand-total"></p>
 					<p id="detail-total-bayar"></p>
 					<p id="detail-kembalian"></p>
 					<p id="detail-order"></p>
@@ -141,6 +142,7 @@
 
 		<script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 		<script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.12.1/api/sum().js"></script>
 		<script type="text/javascript">
 			$(document).ready(function () {
 				$('#reservation').removeAttr('value');
@@ -166,7 +168,7 @@
 							{ data: 'date', name: 'date', className: "text-center" },
 							{ data: 'orderId', name: 'orderId', className: "text-center" },
 							{ data: 'user', name: 'user', className: "text-center" },
-							{ data: 'total', name: 'total', className: "text-center" },
+							{ data: 'total', name: 'total', className: "text-center", "render": $.fn.dataTable.render.number( '.', ',', 0, 'Rp ' ) },
 							{ data: 'action', name: 'action', className: "text-center" },
 						],
 						columnDefs : [ {
@@ -177,7 +179,11 @@
 						lengthMenu : [
 							[10, 25, 50, -1],
 							[10, 25, 50, 'All'],
-						]
+						],
+						drawCallback: function () {
+							let sum = $('#table-data').DataTable().column(5).data().sum();
+							$('#total-all').html(`Rp. ${sum.toLocaleString('id-ID')}`);
+						}	
 					}).on('draw', function () {
 						$('input[name="order_checkbox"]').each(function () {
 							this.checked = false;
@@ -255,18 +261,19 @@
 				let dataId = $(this).data('id');
 				$.get('/order/' + dataId, function (data) {
 					$('#detail-modal').modal('show');
-					$('.modal-title').text("Detail Data");
+					$('.modal-title').text("Detail Order");
 					const event = new Date(data.date);
 					const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 					$('#detail-date').text(`Date : ${event.toLocaleDateString('id-ID', options)}`);
 					$('#detail-user').text(`User : ${data.user.name}`);
-					$('#detail-order-id').text(`Grand Total : ${data.order_id}`);
+					$('#detail-order-id').text(`ID : ${data.order_id}`);
 					$('#detail-total').text(`Total : Rp. ${data.total.toLocaleString()}`);
 					$('#detail-discount').text(`Discount : Rp. ${data.discount.toLocaleString()}`);
+					$('#detail-grand-total').text(`Grand Total : Rp. ${(data.total - data.discount).toLocaleString()}`);
 					$('#detail-total-bayar').text(`Total Bayar : Rp. ${data.total_bayar.toLocaleString()}`);
 					$('#detail-kembalian').text(`Kembalian : Rp. ${data.kembalian.toLocaleString()}`);
 					let html = '<table class="table table-bordered table-striped w-100"><thead><tr class="text-center"><th>#</th><th>Product</th><th>Price</th><th>QTY</th><th>Sub Total</th></tr></thead><tbody>';
-					data.order_detail.forEach((element, index) => html += '<tr class="text-center">' + '<td>' + (index + 1) + '</td>' + '<td>' + element.product_name + '</td>' + '<td>' + element.price + '</td>' + '<td>' + element.quantity + '</td>' + '<td>' + element.sub_total + '</td>' + '</tr>');
+					data.order_detail.forEach((element, index) => html += '<tr class="text-center">' + '<td>' + (index + 1) + '</td>' + '<td>' + element.product_name + '</td>' + '<td> Rp. ' + element.price.toLocaleString() + '</td>' + '<td>' + element.quantity + '</td>' + '<td> Rp. ' + element.sub_total.toLocaleString() + '</td>' + '</tr>');
 					html += '</tbody></table>';
 					$('#detail-order').html(html);
 				});

@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\{Product, Order, OrderDetail, OrderTemporary};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{Auth, DB};
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
@@ -42,7 +43,8 @@ class OrderController extends Controller
                                     }
                                 })
                                 ->addColumn('total', function($data) {
-                                    return 'Rp. '.number_format($data->total,0,",",".");
+                                    return $data->total;
+                                    // return 'Rp. '.number_format($data->total,0,",",".");
                                 })
                                 ->addColumn('description', function($data) {
                                     return $data->description;
@@ -134,7 +136,7 @@ class OrderController extends Controller
                 $items->each->delete();
             }
         }
-        return redirect()->back()->with('success-invoices', 'Transaction Success!');
+        return redirect()->back()->with('success_invoices', $success);
     }
 
     /**
@@ -195,5 +197,14 @@ class OrderController extends Controller
         }
         Order::whereIn('id', $id)->delete();
         return response()->json(['code' => 1]);
+    }
+
+    public function printInvoice($id)
+    {
+        $item = Product::where('id', $id)->first();
+        $pdf = Pdf::setOptions(['isRemoteEnabled' => TRUE, 'enable_javascript' => TRUE]);
+        $pdf = Pdf::loadView('pages.admin.product.print_invoice', compact('number', 'barcodeName'));
+        $pdf->setPaper('a4', 'protait'); 
+        return $pdf->stream($item->name.".pdf");
     }
 }

@@ -6,6 +6,7 @@ use App\Models\{Product, Category};
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{DB, Validator, File};
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ProductController extends Controller
 {
@@ -47,7 +48,9 @@ class ProductController extends Controller
                                     return $data->status;
                                 })
                                 ->addColumn('action', function($data) {
-                                    $button = '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
+                                    $button = '<a href="javascript:void(0)" data-toggle="tooltip" title="Cetak Barcode" data-id="'.$data->id.'" data-original-title="Cetak Barcode" class="btn btn-success btn-md btn-barcode"><i class="fas fa-barcode"></i></a>';
+                                    $button .= '&nbsp;&nbsp;';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
                                     $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
@@ -208,5 +211,21 @@ class ProductController extends Controller
             Product::whereIn('id', $id)->delete();
         }
         return response()->json(['code' => 1]);
+    }
+
+    public function printBarcode(Request $request)
+    {
+        // return response()->json($request->all());
+        $item = Product::where('id', $request->product_id)->first();
+        $number = 1;
+        for ($i=1; $i <= $request->quantity_barcode; $i++) { 
+            // echo $number++.' '.$item->name.'<br>';
+            $barcodeName[] = $item;
+        }
+
+        $pdf = Pdf::setOptions(['isRemoteEnabled' => TRUE, 'enable_javascript' => TRUE]);
+        $pdf = Pdf::loadView('pages.admin.product.print_barcode', compact('number', 'barcodeName'));
+        $pdf->setPaper('a4', 'protait'); 
+        return $pdf->stream($item->name.".pdf");
     }
 }

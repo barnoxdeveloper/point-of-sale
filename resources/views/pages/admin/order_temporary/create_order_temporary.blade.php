@@ -164,7 +164,7 @@
 							<div class="row justify-content-center">
 								<div class="col-md-3">
 									<div class="form-group">
-										<button type="submit" class="btn btn-success btn-block" onclick="bayar();"><i class="fas fa-money-check"></i>&nbsp; Bayar</button>
+										<button type="submit" class="btn btn-success btn-block"><i class="fas fa-money-check"></i>&nbsp; Bayar</button>
 									</div>
 								</div>
 							</div>
@@ -216,13 +216,14 @@
 					@endif
 
 					// sweet alert success start
-					@if(session('success-invoices'))
+					@if(session('success_invoices'))
 						Swal.fire({
 							icon: 'success',
 							title: 'Transaksi Berhasil!',
 							showCancelButton: true,
 							confirmButtonText: 'Data Order',
 							cancelButtonText: `Tetap Disini`,
+							html: `<a href="{{ route('print-invoice', {{ session('success_invoices.order_id') }}) }}"><i class="fa fa-print"></i></a>`,
 						}).then((result) => {
 							if (result.isConfirmed) {
 								window.location = "{{ route('order.index') }}";
@@ -230,8 +231,6 @@
 						});
 					@endif
 					// sweet alert success end
-
-
 
 					function updateTextView(_obj) {
 						let num = getNumber(_obj.val());
@@ -282,17 +281,6 @@
 							$('#kembalian-preview').text("Rp. "+total.toLocaleString());
 						} 
 					});
-
-					function bayar() {
-						if ({{ $grandTotal }} == 0) {
-							Swal.fire({
-								position: 'top-end',
-								icon: 'error',
-								title: 'Transaksi Kosong!',
-								timer: 1500
-							});
-						}
-					}
 				});
 		</script>
 @endpush
