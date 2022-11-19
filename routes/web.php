@@ -47,7 +47,7 @@ Route::middleware(['auth', 'verified', 'active', 'admin', 'revalidate'])
     // route for Order
     Route::resource('order', OrderController::class);
     Route::controller(OrderController::class)->group(function () {
-		Route::post('print-invoice/{id}', 'printInvoice')->name('print-invoice');
+		Route::get('print-invoice/{id}', 'printInvoice')->name('print-invoice');
 		Route::post('delete-selected-order', 'deleteSelectedOrder')->name('delete-selected-order');
 	});
     // route for Order Detail

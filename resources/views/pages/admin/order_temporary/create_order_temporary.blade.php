@@ -223,7 +223,7 @@
 							showCancelButton: true,
 							confirmButtonText: 'Data Order',
 							cancelButtonText: `Tetap Disini`,
-							html: `<a href="{{ route('print-invoice', {{ session('success_invoices.order_id') }}) }}"><i class="fa fa-print"></i></a>`,
+							html: `<a href="{{ route('print-invoice', session('success_invoices.order_id')) }}" class="btn btn-md btn-success" target="_blank"><i class="fa fa-print"></i></a>`,
 						}).then((result) => {
 							if (result.isConfirmed) {
 								window.location = "{{ route('order.index') }}";

@@ -50,7 +50,10 @@ class OrderController extends Controller
                                     return $data->description;
                                 })
                                 ->addColumn('action', function($data) {
-                                    $button = '<a href="javascript:void(0)" data-toggle="tooltip" title="Details" data-id="'.$data->id.'" data-original-title="Details" class="btn btn-primary btn-md btn-detail">'.$data->orderDetail->count().'  <i class="fa fa-box-open"></i></a>';
+                                    $url = route('print-invoice',$data->order_id);
+                                    $button = '<a href="'.$url.'" title="Print" class="btn btn-success btn-md" target="_blank"><i class="fa fa-print"></i></a>';
+                                    $button .= '&nbsp;&nbsp;';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Details" data-id="'.$data->id.'" data-original-title="Details" class="btn btn-primary btn-md btn-detail">'.$data->orderDetail->count().'  <i class="fa fa-box-open"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
                                     $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
@@ -201,10 +204,8 @@ class OrderController extends Controller
 
     public function printInvoice($id)
     {
-        $item = Product::where('id', $id)->first();
-        $pdf = Pdf::setOptions(['isRemoteEnabled' => TRUE, 'enable_javascript' => TRUE]);
-        $pdf = Pdf::loadView('pages.admin.product.print_invoice', compact('number', 'barcodeName'));
-        $pdf->setPaper('a4', 'protait'); 
-        return $pdf->stream($item->name.".pdf");
+        $order = Order::where('order_id', $id)->first();
+        $orderDetail = OrderDetail::where('order_id', $order->order_id)->get();
+        return view('pages.admin.order.print_invoice', compact('order', 'orderDetail'));
     }
 }
