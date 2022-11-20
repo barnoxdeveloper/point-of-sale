@@ -45,6 +45,22 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
+    public function getIsRolesAdminAttribute()
+    {
+        return $this->roles == "ADMINISTRATOR";
+    }
+
+    public function getIsRolesManagerAttribute()
+    {
+        return $this->roles == "MANAGER";
+    }
+
+    public function getIsRolesCashierAttribute()
+    {
+        return $this->roles == "CASHIER";
+    }
+    
+
     public function store()
     {
         return $this->belongsTo(Store::class, 'store_id', 'id');

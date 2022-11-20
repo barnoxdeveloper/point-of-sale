@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 13, 2022 at 04:16 PM
+-- Generation Time: Nov 20, 2022 at 04:13 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.1.6
 
@@ -43,8 +43,16 @@ CREATE TABLE `categories` (
 --
 
 INSERT INTO `categories` (`id`, `name`, `slug`, `store_id`, `photo`, `status`, `created_at`, `updated_at`) VALUES
-(58, 'Megan edit', 'megan-stanley', 3, 'assets/category/SeFZll-3.png', 'ACTIVE', '2022-10-20 16:34:41', '2022-10-20 16:35:05'),
-(59, 'Tatum edit', 'tatum-chang', 1, 'assets/category/ByhC6Z-2.png', 'ACTIVE', '2022-10-20 16:34:41', '2022-10-20 16:38:33');
+(58, 'Megan', 'megan-stanley', 2, 'assets/category/SeFZll-3.png', 'ACTIVE', '2022-10-20 16:34:41', '2022-11-19 16:36:01'),
+(59, 'Tatum edit', 'tatum-chang', 1, 'assets/category/ByhC6Z-2.png', 'ACTIVE', '2022-10-20 16:34:41', '2022-10-20 16:38:33'),
+(60, 'qwerty aaa', 'qwerty', 3, 'assets/category/EUUqbo-11.jpg', 'ACTIVE', '2022-11-19 16:29:36', '2022-11-20 05:13:36'),
+(61, '12345', '12345', 3, 'assets/category/rq8R5c-BJfEHS-4.png', 'NON-ACTIVE', '2022-11-19 16:29:36', '2022-11-19 16:29:36'),
+(62, 'Yolanda Moon', 'yolanda-moon', 2, 'assets/category/2mD4Zd-TM.png', 'NON-ACTIVE', '2022-11-19 16:30:59', '2022-11-19 16:30:59'),
+(63, 'Sierra Shaw', 'sierra-shaw', 2, 'assets/category/5gEKdP-NYEPI.png', 'NON-ACTIVE', '2022-11-19 16:30:59', '2022-11-19 16:30:59'),
+(64, 'Randall Leblanc', 'randall-leblanc', 2, 'assets/category/Phg1Gp-readymix-pesan.jpg', 'NON-ACTIVE', '2022-11-19 16:31:28', '2022-11-19 16:31:28'),
+(65, 'Raymond Barber', 'raymond-barber', 2, 'assets/category/8IcvaD-wetech-bg (1).jpg', 'NON-ACTIVE', '2022-11-19 16:31:28', '2022-11-19 16:31:28'),
+(66, 'Lani Mckay', 'lani-mckay', 2, 'assets/category/T0S9sG-BRSUR.jpg', 'NON-ACTIVE', '2022-11-19 16:36:29', '2022-11-19 16:36:29'),
+(67, 'Nichole Lee', 'nichole-lee', 2, 'assets/category/cTmTd2-BRSUR1.jpg', 'NON-ACTIVE', '2022-11-19 16:36:29', '2022-11-19 16:36:29');
 
 -- --------------------------------------------------------
 
@@ -98,6 +106,7 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 
 CREATE TABLE `orders` (
   `id` bigint(20) UNSIGNED NOT NULL,
+  `store_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `order_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `total` int(11) NOT NULL,
@@ -114,12 +123,10 @@ CREATE TABLE `orders` (
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `user_id`, `order_id`, `total`, `description`, `date`, `discount`, `total_bayar`, `kembalian`, `created_at`, `updated_at`) VALUES
-(1, 1, 'PRD-ABCDEF', 100000, NULL, '2022-10-23', 0, 0, 0, '2022-10-23 14:03:14', '2022-10-23 14:03:14'),
-(2, 1, 'PRD-123456', 200000, NULL, '2022-10-24', 0, 0, 0, '2022-10-24 14:03:14', '2022-10-24 14:03:14'),
-(3, 1, 'PRD-111222', 300000, NULL, '2022-10-25', 0, 0, 0, '2022-10-25 14:05:49', '2022-10-25 14:05:49'),
-(4, 1, 'PRD-222333', 50000, NULL, '2022-10-26', 0, 0, 0, '2022-10-26 14:05:49', '2022-10-26 14:05:49'),
-(5, 1, 'INV-2022-11-13 22:16:06', 73000, NULL, '2022-11-13', 0, 200000, 127000, '2022-11-13 15:16:06', '2022-11-13 15:16:06');
+INSERT INTO `orders` (`id`, `store_id`, `user_id`, `order_id`, `total`, `description`, `date`, `discount`, `total_bayar`, `kembalian`, `created_at`, `updated_at`) VALUES
+(1, 2, 1, 'INV-2022-11-20-22:05:00', 5000, NULL, '2022-11-20', 0, 5000, 0, '2022-11-20 15:05:00', '2022-11-20 15:05:00'),
+(2, 3, 1, 'INV-2022-11-20-22:06:36', 15000, NULL, '2022-11-20', 0, 20000, 5000, '2022-11-20 15:06:36', '2022-11-20 15:06:36'),
+(3, 1, 1, 'INV-2022-11-20-22:06:48', 2500, NULL, '2022-11-20', 0, 5000, 2500, '2022-11-20 15:06:48', '2022-11-20 15:06:48');
 
 -- --------------------------------------------------------
 
@@ -139,6 +146,17 @@ CREATE TABLE `order_details` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `order_details`
+--
+
+INSERT INTO `order_details` (`id`, `order_id`, `product_name`, `product_code`, `price`, `quantity`, `sub_total`, `created_at`, `updated_at`) VALUES
+(1, 'INV-2022-11-20-22:05:00', 'HEADSET 123456789', '6936678405431', 1000, 1, 1000, '2022-11-20 15:05:00', '2022-11-20 15:05:00'),
+(2, 'INV-2022-11-20-22:05:00', 'Rokok ae', '8998989100120', 1500, 1, 1500, '2022-11-20 15:05:00', '2022-11-20 15:05:00'),
+(3, 'INV-2022-11-20-22:05:00', 'KABEL USB 111111', '6957303861330', 2500, 1, 2500, '2022-11-20 15:05:00', '2022-11-20 15:05:00'),
+(4, 'INV-2022-11-20-22:06:36', 'Rokok ae', '8998989100120', 1500, 10, 15000, '2022-11-20 15:06:36', '2022-11-20 15:06:36'),
+(5, 'INV-2022-11-20-22:06:48', 'KABEL USB 111111', '6957303861330', 2500, 1, 2500, '2022-11-20 15:06:48', '2022-11-20 15:06:48');
+
 -- --------------------------------------------------------
 
 --
@@ -156,15 +174,6 @@ CREATE TABLE `order_temporaries` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `order_temporaries`
---
-
-INSERT INTO `order_temporaries` (`id`, `user_id`, `product_name`, `product_code`, `price`, `quantity`, `sub_total`, `created_at`, `updated_at`) VALUES
-(18, 1, 'Rokok', '8998989100120', 1500, 2, 3000, '2022-11-06 16:12:58', '2022-11-07 12:48:23'),
-(19, 1, 'HEADSET', '6936678405431', 1000, 70, 70000, '2022-11-06 16:13:07', '2022-11-07 12:48:40'),
-(20, 2, 'KABEL USB', '6957303861330', 2500, 1, 2500, '2022-11-13 14:40:13', '2022-11-13 14:40:13');
 
 -- --------------------------------------------------------
 
@@ -234,9 +243,9 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `product_code`, `name`, `slug`, `category_id`, `store_id`, `old_price`, `new_price`, `limit_stock`, `stock`, `type`, `description`, `photo`, `status`, `created_at`, `updated_at`) VALUES
-(6, '6936678405431', 'HEADSET', 'headset', 58, 3, 2000, 1000, 10, 100, 'PCS', 'Rerum impedit magna expedita minus iure', NULL, 'ACTIVE', '2022-10-30 15:59:47', '2022-11-06 16:05:38'),
-(10, '8998989100120', 'Rokok', 'rokok', 58, 3, 2000, 1500, 10, 100, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-06 15:56:49', '2022-11-06 16:05:51'),
-(12, '6957303861330', 'KABEL USB', 'kabel-usb', 59, 1, 5000, 2500, 10, 100, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-13 14:40:05', '2022-11-13 14:40:05');
+(6, '6936678405431', 'HEADSET 123456789', 'headset-123456789', 60, 2, 2000, 1000, 10, 37, 'PCS', 'Rerum impedit magna expedita minus iure', NULL, 'ACTIVE', '2022-10-30 15:59:47', '2022-11-20 15:05:00'),
+(10, '8998989100120', 'Rokok ae', 'rokok-ae', 58, 2, 2000, 1500, 10, 32, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-06 15:56:49', '2022-11-20 15:06:36'),
+(12, '6957303861330', 'KABEL USB 111111', 'kabel-usb-111111', 62, 2, 5000, 2500, 10, 55, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-13 14:40:05', '2022-11-20 15:06:48');
 
 -- --------------------------------------------------------
 
@@ -262,10 +271,9 @@ CREATE TABLE `stores` (
 --
 
 INSERT INTO `stores` (`id`, `name`, `slug`, `store_code`, `location`, `description`, `discount`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'Quentin Gonzalez', 'quentin-gonzalez', 'STORE-3', 'Consequatur Consequuntur tenetur nostrum officia neque ipsum quae dolor magna labore minima deleniti', 'Et qui iusto exercitation fugiat ipsa cupiditate labore sapiente et enim et', 0, 'NON-ACTIVE', '2022-10-18 08:29:23', '2022-10-19 06:41:11'),
-(2, 'Igor Jacobs', 'igor-jacobs', 'STORE-1', 'Molestiae sunt accusamus voluptas magnam reiciendis a aut est sit consequuntur a aut aliquip hic', 'Molestias dolores sit sit quis dolore molestias veniam fuga Ipsam voluptas temporibus non blanditiis in in inventore consequatur', 0, 'NON-ACTIVE', '2022-10-18 08:29:28', '2022-10-19 06:32:51'),
-(3, 'Quentin Gamble', 'quentin-gamble', 'STORE-2', 'Quia maxime aperiam molestiae obcaecati consectetur nobis minim nihil obcaecati occaecat non aliquip nisi blanditiis', 'Dolores ex illo doloribus dolores deserunt', 1500, 'ACTIVE', '2022-10-18 08:29:31', '2022-11-07 13:57:52'),
-(4, 'Magee Figueroa', 'magee-figueroa', 'EX QUIBUSDAM POSSIMUS CORRUPTI OFFICIA MOLLITIA', 'Soluta magni in consectetur animi sunt eius quo odio necessitatibus commodi ducimus et sint tempora quia rerum aspernatur nulla', 'Dolores omnis et soluta hic occaecat beatae nulla magna ipsam hic', 1000, 'ACTIVE', '2022-11-07 13:48:44', '2022-11-07 13:48:44');
+(1, 'STORE-3', 'store-3', 'STORE-3', 'Consequatur Consequuntur tenetur nostrum officia neque ipsum quae dolor magna labore minima deleniti', 'Et qui iusto exercitation fugiat ipsa cupiditate labore sapiente et enim et', 0, 'ACTIVE', '2022-10-18 08:29:23', '2022-11-19 15:14:29'),
+(2, 'STORE-1', 'store-1', 'STORE-1', 'Molestiae sunt accusamus voluptas magnam reiciendis a aut est sit consequuntur a aut aliquip hic', 'Molestias dolores sit sit quis dolore molestias veniam fuga Ipsam voluptas temporibus non blanditiis in in inventore consequatur', 0, 'ACTIVE', '2022-10-18 08:29:28', '2022-11-19 15:14:18'),
+(3, 'STORE-2', 'store-2', 'STORE-2', 'Quia maxime aperiam molestiae obcaecati consectetur nobis minim nihil obcaecati occaecat non aliquip nisi blanditiis', 'Dolores ex illo doloribus dolores deserunt', 1500, 'ACTIVE', '2022-10-18 08:29:31', '2022-11-19 15:14:37');
 
 -- --------------------------------------------------------
 
@@ -293,7 +301,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `name`, `email`, `store_id`, `email_verified_at`, `password`, `status`, `roles`, `remember_token`, `created_at`, `updated_at`) VALUES
 (1, 'ADMINISTRATOR', 'admin@admin.com', NULL, '2022-10-15 06:15:38', '$2y$10$Fxr/sMwi2/1h3.Mnzmn/a.uu/HhW3N5WosRcNlmjxfHleQZvTPmPS', 'ACTIVE', 'ADMINISTRATOR', NULL, '2022-10-15 06:13:09', '2022-10-15 06:15:38'),
-(9, 'Buckminster Weiss', 'nebuq@mailinator.com', 1, NULL, '$2y$10$ES8snSJNGFx6myWdA5xTNeahtUzX6JNYhIAi2SFAZrGQ/irBTrbUa', 'NON-ACTIVE', 'MANAGER', NULL, '2022-10-18 07:36:02', '2022-10-19 06:40:34'),
+(9, 'Buckminster Weiss', 'manager@manager.com', 2, '2022-11-19 15:19:43', '$2y$10$qPBKtnOLQR2eMVkt4vtYdOejZQ1BAaL4i/W7zqyibbplY3pqSmrAW', 'ACTIVE', 'MANAGER', NULL, '2022-10-18 07:36:02', '2022-11-19 15:19:43'),
 (10, 'Barry Moon', 'dikof@mailinator.com', 3, NULL, '$2y$10$u88bvfg/l1Y7exLn69YlC.RMyV.0jhOCfXgRVTvHIZrj9YLyu90Mi', 'NON-ACTIVE', 'MANAGER', NULL, '2022-10-18 07:36:11', '2022-10-18 08:33:12'),
 (11, 'Merrill Swanson', 'nebyduxyf@mailinator.com', 2, NULL, '$2y$10$MqaI.wfunnurytpvVqXkH.TUywh6tvzd9DgK6hlF5uYG8Y9RKyrmu', 'ACTIVE', 'MANAGER', NULL, '2022-10-18 07:36:16', '2022-10-18 08:37:55');
 
@@ -381,7 +389,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -399,19 +407,19 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `order_temporaries`
 --
 ALTER TABLE `order_temporaries`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`

@@ -7,11 +7,12 @@
 			<div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">{{ $title }}</h1>
+                        <h4 class="m-0">{{ $title }}</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('category-user.index') }}">Category</a></li>
                             <li class="breadcrumb-item active">{{ $title }}</li>
                         </ol>
                     </div>
@@ -35,7 +36,6 @@
 							<table id="table-data" class="table table-bordered table-striped w-100">
 								<thead>
 									<tr class="text-center">
-										<th width="5%"><input type="checkbox" name="main_checkbox"><label></label></th>
 										<th>#</th>
 										<th>Name</th>
 										<th>Catrgory</th>
@@ -192,7 +192,7 @@
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					<form action="{{ route('print-barcode') }}" id="form-post-print-barcode" target="_blank" method="POST">
+					<form action="{{ route('print-barcode-user') }}" id="form-post-print-barcode" target="_blank" method="POST">
 						@csrf
 						<div class="row">
 							<input type="hidden" readonly name="product_id" id="product-id">
@@ -248,16 +248,15 @@
 						[10, 25, 50, 'All'],
 					],
 					columnDefs : [ {
-						"targets" : [0, 4, 6],
+						"targets" : [3, 5],
 						"orderable" : false,
 						"searchable" : false,
 					} ],
 					ajax : {
-						url : "{{ route('product.index') }}",
+						url : "{{ route('product-user-where-category', $id) }}",
 						type : 'GET',
 					},
 					columns: [
-						{ data: 'checkbox', name: 'checkbox', className: "text-center"},
 						{ data: 'DT_RowIndex', name: 'DT_RowIndex', className: "text-center" },
 						{ data: 'name', name: 'name', className: "text-center" },
 						{ data: 'category', name: 'category', className: "text-center" },
@@ -267,12 +266,6 @@
 						{ data: 'status', name: 'status', className: "text-center" },
 						{ data: 'action', name: 'action', className: "text-center" },
 					],
-				}).on('draw', function () {
-					$('input[name="product_checkbox"]').each(function (){
-						this.checked = false;
-					});
-					$('input[name="main_checkbox"]').prop('checked', false);
-					$('#delete-all-btn').addClass('d-none');
 				});
 			});
 		</script>
@@ -341,7 +334,7 @@
 								if (result.isConfirmed) {
 									$(".modal-body").find("p").show();
 									$.ajax({
-										url: "{{ route('product.store') }}",
+										url: "{{ route('product-user.store') }}",
 										data: formData,
 										type: 'POST',
 										dataType: 'json',
@@ -385,7 +378,7 @@
 				$(".modal-body").find("p").hide();
 				$('#metode').val('edit');
 				$('.modal-title').text("Edit Data (* Required)");
-				$.get('product/' + dataId + '/edit', function (data) {
+				$.get('/product-user/' + dataId + '/edit', function (data) {
 					$('#modal-post').modal('show');
 					$(document).ready(function() {
 						$("#category-id").select2({
@@ -419,102 +412,37 @@
 			});
 
 			// method delete start
-			$(document).on('click', '.delete', function () {
-				dataId = $(this).data('id');
-				Swal.fire({
-						title: 'Are you sure?',
-						text: "You won't be able to revert this!",
-						icon: 'warning',
-						showCancelButton: true,
-						confirmButtonColor: '#3085d6',
-						cancelButtonColor: '#d33',
-						confirmButtonText: 'Yes, delete it!'
-					}).then((result) => {
-						if (result.isConfirmed) {
-							$.ajax({
-								url: "product/" + dataId,
-								type: 'DELETE',
-							success: function (data) {
-								$('#delete-modal').modal('hide');
-								Swal.fire(
-									'Deleted!',
-									'Your Data has been Deleted.',
-									'success'
-								);
-								$('#table-data').DataTable().ajax.reload();
-							},
-							error: function (data) {
-								console.log('Error: ', data);
-							}
-						});
-					}
-				});
-			});
-
-			$(document).on('click', 'input[name="main_checkbox"]', function() {
-				if (this.checked) {
-					$('input[name="product_checkbox"]').each(function () {
-						this.checked = true;
-					});
-				} else {
-					$('input[name="product_checkbox"]').each(function () {
-						this.checked = false;
-					});	
-				}
-				toggleDeleteAllBtn();
-			});
-
-			$(document).on('change', 'input[name="product_checkbox"]', function() {
-				if ($('input[name="product_checkbox"]').length == $('input[name="product_checkbox"]:checked').length) {
-					$('input[name="main_checkbox"]').prop('checked', true);
-				} else {
-					$('input[name="main_checkbox"]').prop('checked', false);
-				}
-				toggleDeleteAllBtn();
-			});
-
-			function toggleDeleteAllBtn() {
-				if ($('input[name="product_checkbox"]:checked').length > 0) {
-					$('#delete-all-btn').text('Delete ('+ $('input[name="product_checkbox"]:checked').length +')').removeClass('d-none');
-				} else {
-					$('#delete-all-btn').addClass('d-none');
-				}
-			}
-			// method delete end
-
-			$('#delete-all-btn').click(function () {
-				let checkedProduct = [];
-				$('input[name="product_checkbox"]:checked').each(function () {
-					checkedProduct.push($(this).data('id'));
-				});
-				
-				const url = "{{ route('delete-selected-product') }}";
-				if (checkedProduct.length > 0) {
-					Swal.fire({
-						title: 'Are you sure?',
-						html: `You want to delete <b>(${checkedProduct.length})</b> product`,
-						icon: 'info',
-						showCancelButton: true,
-						confirmButtonColor: '#3085d6',
-						cancelButtonColor: '#d33',
-						confirmButtonText: 'Yes, Delete!',
-						allowOutsideClick: false,
-					}).then((result) => {
-						if (result.value) {
-							$.post(url, {id:checkedProduct}, function (data) {
-								if (data.code == 1) {
-									Swal.fire(
-										'Saved!',
-										'Your Data has been Deleted.',
-										'success'
-									);
-									$('#table-data').DataTable().ajax.reload();
-								}
-							}, 'json');
-						}
-					});
-				}
-			});
+			// $(document).on('click', '.delete', function () {
+			// 	dataId = $(this).data('id');
+			// 	Swal.fire({
+			// 			title: 'Are you sure?',
+			// 			text: "You won't be able to revert this!",
+			// 			icon: 'warning',
+			// 			showCancelButton: true,
+			// 			confirmButtonColor: '#3085d6',
+			// 			cancelButtonColor: '#d33',
+			// 			confirmButtonText: 'Yes, delete it!'
+			// 		}).then((result) => {
+			// 			if (result.isConfirmed) {
+			// 				$.ajax({
+			// 					url: "product/" + dataId,
+			// 					type: 'DELETE',
+			// 				success: function (data) {
+			// 					$('#delete-modal').modal('hide');
+			// 					Swal.fire(
+			// 						'Deleted!',
+			// 						'Your Data has been Deleted.',
+			// 						'success'
+			// 					);
+			// 					$('#table-data').DataTable().ajax.reload();
+			// 				},
+			// 				error: function (data) {
+			// 					console.log('Error: ', data);
+			// 				}
+			// 			});
+			// 		}
+			// 	});
+			// });
 		});
 
 	</script>

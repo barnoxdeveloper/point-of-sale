@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\User;
 
 use Carbon\Carbon;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\{DB, Validator, File};
 
-class CategoryController extends Controller
+class CategoryUserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,20 +20,12 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         $title = "Data Category";
-        $items = Category::with('store')->get();
+        $items = Category::with('store')->where('store_id', Auth::user()->store_id)->get();
         $stores = DB::table('stores')->orderBy('name', 'ASC')->get();
-        if($request->ajax()) {
+        if($request->ajax()){
             return datatables()->of($items)
-                                ->addColumn('checkbox', function($data) {
-                                    return '<input type="checkbox" name="category_checkbox" data-id="'.$data['id'].'"><label></label>';
-                                })
                                 ->addColumn('name', function ($data) {
                                     return $data->name;
-                                })
-                                ->addColumn('storeName', function ($data) {
-                                    if ($data->store !== NULL) {
-                                        return $data->store->store_code.' | '.$data->store->name;
-                                    }
                                 })
                                 ->addColumn('photo', function ($data) {
                                     if ($data->getRawOriginal('photo') !== NULL) {
@@ -42,18 +36,19 @@ class CategoryController extends Controller
                                     return $data->status;
                                 })
                                 ->addColumn('action', function($data) {
-                                    $url = route('product-where-category', encrypt($data->id));
+                                    $url = route('product-user-where-category', encrypt($data->id));
                                     $button = '<a href="'.$url.'" title="Data Product" class="btn btn-primary btn-md"><i class="fas fa-boxes"></i></a>';
-                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
+                                    // $button .= '&nbsp;&nbsp;';
+                                    // $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
-                                ->rawColumns(['checkbox', 'name', 'storeName', 'photo', 'status', 'action'])
+                                ->rawColumns(['name', 'photo', 'status', 'action'])
                                 ->addIndexColumn()
                                 ->make(true);
         }
-        return view('pages.admin.category.index_category', compact('title', 'stores'));
+        return view('pages.user.category.index_category', compact('title', 'stores'));
     }
 
     /**
@@ -75,7 +70,6 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make( $request->all(),[
-            'store_id.*' => 'required|exists:stores,id|not_in:0',
             'name.*' => 'required|max:255',
             'photo.*' => 'required|mimes:png,jpg,jpeg,svg|max:1000',
         ]);
@@ -90,7 +84,7 @@ class CategoryController extends Controller
             if ($request->hasfile('photo')) {
                 $slug = str_replace(' ', '-', array_map('strtolower', $request->name));
                 foreach ($request->file('photo') as $key => $item) {
-                    $data[$key]['store_id'] = $request->store_id[$key];
+                    $data[$key]['store_id'] = Auth::user()->store_id;
                     $data[$key]['name'] = $request->name[$key];
                     $data[$key]['slug'] = $slug[$key];
                     $fileName = Str::random(6).'-'.$item->getClientOriginalName();
@@ -143,7 +137,6 @@ class CategoryController extends Controller
     {
         $item = Category::findOrFail($id);
         $validator = Validator::make( $request->all(),[
-            'store_id' => 'required|exists:stores,id|not_in:0',
             'name' => 'required|max:255',
             'photo' => 'nullable|mimes:png,jpg,jpeg,svg|max:1000',
             'status' => 'required|in:ACTIVE,NON-ACTIVE',
@@ -158,11 +151,10 @@ class CategoryController extends Controller
             $data = $request->all();
             $photo = $request->file('photo');
             //jika photo tidak di rubah
-            if($photo == ""){
+            if($photo == "") {
                 $data['photo'] = $item->getRawOriginal('photo');
                 $item->update($data);
-            }
-            else if ($photo !== ""){
+            } else if ($photo !== "") {
                 $data = $request->all();
                 // jika photo di rubah, maka unlink photo yang lama
                 File::delete('storage/'. $item->getRawOriginal('photo'));

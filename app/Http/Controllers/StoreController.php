@@ -19,7 +19,7 @@ class StoreController extends Controller
     {
         $title = "Data Store";
         $items = Store::orderBy('name', 'ASC')->get();
-        if($request->ajax()){
+        if($request->ajax()) {
             return datatables()->of($items)
                                 ->addColumn('checkbox', function($data) {
                                     return '<input type="checkbox" name="store_checkbox" data-id="'.$data['id'].'"><label></label>';
@@ -30,17 +30,26 @@ class StoreController extends Controller
                                 ->addColumn('name', function ($data) {
                                     return $data->name;
                                 })
-                                ->addColumn('location', function($data){
+                                ->addColumn('location', function($data) {
                                     return $data->location;
                                 })
-                                ->addColumn('discount', function($data){
+                                ->addColumn('discount', function($data) {
                                     return 'Rp. '.number_format($data->discount,0,",",",");
                                 })
-                                ->addColumn('status', function($data){
+                                ->addColumn('status', function($data) {
                                     return $data->status;
                                 })
-                                ->addColumn('action', function($data){
-                                    $button = '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
+                                ->addColumn('action', function($data) {
+                                    $urlProduct = '#';
+                                    $urlcategory = '#';
+                                    $urlOrderStore = route('order-where-store', encrypt($data->id));
+                                    $button = '<a href="'.$urlProduct.'" title="Data Product by Store" class="btn btn-secondary btn-md"><i class="fas fa-boxes"></i></a>';
+                                    $button .= '&nbsp;&nbsp;';
+                                    $button .= '<a href="'.$urlcategory.'" title="Data Category by Store" class="btn btn-success btn-md"><i class="fa fa-list"></i></a>';
+                                    $button .= '&nbsp;&nbsp;';
+                                    $button .= '<a href="'.$urlOrderStore.'" title="Data Order by Store" class="btn btn-primary btn-md"><i class="fas fa-cash-register"></i></a>';
+                                    $button .= '&nbsp;&nbsp;';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
                                     $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
@@ -71,27 +80,20 @@ class StoreController extends Controller
     public function store(Request $request)
     {
         $id = $request->id;
-        $storeCheck = Store::find($id);
-        if ($request->type == 'edit') {
-            $validator = Validator::make( $request->all(),[
-                'name' => 'required|max:255',
-                'store_code' => ['required', 'max:50', Rule::unique('stores')->ignore($storeCheck->id)],
-                'location' => 'required|max:255',
-                'discount' => 'nullable|max:11',
-                'description' => 'nullable|max:255',
-                'status' => 'required|in:ACTIVE,NON-ACTIVE',
-            ]);
-        } else if ($request->type == 'create') {
-            $validator = Validator::make( $request->all(),[
-                'name' => 'required|max:255',
-                'store_code' => 'required|max:50|unique:stores,store_code',
-                'location' => 'required|max:255',
-                'discount' => 'nullable|max:11',
-                'description' => 'nullable|max:255',
-                'status' => 'required|in:ACTIVE,NON-ACTIVE',
-            ]);
+        $validator = Validator::make( $request->all(),[
+            'name' => 'required|max:255',
+            'store_code' => ['required', 'max:50', Rule::unique('stores')->ignore($id)],
+            'location' => 'required|max:255',
+            'discount' => 'nullable|max:11',
+            'description' => 'nullable|max:255',
+            'status' => 'required|in:ACTIVE,NON-ACTIVE',
+        ]);
+        if ($request->discount == '') {
+            $discount = 0;
+        } else {
+            $discount = str_replace(",","", $request->discount);
         }
-
+        
         if ($validator->fails()) {
             return response()->json([
                 'code' => 0,
@@ -105,7 +107,7 @@ class StoreController extends Controller
                 'slug' => Str::slug($request->name),
                 'store_code' => Str::upper($request->store_code),
                 'location' => $request->location,
-                'discount' => str_replace(",","", $request->discount),
+                'discount' => $discount,
                 'description' => $request->description,
                 'status' => $request->status,
             ]); 

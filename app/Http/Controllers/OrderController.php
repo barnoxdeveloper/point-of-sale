@@ -20,12 +20,12 @@ class OrderController extends Controller
         $title = "Data Order";
         if($request->ajax()){
             if (!empty($request->startDate)) {
-                $items = Order::with(['user', 'orderDetail'])
+                $items = Order::with(['store', 'user', 'orderDetail'])
                                 ->whereBetween('date', [$request->startDate, $request->endDate])
                                 ->orderBy('date', 'DESC')
                                 ->get();
             } else {
-                $items = Order::with(['user', 'orderDetail'])->orderBy('date', 'DESC')->get();
+                $items = Order::with(['store', 'user', 'orderDetail'])->orderBy('date', 'DESC')->get();
             }
             return datatables()->of($items)
                                 ->addColumn('checkbox', function($data) {
@@ -36,6 +36,11 @@ class OrderController extends Controller
                                 })
                                 ->addColumn('orderId', function($data) {
                                     return $data->order_id;
+                                })
+                                ->addColumn('store', function($data) {
+                                    if ($data->store !== NULL) {
+                                        return $data->store->name;
+                                    }
                                 })
                                 ->addColumn('user', function($data) {
                                     if ($data->user !== NULL) {
@@ -58,12 +63,11 @@ class OrderController extends Controller
                                     $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
-                                ->rawColumns(['checkbox', 'date', 'orderId', 'user', 'total', 'description', 'action'])
+                                ->rawColumns(['checkbox', 'date', 'orderId', 'store', 'user', 'total', 'description', 'action'])
                                 ->addIndexColumn()
                                 ->make(true);
         }
-        $total = Order::sum('total');
-        return view('pages.admin.order.index_order', compact('title', 'total'));
+        return view('pages.admin.order.index_order', compact('title'));
     }
 
     /**
@@ -105,6 +109,7 @@ class OrderController extends Controller
         // Get Invoice
         $date = Carbon::now();
         $orderId = 'INV'.'-'.str_replace(" ","-", $date);
+        $data['store_id'] = $request->store_id;
         $data['user_id'] = $userId;
         $data['order_id'] = $orderId;
         $data['total'] = $grandTotal;
@@ -207,5 +212,60 @@ class OrderController extends Controller
         $order = Order::where('order_id', $id)->first();
         $orderDetail = OrderDetail::where('order_id', $order->order_id)->get();
         return view('pages.admin.order.print_invoice', compact('order', 'orderDetail'));
+    }
+
+    public function orderWhereStore(Request $request, $id)
+    {
+        $store = DB::table('stores')->where('id', decrypt($id))->first();
+        $title = "Data Order (Store : ". $store->name . ")";
+        if($request->ajax()){
+            if (!empty($request->startDate)) {
+                $items = Order::with(['user', 'orderDetail'])
+                                ->where('store_id', decrypt($id))
+                                ->whereBetween('date', [$request->startDate, $request->endDate])
+                                ->orderBy('date', 'DESC')
+                                ->get();
+            } else {
+                $items = Order::with(['user', 'orderDetail'])
+                                ->where('store_id', decrypt($id))
+                                ->orderBy('date', 'DESC')
+                                ->get();
+            }
+            return datatables()->of($items)
+                                ->addColumn('checkbox', function($data) {
+                                    return '<input type="checkbox" name="order_checkbox" data-id="'.$data['id'].'"><label></label>';
+                                })
+                                ->addColumn('date', function ($data) {
+                                    return date("d-M-Y", strtotime($data->date));
+                                })
+                                ->addColumn('orderId', function($data) {
+                                    return $data->order_id;
+                                })
+                                ->addColumn('user', function($data) {
+                                    if ($data->user !== NULL) {
+                                        return $data->user->name;
+                                    }
+                                })
+                                ->addColumn('total', function($data) {
+                                    return $data->total;
+                                    // return 'Rp. '.number_format($data->total,0,",",".");
+                                })
+                                ->addColumn('description', function($data) {
+                                    return $data->description;
+                                })
+                                ->addColumn('action', function($data) {
+                                    $url = route('print-invoice',$data->order_id);
+                                    $button = '<a href="'.$url.'" title="Print" class="btn btn-success btn-md" target="_blank"><i class="fa fa-print"></i></a>';
+                                    $button .= '&nbsp;&nbsp;';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Details" data-id="'.$data->id.'" data-original-title="Details" class="btn btn-primary btn-md btn-detail">'.$data->orderDetail->count().'  <i class="fa fa-box-open"></i></a>';
+                                    $button .= '&nbsp;&nbsp;';
+                                    $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
+                                    return $button;
+                                })
+                                ->rawColumns(['checkbox', 'date', 'orderId', 'user', 'total', 'description', 'action'])
+                                ->addIndexColumn()
+                                ->make(true);
+        }
+        return view('pages.admin.order.index_order_where_store', compact('title', 'id'));
     }
 }

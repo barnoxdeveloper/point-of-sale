@@ -70,7 +70,6 @@
 						<div class="row">
 							<div class="col-md-6">
 								<input type="hidden" readonly name="id" id="id">
-								<input type="hidden" readonly name="type" id="type">
 								<div class="form-group">
 									<label for="name">Name*</label>
 									<input type="text" autofocus name="name" id="name" required class="form-control" maxlength="255" placeholder="Name" value="{{ old('name') }}">
@@ -233,7 +232,7 @@
 				return Number(out.join(""));
 			}
 
-			$("input[type=text]").on("keyup", function () {
+			$("#discount").on("keyup", function () {
 				updateTextView($(this));
 			});
 
@@ -244,7 +243,6 @@
 				$('.modal-title').text("Create Data (* Required)");
 				$('#form-post').trigger("reset");
 				$('#id').val('');
-				$('#type').val('create');
 				$(".modal-body").find("p").hide();
 			});
 
@@ -310,7 +308,6 @@
 					$('.modal-title').text("Edit Data (* Required)");
 					// set value masing-masing id berdasarkan data yg diperoleh dari ajax get request diatas               
 					$('#id').val(data.id);
-					$('#type').val('edit');
 					$('#name').val(data.name);
 					$('#store-code').val(data.store_code);
 					$('#location').val(data.location);

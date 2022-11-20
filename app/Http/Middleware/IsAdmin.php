@@ -19,6 +19,6 @@ class IsAdmin
         if (Auth::user() && Auth::user()->roles == 'ADMINISTRATOR') {
             return $next($request);
         }
-        return redirect('/home');
+        return redirect('/dashboard');
     }
 }

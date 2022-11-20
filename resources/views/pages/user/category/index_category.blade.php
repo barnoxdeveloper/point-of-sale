@@ -25,9 +25,8 @@
 					<div class="card-header">
 						<div class="row">
 							<div class="col-6">
-								<a href="javascript:void(0)" class="btn btn-sm btn-success" id="btn-create">+ Create Data</a>
-								<button class="btn btn-sm btn-danger d-none deleteAllBtn" id="delete-all-btn">Delete All</button>
-							</div>
+								<a href="javascript:void(0)" class="btn btn-sm btn-success" id="btn-create">+ Create Category</a>
+                            </div>
 						</div>
 					</div>
 					<div class="card-body">
@@ -35,10 +34,8 @@
 							<table id="table-data" class="table table-bordered table-striped w-100">
 								<thead>
 									<tr class="text-center">
-										<th width="5%"><input type="checkbox" name="main_checkbox"><label></label></th>
 										<th>#</th>
 										<th>Name</th>
-										<th>Store</th>
 										<th>Photo</th>
 										<th>Status</th>
 										<th>Actions</th>
@@ -68,22 +65,13 @@
 							<table class="table table-bordered table-striped w-100" id="dynamic-table">
 								<thead>
 									<tr class="text-center">
-										<th width="35%">Store</th>
-										<th width="35%">Name</th>
-										<th width="20%">Photo</th>
-										<th width="10%">Action</th>
+										<th>Name</th>
+										<th>Photo</th>
+										<th>Action</th>
 									</tr>
 								</thead>
 								<tbody>
 									<tr class="text-center">
-										<td>
-											<select class="form-control select2 store_id" required name="store_id[]" style="width: 100%;">
-												<option value="" selected disabled>Select Store</option>
-												@foreach($stores as $item)
-												<option {{ old('store_id') == $item->id ? "selected" : "" }} value="{{ $item->id }}">{{ $item->store_code }} | {{ $item->name }}</option>
-												@endforeach
-											</select>
-										</td>
 										<td>
 											<input type="text" name="name[]" required class="form-control" placeholder="Name">
 										</td>
@@ -128,19 +116,7 @@
 						<div class="row">
 							<div class="col-md-6">
 								<div class="form-group">
-									<label for="store-id-edit">Store*</label>
-									<select class="form-control select2" name="store_id" id="store-id-edit" required style="width: 100%;">
-										<option value="" selected disabled>Select Store</option>
-										@foreach($stores as $item)
-										<option {{ old('store_id') == $item->id ? "selected" : "" }} value="{{ $item->id }}">{{ $item->store_code }} | {{ $item->name }}</option>
-										@endforeach
-									</select>
-									<p class="text-danger error-text store_id_error"></p>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="name">Name</label>
+									<label for="name-edit">Store</label>
 									<input type="text" name="name" id="name-edit" required class="form-control" placeholder="Name">
 									<p class="text-danger error-text name_error"></p>
 								</div>
@@ -210,29 +186,21 @@
 						[10, 25, 50, 'All'],
 					],
 					columnDefs : [ {
-						"targets" : [0, 4, 6],
+						"targets" : [1, 2, 4],
 						"orderable" : false,
 						"searchable" : false,
 					} ],
 					ajax : {
-						url : "{{ route('category.index') }}",
+						url : "{{ route('category-user.index') }}",
 						type : 'GET',
 					},
 					columns: [
-						{ data: 'checkbox', name: 'checkbox', className: "text-center"},
 						{ data: 'DT_RowIndex', name: 'DT_RowIndex', className: "text-center" },
 						{ data: 'name', name: 'name', className: "text-center" },
-						{ data: 'storeName', name: 'storeName', className: "text-center" },
 						{ data: 'photo', name: 'photo', className: "text-center" },
 						{ data: 'status', name: 'status', className: "text-center" },
 						{ data: 'action', name: 'action', className: "text-center" },
 					],
-				}).on('draw', function () {
-					$('input[name="category_checkbox"]').each(function (){
-						this.checked = false;
-					});
-					$('input[name="main_checkbox"]').prop('checked', false);
-					$('#delete-all-btn').addClass('d-none');
 				});
 			});
 		</script>
@@ -279,7 +247,7 @@
 							dropdownParent: $("#modal-post")
 						});
 					});
-					$("#dynamic-table").append(`<tr class="text-center"><td><select class="form-control select2 store_id" required name="store_id[]" style="width: 100%;"><option value="" selected disabled>Select Store</option>@foreach($stores as $item)<option {{ old('store_id') == $item->id ? "selected" : "" }} value="{{ $item->id }}">{{ $item->store_code }} | {{ $item->name }}</option>@endforeach</select></td><td><input type="text" name="name[]" required class="form-control" placeholder="Name"></td><td><input type="file" accept="image/*" name="photo[]" required class="form-control"></td><td><button type="button" class="btn btn-danger remove-tr">-</button></td></tr>`);
+					$("#dynamic-table").append(`<tr class="text-center"><td><input type="text" name="name[]" required class="form-control" placeholder="Name"></td><td><input type="file" accept="image/*" name="photo[]" required class="form-control"></td><td><button type="button" class="btn btn-danger remove-tr">-</button></td></tr>`);
 				});
 			
 				$(document).on('click', '.remove-tr', function(){  
@@ -302,7 +270,7 @@
 								if (result.isConfirmed) {
 									$(".modal-body").find("p").show();
 									$.ajax({
-										url: "{{ route('category.store') }}",
+										url: "{{ route('category-user.store') }}",
 										type: 'POST',
 										dataType: 'json',
 										data: formData,
@@ -353,7 +321,7 @@
 			$(document).on('click', '.editPost', function () {
 				let dataId = $(this).data('id');
 				$(".modal-body").find("p").hide();
-				$.get('category/' + dataId + '/edit', function (data) {
+				$.get('category-user/' + dataId + '/edit', function (data) {
 					$('#modal-edit').modal('show');
 					$(document).ready(function() {
 						$("#store_id-edit").select2({
@@ -363,7 +331,6 @@
 					$('.modal-title').text("Edit Data (* Required)");
 					// set value masing-masing id berdasarkan data yg diperoleh dari ajax get request diatas
 					$('#id').val(data.id);
-					$('#store-id-edit').val(data.store_id);
 					$('#name-edit').val(data.name);
 					$('#photo-preview').html(`<a href="${data.photo}" title="${data.photo}" target="_blank"><img src="${data.photo}" alt="${data.photo}" style="width: 100px; height: 100px;"></a>`);
 					// status
@@ -390,7 +357,7 @@
 								if (result.isConfirmed) {
 									$(".modal-body").find("p").show();
 									let id = $("input[name=id]").val();
-									let url = "{{ route('category.update', ":id") }}";
+									let url = "{{ route('category-user.update', ":id") }}";
 									url = url.replace(':id', id);
 									$.ajax({
 										type: 'POST',
@@ -443,102 +410,38 @@
 
 
 			// method delete start
-			$(document).on('click', '.delete', function () {
-				dataId = $(this).data('id');
-				Swal.fire({
-						title: 'Are you sure?',
-						text: "You won't be able to revert this!",
-						icon: 'warning',
-						showCancelButton: true,
-						confirmButtonColor: '#3085d6',
-						cancelButtonColor: '#d33',
-						confirmButtonText: 'Yes, delete it!'
-					}).then((result) => {
-						if (result.isConfirmed) {
-							$.ajax({
-								url: "category/" + dataId,
-								type: 'DELETE',
-							success: function (data) {
-								$('#delete-modal').modal('hide');
-								Swal.fire(
-									'Deleted!',
-									'Your Data has been Deleted.',
-									'success'
-								);
-								$('#table-data').DataTable().ajax.reload();
-							},
-							error: function (data) {
-								console.log('Error: ', data);
-							}
-						});
-					}
-				});
-			});
+			// $(document).on('click', '.delete', function () {
+			// 	dataId = $(this).data('id');
+			// 	Swal.fire({
+			// 			title: 'Are you sure?',
+			// 			text: "You won't be able to revert this!",
+			// 			icon: 'warning',
+			// 			showCancelButton: true,
+			// 			confirmButtonColor: '#3085d6',
+			// 			cancelButtonColor: '#d33',
+			// 			confirmButtonText: 'Yes, delete it!'
+			// 		}).then((result) => {
+			// 			if (result.isConfirmed) {
+			// 				$.ajax({
+			// 					url: "category-user/" + dataId,
+			// 					type: 'DELETE',
+			// 				success: function (data) {
+			// 					$('#delete-modal').modal('hide');
+			// 					Swal.fire(
+			// 						'Deleted!',
+			// 						'Your Data has been Deleted.',
+			// 						'success'
+			// 					);
+			// 					$('#table-data').DataTable().ajax.reload();
+			// 				},
+			// 				error: function (data) {
+			// 					console.log('Error: ', data);
+			// 				}
+			// 			});
+			// 		}
+			// 	});
+			// });
 
-			$(document).on('click', 'input[name="main_checkbox"]', function() {
-				if (this.checked) {
-					$('input[name="category_checkbox"]').each(function () {
-						this.checked = true;
-					});
-				} else {
-					$('input[name="category_checkbox"]').each(function () {
-						this.checked = false;
-					});	
-				}
-				toggleDeleteAllBtn();
-			});
-
-			$(document).on('change', 'input[name="category_checkbox"]', function() {
-				if ($('input[name="category_checkbox"]').length == $('input[name="category_checkbox"]:checked').length) {
-					$('input[name="main_checkbox"]').prop('checked', true);
-				} else {
-					$('input[name="main_checkbox"]').prop('checked', false);
-				}
-				toggleDeleteAllBtn();
-			});
-
-			function toggleDeleteAllBtn() {
-				if ($('input[name="category_checkbox"]:checked').length > 0) {
-					$('#delete-all-btn').text('Delete ('+ $('input[name="category_checkbox"]:checked').length +')').removeClass('d-none');
-				} else {
-					$('#delete-all-btn').addClass('d-none');
-				}
-			}
-
-			$('#delete-all-btn').click(function () {
-				let checkedCategory = [];
-				$('input[name="category_checkbox"]:checked').each(function () {
-					checkedCategory.push($(this).data('id'));
-				});
-				
-				const url = "{{ route('delete-selected-category') }}";
-				if (checkedCategory.length > 0) {
-					Swal.fire({
-						title: 'Are you sure?',
-						html: `You want to delete <b>(${checkedCategory.length})</b> category`,
-						icon: 'info',
-						showCancelButton: true,
-						confirmButtonColor: '#3085d6',
-						cancelButtonColor: '#d33',
-						confirmButtonText: 'Yes, Delete!',
-						allowOutsideClick: false,
-					}).then((result) => {
-						if (result.value) {
-							$.post(url, {id:checkedCategory}, function (data) {
-								if (data.code == 1) {
-									Swal.fire(
-										'Deleted!',
-										'Your Data has been Deleted.',
-										'success'
-									);
-									$('#table-data').DataTable().ajax.reload();
-								}
-							}, 'json');
-						}
-					});
-				}
-			});
-			// method delete end
 		});
 	</script>
 

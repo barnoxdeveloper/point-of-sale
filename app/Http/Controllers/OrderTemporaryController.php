@@ -26,6 +26,10 @@ class OrderTemporaryController extends Controller
     public function create()
     {
         $title = "Create Order";
+        $stores = DB::table('stores')
+                        ->where('status', 'ACTIVE')
+                        ->orderBy('name', 'ASC')
+                        ->get(['id', 'name']);
         $products = DB::table('products')
                         ->where('status', 'ACTIVE')
                         ->where('stock','!=', 0)
@@ -33,7 +37,7 @@ class OrderTemporaryController extends Controller
         $items = DB::table('order_temporaries')->where('user_id', Auth::user()->id)->get();
         $i = 1;;
         $grandTotal = DB::table('order_temporaries')->where('user_id', Auth::user()->id)->sum('sub_total');
-        return view('pages.admin.order_temporary.create_order_temporary', compact('title', 'products', 'items', 'i', 'grandTotal'));
+        return view('pages.admin.order_temporary.create_order_temporary', compact('title', 'stores', 'products', 'items', 'i', 'grandTotal'));
     }
 
     /**

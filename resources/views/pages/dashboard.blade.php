@@ -21,8 +21,9 @@
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
+                    @if(Auth::user()->is_roles_admin)
                     <div class="col-lg-3 col-6">
-                        <div class="small-box bg-info">
+                        <div class="small-box bg-primary">
                             <div class="inner">
                                 <h3>{{ $users }}</h3>
                                 <p>Users</p>
@@ -60,15 +61,18 @@
                     <div class="col-lg-3 col-6">
                         <div class="small-box bg-danger">
                             <div class="inner">
-                                <h3>65</h3>
-                                <p>Unique Visitors</p>
+                                <h3>{{ $products }}</h3>
+                                <p>Products</p>
                             </div>
                             <div class="icon">
-                                <i class="fa fa-shopping-bag"></i>
+                                <i class="fas fa-boxes"></i>
                             </div>
-                            <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            <a href="{{ route('product.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
+                    @elseif (Auth::user()->is_roles_manager)
+                    @elseif (Auth::user()->is_roles_cashier)
+                    @endif
                 </div>
             </div>
         </section>

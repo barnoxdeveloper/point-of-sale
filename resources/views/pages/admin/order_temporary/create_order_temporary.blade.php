@@ -164,6 +164,20 @@
 							<div class="row justify-content-center">
 								<div class="col-md-3">
 									<div class="form-group">
+										<label for="store-id">Store*</label>
+										<select class="form-control select2" name="store_id" id="store-id" required style="width: 100%;">
+											<option value="" selected disabled>Select Store</option>
+											@foreach($stores as $item)
+											<option {{ old('store_id') == $item->id ? "selected" : "" }} value="{{ $item->id }}">{{ $item->name }}</option>
+											@endforeach
+										</select>
+										<p class="text-danger error-text store_id_error"></p>
+									</div>
+								</div>
+							</div>
+							<div class="row justify-content-center">
+								<div class="col-md-3">
+									<div class="form-group">
 										<button type="submit" class="btn btn-success btn-block"><i class="fas fa-money-check"></i>&nbsp; Bayar</button>
 									</div>
 								</div>

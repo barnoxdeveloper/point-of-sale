@@ -9,7 +9,7 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $fillable =['user_id', 'order_id', 'total', 'description', 'date', 'discount', 'total_bayar', 'kembalian'];
+    protected $fillable =['store_id', 'user_id', 'order_id', 'total', 'description', 'date', 'discount', 'total_bayar', 'kembalian'];
     
     // inisalisasi nama tabel
     protected $table = 'orders';
@@ -19,6 +19,11 @@ class Order extends Model
 
     //inisialisasi primarykey pada tabel
     protected $primaryKey = 'id';
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class, 'store_id', 'id');
+    }
 
     public function user()
     {

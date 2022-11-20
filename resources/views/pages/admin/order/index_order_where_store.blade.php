@@ -7,11 +7,12 @@
 			<div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">{{ $title }}</h1>
+                        <h4 class="m-0">{{ $title }}</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('store.index') }}">Store</a></li>
                             <li class="breadcrumb-item active">{{ $title }}</li>
                         </ol>
                     </div>
@@ -72,7 +73,6 @@
 										<th>#</th>
 										<th>Date</th>
 										<th>ID</th>
-										<th>Store</th>
 										<th>User</th>
 										<th>Total</th>
 										<th>Actions</th>
@@ -81,7 +81,7 @@
                                 <tbody></tbody>
                                 <tfoot>
 									<tr>
-										<th colspan="6">Total</th>
+										<th colspan="5">Total</th>
 										<th id="total-all"></th>
 										<th>-</th>
 									</tr>
@@ -104,7 +104,6 @@
 				</div>
 				<div class="modal-body">
 					<p id="detail-date"></p>
-					<p id="detail-store"></p>
 					<p id="detail-user"></p>
 					<p id="detail-order-id"></p>
 					<p id="detail-total"></p>
@@ -160,7 +159,7 @@
 						serverSide : true,
 						pageLength : 25,
 						ajax : {
-							url : "{{ route('order.index') }}",
+							url : "{{ route('order-where-store', $id) }}",
 							data : {startDate, endDate},
 							type : 'GET',
 						},
@@ -169,12 +168,11 @@
 							{ data: 'DT_RowIndex', name: 'DT_RowIndex', className: "text-center" },
 							{ data: 'date', name: 'date', className: "text-center" },
 							{ data: 'orderId', name: 'orderId', className: "text-center" },
-							{ data: 'store', name: 'store', className: "text-center" },
 							{ data: 'user', name: 'user', className: "text-center" },
 							{ data: 'total', name: 'total', className: "text-center", "render": $.fn.dataTable.render.number( '.', ',', 0, 'Rp ' ) },
 							{ data: 'action', name: 'action', className: "text-center" },
 						],
-						columnDefs : [{
+						columnDefs : [ {
 							"targets" : [0, 3 ,6],
 							"orderable" : false,
 							"searchable" : false,
@@ -184,7 +182,7 @@
 							[10, 25, 50, 'All'],
 						],
 						drawCallback: function () {
-							let sum = $('#table-data').DataTable().column(6).data().sum();
+							let sum = $('#table-data').DataTable().column(5).data().sum();
 							$('#total-all').html(`Rp. ${sum.toLocaleString('id-ID')}`);
 						}	
 					}).on('draw', function () {
@@ -296,7 +294,7 @@
 					}).then((result) => {
 						if (result.isConfirmed) {
 							$.ajax({
-								url: "order/" + dataId,
+								url: "/order/" + dataId,
 								type: 'DELETE',
 							success: function (data) {
 								$('#delete-modal').modal('hide');

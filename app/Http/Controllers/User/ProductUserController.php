@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\User;
 
-use App\Models\{Product, Category};
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\{DB, Validator, File};
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\{Product, Category};
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\{DB, Validator, File};
 
-class ProductController extends Controller
+class ProductUserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,14 +19,15 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $title = "Data Products";
-        $items = Product::with('store', 'category')->get();
-        $categories = DB::table('categories')->orderBy('name', 'ASC')->get();
-        if($request->ajax()){
+        $title = "All Products";
+        $categories = Category::where('store_id', Auth::user()->store_id)->get();
+        foreach ($categories as $key => $item) {
+            $categoryId[] = $item->id;
+        }
+        $items = Product::with('category')->whereIn('category_id', $categoryId)->get();
+        
+        if($request->ajax()) {
             return datatables()->of($items)
-                                ->addColumn('checkbox', function($data) {
-                                    return '<input type="checkbox" name="product_checkbox" data-id="'.$data['id'].'"><label></label>';
-                                })
                                 ->addColumn('name', function($data) {
                                     return $data->product_code.' - '.$data->name;
                                 })
@@ -52,14 +55,14 @@ class ProductController extends Controller
                                     $button .= '&nbsp;&nbsp;';
                                     $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
+                                    // $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
-                                ->rawColumns(['checkbox', 'name', 'category', 'price', 'stock', 'photo', 'status', 'action'])
+                                ->rawColumns(['name', 'category', 'price', 'stock', 'photo', 'status', 'action'])
                                 ->addIndexColumn()
                                 ->make(true);
         }
-        return view('pages.admin.product.index_product', compact('title', 'categories'));
+        return view('pages.user.product.index_product', compact('title', 'categories'));
     }
 
     /**
@@ -215,14 +218,11 @@ class ProductController extends Controller
 
     public function printBarcode(Request $request)
     {
-        // return response()->json($request->all());
         $item = Product::where('id', $request->product_id)->first();
         $number = 1;
         for ($i=1; $i <= $request->quantity_barcode; $i++) { 
-            // echo $number++.' '.$item->name.'<br>';
             $barcodeName[] = $item;
         }
-
         $pdf = Pdf::setOptions(['isRemoteEnabled' => TRUE, 'enable_javascript' => TRUE]);
         $pdf = Pdf::loadView('pages.admin.product.print_barcode', compact('number', 'barcodeName'));
         $pdf->setPaper('a4', 'protait'); 
@@ -237,9 +237,6 @@ class ProductController extends Controller
         $title = "Data Products (Category : ". $category->name . ")";
         if($request->ajax()) {
             return datatables()->of($items)
-                                ->addColumn('checkbox', function($data) {
-                                    return '<input type="checkbox" name="product_checkbox" data-id="'.$data['id'].'"><label></label>';
-                                })
                                 ->addColumn('name', function($data) {
                                     return $data->product_code.' - '.$data->name;
                                 })
@@ -267,13 +264,13 @@ class ProductController extends Controller
                                     $button .= '&nbsp;&nbsp;';
                                     $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
+                                    // $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
-                                ->rawColumns(['checkbox', 'name', 'category', 'price', 'stock', 'photo', 'status', 'action'])
+                                ->rawColumns(['name', 'category', 'price', 'stock', 'photo', 'status', 'action'])
                                 ->addIndexColumn()
                                 ->make(true);
         }
-        return view('pages.admin.product.index_product_where_category', compact('title', 'categories', 'id'));
+        return view('pages.user.product.index_product_where_category', compact('title', 'categories', 'id'));
     }
 }

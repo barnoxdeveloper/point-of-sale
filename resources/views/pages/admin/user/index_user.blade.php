@@ -70,7 +70,6 @@
 						<div class="row">
 							<div class="col-md-6">
 								<input type="hidden" readonly name="id" id="id">
-								<input type="hidden" readonly name="type" id="type">
 								<div class="form-group">
 									<label for="name">Name*</label>
 									<input type="text" autofocus name="name" id="name" required class="form-control" maxlength="50" placeholder="Name" value="{{ old('name') }}">
@@ -240,7 +239,6 @@
 				$('#form-post').trigger("reset");
 				$('#id').val('');
 				$('#password').prop('readonly', false);
-				$('#type').val('create');
 				$(".modal-body").find("p").hide();
 				$('#checkbox-password').attr("style", "display: none;");
 			});
@@ -313,7 +311,6 @@
 					});
 					$('.modal-title').text("Edit Data (* Required)");
 					// set value masing-masing id berdasarkan data yg diperoleh dari ajax get request diatas               
-					$('#type').val('edit');
 					$('#id').val(data.id);
 					$('#name').val(data.name);
 					$('#email').val(data.email);
@@ -326,7 +323,7 @@
 						$('#cashier').prop('selected', true);
 					}
 					// status
-					if (data.code == "ACTIVE") {
+					if (data.status == "ACTIVE") {
 						$('#active').prop('checked', true);
 					} else {
 						$('#non-active').prop('checked', true);

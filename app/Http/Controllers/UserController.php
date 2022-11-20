@@ -77,7 +77,6 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $id = $request->id;
-        $type = $request->type;
         $password = $request->password;
         // check user exists
         $userCheck = User::find($id);
@@ -87,25 +86,14 @@ class UserController extends Controller
             $pass = $userCheck->password;
         }
 
-        if ($type == 'edit') {
-            $validator = Validator::make( $request->all(),[
-                'name' => 'required|max:50',
-                'email' => ['required', 'email', 'max:50', Rule::unique('users')->ignore($userCheck->id)],
-                'store_id' => 'nullable|exists:stores,id',
-                'password' => 'max:50',
-                'roles' => 'required|not_in:0|in:ADMINISTRATOR,MANAGER,CASHIER',
-                'status' => 'required|in:ACTIVE,NON-ACTIVE',
-            ]);
-        } else if ($type == 'create') {
-            $validator = Validator::make( $request->all(),[
-                'name' => 'required|max:50',
-                'email' => 'required|email|max:50|unique:users,email',
-                'store_id' => 'nullable|exists:stores,id',
-                'password' => 'max:50',
-                'roles' => 'required|not_in:0|in:ADMINISTRATOR,MANAGER,CASHIER',
-                'status' => 'required|in:ACTIVE,NON-ACTIVE',
-            ]);
-        }
+        $validator = Validator::make( $request->all(),[
+            'name' => 'required|max:50',
+            'email' => ['required', 'email', 'max:50', Rule::unique('users')->ignore($id)],
+            'store_id' => 'nullable|exists:stores,id',
+            'password' => 'max:50',
+            'roles' => 'required|not_in:0|in:ADMINISTRATOR,MANAGER,CASHIER',
+            'status' => 'required|in:ACTIVE,NON-ACTIVE',
+        ]);
 
         if ($validator->fails()) {
             return response()->json([

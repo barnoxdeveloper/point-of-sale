@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
-class IsActive
+class IsManager
 {
     /**
      * Handle an incoming request.
@@ -16,11 +16,9 @@ class IsActive
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::user() && Auth::user()->status == 'ACTIVE') {
+        if (Auth::user() && Auth::user()->roles == 'MANAGER' || Auth::user()->roles == 'ADMINISTRATOR') {
             return $next($request);
         }
-        $request->session()->flush();
-        $request->session()->regenerate();
-        return to_route('login')->with('status', 'Your Account Non Active!');
+        return redirect('/dashboard');
     }
 }

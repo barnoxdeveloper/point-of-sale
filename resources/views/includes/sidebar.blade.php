@@ -26,6 +26,7 @@
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <div class="dropdown-divider"></div>
+                        @if(Auth::user()->is_roles_admin)
                         <li class="nav-item {{ (request()->is('dashboard')) ? 'active' : '' }}">
                             <a href="{{ route('dashboard') }}" class="nav-link {{ (request()->is('dashboard')) ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-home"></i>
@@ -55,7 +56,7 @@
                         </li>
                         <div class="dropdown-divider"></div>
                         <li class="nav-item {{ (request()->is('product')) ? 'active' : '' }}">
-                            <a href="{{ route('product.index') }}" class="nav-link {{ (request()->is('product')) ? 'active' : '' }}">
+                            <a href="{{ route('product.index') }}" class="nav-link {{ (request()->is('product*')) ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-boxes"></i>
                                 <p>Product</p>
                             </a>
@@ -67,6 +68,23 @@
                                 <p>Orders</p>
                             </a>
                         </li>
+                        @elseif (Auth::user()->is_roles_manager)
+                        <li class="nav-item {{ (request()->is('category-user')) ? 'active' : '' }}">
+                            <a href="{{ route('category-user.index') }}" class="nav-link {{ (request()->is('category-user')) ? 'active' : '' }}">
+                                <i class="nav-icon fa fa-list"></i>
+                                <p>Category</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item {{ (request()->is('product-user')) ? 'active' : '' }}">
+                            <a href="{{ route('product-user.index') }}" class="nav-link {{ (request()->is('product-user*')) ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-boxes"></i>
+                                <p>Product</p>
+                            </a>
+                        </li>
+                        @elseif (Auth::user()->is_roles_cashier)
+                        
+                        @endif
                         <div class="dropdown-divider"></div>
                     </ul>
                 </nav>
