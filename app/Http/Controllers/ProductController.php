@@ -229,10 +229,57 @@ class ProductController extends Controller
         return $pdf->stream($item->name.".pdf");
     }
 
+    public function productWhereStore(Request $request, $id)
+    {
+        $items = Product::with('category')->where('store_id', decrypt($id))->get();
+        $categories = DB::table('categories')->where('store_id', decrypt($id))->orderBy('name', 'ASC')->get();
+        $store = DB::table('stores')->where('id', decrypt($id))->first();
+        $title = "Data Products (Store : ". $store->name . ")";
+        if($request->ajax()) {
+            return datatables()->of($items)
+                                ->addColumn('checkbox', function($data) {
+                                    return '<input type="checkbox" name="product_checkbox" data-id="'.$data['id'].'"><label></label>';
+                                })
+                                ->addColumn('name', function($data) {
+                                    return $data->product_code.' - '.$data->name;
+                                })
+                                ->addColumn('category', function($data){
+                                    if ($data->category !== NULL) {
+                                        return Str::upper($data->category->name);
+                                    }
+                                })
+                                ->addColumn('price', function($data) {
+                                    return '<del>'.number_format($data->old_price,0,",",".").'</del> | '.number_format($data->new_price,0,",",".").'';
+                                })
+                                ->addColumn('stock', function($data) {
+                                    return '<span class="text-danger">'.$data->limit_stock.'</span> | <span class="text-success">'.$data->stock.'</span>';
+                                })
+                                ->addColumn('photo', function ($data) {
+                                    if ($data->getRawOriginal('photo') !== NULL) {
+                                        return '<a href="'.$data->photo.'" title="'.$data->photo.'" target="_blank><img src="'.$data->photo.'" alt="'.$data->photo.'" style="width: 100px; height: 100px;"><img src="'.$data->photo.'" alt="'.$data->photo.'" style="width: 100px; height: 100px;"></a>';    
+                                    }
+                                })
+                                ->addColumn('status', function($data) {
+                                    return $data->status;
+                                })
+                                ->addColumn('action', function($data) {
+                                    $button = '<a href="javascript:void(0)" data-toggle="tooltip" title="Cetak Barcode" data-id="'.$data->id.'" data-original-title="Cetak Barcode" class="btn btn-success btn-md btn-barcode"><i class="fas fa-barcode"></i></a>';
+                                    $button .= '&nbsp;&nbsp;';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
+                                    $button .= '&nbsp;&nbsp;';
+                                    $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
+                                    return $button;
+                                })
+                                ->rawColumns(['checkbox', 'name', 'category', 'price', 'stock', 'photo', 'status', 'action'])
+                                ->addIndexColumn()
+                                ->make(true);
+        }
+        return view('pages.admin.product.product_where_store', compact('title', 'categories', 'id'));
+    }
+
     public function productWhereCategory(Request $request, $id)
     {
         $items = Product::with('store', 'category')->where('category_id', decrypt($id))->get();
-        $categories = DB::table('categories')->orderBy('name', 'ASC')->get();
         $category = DB::table('categories')->where('id', decrypt($id))->first();
         $title = "Data Products (Category : ". $category->name . ")";
         if($request->ajax()) {
@@ -274,6 +321,6 @@ class ProductController extends Controller
                                 ->addIndexColumn()
                                 ->make(true);
         }
-        return view('pages.admin.product.index_product_where_category', compact('title', 'categories', 'id'));
+        return view('pages.admin.product.product_where_category', compact('title',  'id'));
     }
 }

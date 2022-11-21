@@ -44,6 +44,7 @@ class CategoryController extends Controller
                                 ->addColumn('action', function($data) {
                                     $url = route('product-where-category', encrypt($data->id));
                                     $button = '<a href="'.$url.'" title="Data Product" class="btn btn-primary btn-md"><i class="fas fa-boxes"></i></a>';
+                                    $button .= '&nbsp;&nbsp;';
                                     $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
                                     $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
@@ -202,5 +203,42 @@ class CategoryController extends Controller
             Category::whereIn('id', $id)->delete();
         }
         return response()->json(['code' => 1]);
+    }
+
+    public function categoryWhereStore(Request $request, $id)
+    {
+        $items = Category::where('store_id', decrypt($id))->get();
+        $store = DB::table('stores')->where('id', decrypt($id))->first();
+        $title = "Data Category (Store : ". $store->name . ")";
+        if($request->ajax()) {
+            return datatables()->of($items)
+                                ->addColumn('checkbox', function($data) {
+                                    return '<input type="checkbox" name="category_checkbox" data-id="'.$data['id'].'"><label></label>';
+                                })
+                                ->addColumn('name', function ($data) {
+                                    return $data->name;
+                                })
+                                ->addColumn('photo', function ($data) {
+                                    if ($data->getRawOriginal('photo') !== NULL) {
+                                        return '<a href="'.$data->photo.'" title="'.$data->photo.'" target="_blank><img src="'.$data->photo.'" alt="'.$data->photo.'" style="width: 100px; height: 100px;"><img src="'.$data->photo.'" alt="'.$data->photo.'" style="width: 100px; height: 100px;"></a>';    
+                                    }
+                                })
+                                ->addColumn('status', function($data) {
+                                    return $data->status;
+                                })
+                                ->addColumn('action', function($data) {
+                                    $url = route('product-where-category', encrypt($data->id));
+                                    $button = '<a href="'.$url.'" title="Data Product" class="btn btn-primary btn-md"><i class="fas fa-boxes"></i></a>';
+                                    $button .= '&nbsp;&nbsp;';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
+                                    $button .= '&nbsp;&nbsp;';
+                                    $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
+                                    return $button;
+                                })
+                                ->rawColumns(['checkbox', 'name', 'photo', 'status', 'action'])
+                                ->addIndexColumn()
+                                ->make(true);
+        }
+        return view('pages.admin.category.category_where_store', compact('id', 'title'));
     }
 }

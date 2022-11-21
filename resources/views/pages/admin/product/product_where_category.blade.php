@@ -12,7 +12,7 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-							<li class="breadcrumb-item"><a href="{{ route('category.index') }}">Category</a></li>
+							<li class="breadcrumb-item"><a href="#" onclick="history.back()">Category</a></li>
                             <li class="breadcrumb-item active">{{ $title }}</li>
                         </ol>
                     </div>
@@ -39,7 +39,7 @@
 										<th width="5%"><input type="checkbox" name="main_checkbox"><label></label></th>
 										<th>#</th>
 										<th>Name</th>
-										<th>Catrgory</th>
+										<th>Category</th>
 										<th>Price</th>
 										<th>Stock</th>
 										<th>Photo</th>
@@ -71,6 +71,7 @@
 							<div class="col-md-6">
 								<input type="hidden" readonly name="id" id="id">
 								<input type="hidden" readonly name="metode" id="metode">
+								<input type="hidden" readonly name="category_id" id="category-id" value="{{ decrypt($id) }}">
 								<div class="form-group">
 									<label for="product-code">Product Code</label>
 									<input type="text" autofocus name="product_code" id="product-code" class="form-control" maxlength="255" placeholder="Product Code" value="{{ old('product_code') }}">
@@ -82,18 +83,6 @@
 									<label for="name">Name*</label>
 									<input type="text" name="name" id="name" required class="form-control" maxlength="255" placeholder="Name" value="{{ old('name') }}">
 									<p class="text-danger error-text name_error"></p>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="category-id">Category*</label>
-									<select class="form-control select2" name="category_id" id="category-id" required style="width: 100%;">
-										<option value="" selected disabled>Select Category</option>
-										@foreach($categories as $item)
-										<option {{ old('category_id') == $item->id ? "selected" : "" }} value="{{ $item->id }}">{{ $item->name }}</option>
-										@endforeach
-									</select>
-									<p class="text-danger error-text category_id_error"></p>
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -279,17 +268,6 @@
 		</script>
 @endpush
 
-@push('style-select2')
-
-		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-	
-@endpush
-
-@push('script-select2')
-
-		<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-@endpush
-
 @push('modal-post')
 	<script>
 		// method create
@@ -314,11 +292,6 @@
 			const myModal = new bootstrap.Modal($('#modal-post'));
 			$('#btn-create').click(function () {
 				myModal.show();
-				$(document).ready(function() {
-					$("#category-id").select2({
-						dropdownParent: $("#modal-post")
-					});
-				});
 				$('.modal-title').text("Create Data (* Required)");
 				$('#form-post').trigger("reset");
 				$('#id').val('');
@@ -388,11 +361,6 @@
 				$('.modal-title').text("Edit Data (* Required)");
 				$.get('/product/' + dataId + '/edit', function (data) {
 					$('#modal-post').modal('show');
-					$(document).ready(function() {
-						$("#category-id").select2({
-							dropdownParent: $("#modal-post")
-						});
-					});
 					// set value masing-masing id berdasarkan data yg diperoleh dari ajax get request diatas               
 					$('#id').val(data.id);
 					$('#product-code').val(data.product_code);
@@ -433,7 +401,7 @@
 					}).then((result) => {
 						if (result.isConfirmed) {
 							$.ajax({
-								url: "product/" + dataId,
+								url: "/product/" + dataId,
 								type: 'DELETE',
 							success: function (data) {
 								$('#delete-modal').modal('hide');

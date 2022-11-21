@@ -42,11 +42,13 @@ Route::middleware(['auth', 'verified', 'active', 'admin', 'revalidate'])
     // route for category
     Route::resource('category', CategoryController::class);
     Route::controller(CategoryController::class)->group(function () {
+        Route::get('category-where-store/{id}', 'categoryWhereStore')->name('category-where-store');
 		Route::post('delete-selected-category', 'deleteSelectedCategory')->name('delete-selected-category');
 	});
     // route for product
     Route::resource('product', ProductController::class);
     Route::controller(ProductController::class)->group(function () {
+        Route::get('product-where-store/{id}', 'productWhereStore')->name('product-where-store');
         Route::get('product-where-category/{id}', 'productWhereCategory')->name('product-where-category');
         Route::post('print-barcode', 'printBarcode')->name('print-barcode');
 		Route::post('delete-selected-product', 'deleteSelectedProduct')->name('delete-selected-product');

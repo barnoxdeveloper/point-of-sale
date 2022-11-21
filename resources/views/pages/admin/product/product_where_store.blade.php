@@ -7,11 +7,12 @@
 			<div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">{{ $title }}</h1>
+                        <h4 class="m-0">{{ $title }}</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+							<li class="breadcrumb-item"><a href="{{ route('store.index') }}">Store</a></li>
                             <li class="breadcrumb-item active">{{ $title }}</li>
                         </ol>
                     </div>
@@ -253,7 +254,7 @@
 						"searchable" : false,
 					} ],
 					ajax : {
-						url : "{{ route('product.index') }}",
+						url : "{{ route('product-where-store', $id) }}",
 						type : 'GET',
 					},
 					columns: [
@@ -385,7 +386,7 @@
 				$(".modal-body").find("p").hide();
 				$('#metode').val('edit');
 				$('.modal-title').text("Edit Data (* Required)");
-				$.get('product/' + dataId + '/edit', function (data) {
+				$.get('/product/' + dataId + '/edit', function (data) {
 					$('#modal-post').modal('show');
 					$(document).ready(function() {
 						$("#category-id").select2({
@@ -432,7 +433,7 @@
 					}).then((result) => {
 						if (result.isConfirmed) {
 							$.ajax({
-								url: "product/" + dataId,
+								url: "/product/" + dataId,
 								type: 'DELETE',
 							success: function (data) {
 								$('#delete-modal').modal('hide');

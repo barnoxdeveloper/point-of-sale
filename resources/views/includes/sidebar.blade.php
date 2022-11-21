@@ -49,7 +49,7 @@
                         </li>
                         <div class="dropdown-divider"></div>
                         <li class="nav-item {{ (request()->is('category')) ? 'active' : '' }}">
-                            <a href="{{ route('category.index') }}" class="nav-link {{ (request()->is('category')) ? 'active' : '' }}">
+                            <a href="{{ route('category.index') }}" class="nav-link {{ (request()->is('category*')) ? 'active' : '' }}">
                                 <i class="nav-icon fa fa-list"></i>
                                 <p>Category</p>
                             </a>

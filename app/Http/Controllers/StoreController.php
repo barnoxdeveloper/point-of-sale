@@ -40,12 +40,12 @@ class StoreController extends Controller
                                     return $data->status;
                                 })
                                 ->addColumn('action', function($data) {
-                                    $urlProduct = '#';
-                                    $urlcategory = '#';
+                                    $urlProduct = route('product-where-store', encrypt($data->id));;
+                                    $urlCategory = route('category-where-store', encrypt($data->id));
                                     $urlOrderStore = route('order-where-store', encrypt($data->id));
                                     $button = '<a href="'.$urlProduct.'" title="Data Product by Store" class="btn btn-secondary btn-md"><i class="fas fa-boxes"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="'.$urlcategory.'" title="Data Category by Store" class="btn btn-success btn-md"><i class="fa fa-list"></i></a>';
+                                    $button .= '<a href="'.$urlCategory.'" title="Data Category by Store" class="btn btn-success btn-md"><i class="fa fa-list"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
                                     $button .= '<a href="'.$urlOrderStore.'" title="Data Order by Store" class="btn btn-primary btn-md"><i class="fas fa-cash-register"></i></a>';
                                     $button .= '&nbsp;&nbsp;';

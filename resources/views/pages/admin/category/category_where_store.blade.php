@@ -7,11 +7,12 @@
 			<div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">{{ $title }}</h1>
+                        <h4 class="m-0">{{ $title }}</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('store.index') }}">Store</a></li>
                             <li class="breadcrumb-item active">{{ $title }}</li>
                         </ol>
                     </div>
@@ -38,9 +39,6 @@
 										<th width="5%"><input type="checkbox" name="main_checkbox"><label></label></th>
 										<th>#</th>
 										<th>Name</th>
-										<th>Category</th>
-										<th>Price</th>
-										<th>Stock</th>
 										<th>Photo</th>
 										<th>Status</th>
 										<th>Actions</th>
@@ -64,90 +62,73 @@
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					<form action="" enctype="multipart/form-data" id="form-post">
+					<form action="" enctype="multipart/form-data" method="POST" id="form-post">
 						@csrf
+						<div class="table-responsive">
+							<table class="table table-bordered table-striped w-100" id="dynamic-table">
+								<thead>
+									<tr class="text-center">
+										<th>Name</th>
+										<th>Photo</th>
+										<th>Action</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="text-center">
+										<td>
+											<input type="hidden" name="store_id[]" required readonly value="{{ decrypt($id) }}">
+											<input type="text" name="name[]" required class="form-control" placeholder="Name">
+										</td>
+										<td>
+											<input type="file" accept="image/*" name="photo[]" required class="form-control">
+										</td>
+										<td>
+											<button type="button" name="add" id="add" class="btn btn-success">+</button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="form-group text-center">
+							<button type="submit" class="btn btn-primary" id="btn-save">
+								<i class="far fa-paper-plane"></i>
+								Save
+							</button>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">X</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{{-- modal edit --}}
+	<div class="modal fade" id="modal-edit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modal-edit-label" aria-hidden="true">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modal-edit-label"></h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form action="" enctype="multipart/form-data" id="form-edit">
+						@csrf
+						@method('PUT')
+						<input type="hidden" readonly name="id" id="id">
+						<input type="hidden" readonly name="store_id" id="store-id-edit">
 						<div class="row">
 							<div class="col-md-6">
-								<input type="hidden" readonly name="id" id="id">
-								<input type="hidden" readonly name="metode" id="metode">
 								<div class="form-group">
-									<label for="product-code">Product Code</label>
-									<input type="text" autofocus name="product_code" id="product-code" class="form-control" maxlength="255" placeholder="Product Code" value="{{ old('product_code') }}">
-									<p class="text-danger error-text product_code_error"></p>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="name">Name*</label>
-									<input type="text" name="name" id="name" required class="form-control" maxlength="255" placeholder="Name" value="{{ old('name') }}">
+									<label for="name">Name</label>
+									<input type="text" name="name" id="name-edit" required class="form-control" placeholder="Name">
 									<p class="text-danger error-text name_error"></p>
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label for="category-id">Category*</label>
-									<select class="form-control select2" name="category_id" id="category-id" required style="width: 100%;">
-										<option value="" selected disabled>Select Category</option>
-										@foreach($categories as $item)
-										<option {{ old('category_id') == $item->id ? "selected" : "" }} value="{{ $item->id }}">{{ $item->name }}</option>
-										@endforeach
-									</select>
-									<p class="text-danger error-text category_id_error"></p>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="old-price">Old Price*</label>
-									<input type="number" name="old_price" id="old-price" required class="form-control" placeholder="Old Price" value="{{ old('old_price') }}">
-									<p class="text-danger error-text old_price_error"></p>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="new-price">New Price*</label>
-									<input type="number" name="new_price" id="new-price" required class="form-control" placeholder="New Price" value="{{ old('new_price') }}">
-									<p class="text-danger error-text new_price_error"></p>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="limit-stock">Limit Stock*</label>
-									<input type="number" name="limit_stock" id="limit-stock" required class="form-control" placeholder="Limit Stock" value="{{ old('limit_stock') }}">
-									<p class="text-danger error-text limit_stock_error"></p>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="stock">Stock*</label>
-									<input type="number" name="stock" id="stock" required class="form-control" placeholder="Stock" value="{{ old('stock') }}">
-									<p class="text-danger error-text stock_error"></p>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="type">Type*</label>
-									<select class="form-control" name="type" id="type" required style="width: 100%;">
-										<option value="" selected disabled>Select Type</option>
-										<option value="PCS" id="pcs">PCS</option>
-										<option value="PACK" id="pack">PACK</option>
-										<option value="KILOGRAM" id="kilogram">KILOGRAM</option>
-										<option value="LITER" id="liter">LITER</option>
-										<option value="ROLL" id="roll">ROLL</option>
-										<option value="METER" id="meter">METER</option>
-									</select>
-									<p class="text-danger error-text type_error"></p>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="description">Description</label>
-									<input type="text" name="description" id="description" class="form-control" maxlength="255" placeholder="Description" value="{{ old('description') }}">
-									<p class="text-danger error-text description_error"></p>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="photo">Photo(1mb) : <span id="photo-preview"></span></label>
+									<label for="photo">Photo(1mb) <span id="photo-preview"></span></label>
 									<input type="file" accept="image/*" name="photo" id="photo" class="form-control">
 									<p class="text-danger error-text photo_error"></p>
 								</div>
@@ -167,48 +148,10 @@
 								</div>
 							</div>
 						</div>
-
 						<div class="form-group text-center">
 							<button type="submit" class="btn btn-primary" id="btn-save">
 								<i class="far fa-paper-plane"></i>
 								Save
-							</button>
-						</div>
-					</form>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-danger" data-bs-dismiss="modal" aria-label="Close">X</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	{{-- modal print barcode --}}
-	<div class="modal fade" id="modal-print-barcode" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="static-backdrop-label-print-barcode" aria-hidden="true">
-		<div class="modal-dialog modal-md">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title-print-barcode" id="static-backdrop-label-print-barcode"></h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<form action="{{ route('print-barcode') }}" id="form-post-print-barcode" target="_blank" method="POST">
-						@csrf
-						<div class="row">
-							<input type="hidden" readonly name="product_id" id="product-id">
-							<div class="col-md-12">
-								<div class="form-group">
-									<label for="quantity-barcode">Qty Barcode*</label>
-									<input type="number" name="quantity_barcode" id="quantity-barcode" required class="form-control" placeholder="Qty Barcode" value="">
-									<p class="text-danger error-text quantity_barcode_error"></p>
-								</div>
-							</div>
-						</div>
-
-						<div class="form-group text-center">
-							<button type="submit" class="btn btn-primary" id="btn-save">
-								<i class="fas fa-print"></i>
-								Print
 							</button>
 						</div>
 					</form>
@@ -248,27 +191,24 @@
 						[10, 25, 50, 'All'],
 					],
 					columnDefs : [ {
-						"targets" : [0, 4, 6],
+						"targets" : [0, 3, 5],
 						"orderable" : false,
 						"searchable" : false,
 					} ],
 					ajax : {
-						url : "{{ route('product.index') }}",
+						url : "{{ route('category-where-store', $id) }}",
 						type : 'GET',
 					},
 					columns: [
 						{ data: 'checkbox', name: 'checkbox', className: "text-center"},
 						{ data: 'DT_RowIndex', name: 'DT_RowIndex', className: "text-center" },
 						{ data: 'name', name: 'name', className: "text-center" },
-						{ data: 'category', name: 'category', className: "text-center" },
-						{ data: 'price', name: 'price', className: "text-center" },
-						{ data: 'stock', name: 'stock', className: "text-center" },
 						{ data: 'photo', name: 'photo', className: "text-center" },
 						{ data: 'status', name: 'status', className: "text-center" },
 						{ data: 'action', name: 'action', className: "text-center" },
 					],
 				}).on('draw', function () {
-					$('input[name="product_checkbox"]').each(function (){
+					$('input[name="category_checkbox"]').each(function (){
 						this.checked = false;
 					});
 					$('input[name="main_checkbox"]').prop('checked', false);
@@ -291,45 +231,46 @@
 
 @push('modal-post')
 	<script>
-		// method create
-		$(function() {
+		$(document).ready(function () {
 			$.ajaxSetup({
-				headers: {
+				headers : {
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
 				}
 			});
 
+			// method create start
 			$.fn.modal.Constructor.prototype.enforceFocus = function() {};
-			// function print barcode start
-			const modalPrintBarcode = new bootstrap.Modal($('#modal-print-barcode'));
-			$(document).on('click', '.btn-barcode', function () {
-				modalPrintBarcode.show();
-				$('.modal-title-print-barcode').text("Quantity Barcode (* Required)");
-				$('#product-id').val($(this).data('id'));
-				$(".modal-body").find("p").hide();
-				$('#quantity-barcode').focus();
-			});
-
-			const myModal = new bootstrap.Modal($('#modal-post'));
+			const myModal = new bootstrap.Modal(document.getElementById('modal-post'));
 			$('#btn-create').click(function () {
 				myModal.show();
+				$("#form-post").attr( "enctype", "multipart/form-data" );
 				$(document).ready(function() {
-					$("#category-id").select2({
+					$(".store_id").select2({
 						dropdownParent: $("#modal-post")
 					});
 				});
 				$('.modal-title').text("Create Data (* Required)");
 				$('#form-post').trigger("reset");
-				$('#id').val('');
-				$('#metode').val('create');
 				$(".modal-body").find("p").hide();
-				$('#name').focus();
+
+				$('#add').click(function() {
+					$(document).ready(function() {
+						$(".store_id").select2({
+							dropdownParent: $("#modal-post")
+						});
+					});
+					$("#dynamic-table").append(`<tr class="text-center"><td><input type="hidden" name="store_id[]" required readonly value="{{ decrypt($id) }}"><input type="text" name="name[]" required class="form-control" placeholder="Name"></td><td><input type="file" accept="image/*" name="photo[]" required class="form-control"></td><td><button type="button" class="btn btn-danger remove-tr">-</button></td></tr>`);
+				});
+			
+				$(document).on('click', '.remove-tr', function(){  
+					$(this).parents('tr').remove();
+				});
 			});
 
 			if ($("#form-post").length > 0) {
 				$("#form-post").validate({
 					submitHandler: function (form) {
-						let formData = new FormData(document.getElementById('form-post')); 
+						let formData = new FormData($("#form-post")[0]); 
 						Swal.fire({
 							title: 'Are you sure?',
 							icon: 'info',
@@ -341,35 +282,43 @@
 								if (result.isConfirmed) {
 									$(".modal-body").find("p").show();
 									$.ajax({
-										url: "{{ route('product.store') }}",
-										data: formData,
+										url: "{{ route('category.store') }}",
 										type: 'POST',
 										dataType: 'json',
+										data: formData,
 										cache: false,
 										contentType: false,
 										processData: false,
-									beforeSend:function(){
+									beforeSend: function(){
 										$(document).find('p.error-text').text('');
 									},
 									success: function (data) {
 										if (data.code == 0) {
 											$.each(data.messages, function(prefix, val) {
-												$('p.'+prefix+'_error').text(val[0]);
+												Swal.fire(
+													`Error!`,
+													`${val}`,
+													'error'
+												);
 											});
-										} else {
+										} else if (data.code == 200){
 											$('#form-post').trigger("reset");
 											$('#modal-post').modal('hide');
 											$('#table-data').DataTable().ajax.reload();
 											Swal.fire(
-												data.notif,
-												data.messages,
-												data.icon,
+												`${data.notif}`,
+												`${data.messages}`,
+												'success'
 											);
 										}
 									},
 									error: function (data) {
 										$.each(data.messages, function(prefix, val) {
-											$('p.'+prefix+'_error').text(val[0]);
+											Swal.fire(
+												`Error!`,
+												`${val}`,
+												'error'
+											);
 										});
 									}
 								});
@@ -378,45 +327,100 @@
 					}
 				});
 			}
+			// method create end
 
-			// method edit data
+			// method edit start
 			$(document).on('click', '.editPost', function () {
 				let dataId = $(this).data('id');
 				$(".modal-body").find("p").hide();
-				$('#metode').val('edit');
-				$('.modal-title').text("Edit Data (* Required)");
-				$.get('product/' + dataId + '/edit', function (data) {
-					$('#modal-post').modal('show');
+				$.get('/category/' + dataId + '/edit', function (data) {
+					$('#modal-edit').modal('show');
 					$(document).ready(function() {
-						$("#category-id").select2({
-							dropdownParent: $("#modal-post")
+						$("#store_id-edit").select2({
+							dropdownParent: $("#modal-edit")
 						});
 					});
-					// set value masing-masing id berdasarkan data yg diperoleh dari ajax get request diatas               
+					$('.modal-title').text("Edit Data (* Required)");
+					// set value masing-masing id berdasarkan data yg diperoleh dari ajax get request diatas
 					$('#id').val(data.id);
-					$('#product-code').val(data.product_code);
-					$('#name').val(data.name);
-					$('#category-id').val(data.category_id);
-					$('#old-price').val(data.old_price);
-					$('#new-price').val(data.new_price);
-					$('#limit-stock').val(data.limit_stock);
-					$('#stock').val(data.stock);
-					$('#type').val(data.type);
-					$('#description').val(data.description);
-					if (data.photo == window.location.protocol+"//"+window.location.hostname+":"+window.location.port+"/storage") {
-						$('#photo-preview').html('Photo Not Found');
-					} else {
-						$('#photo-preview').html(`<a href="${data.photo}" title="${data.photo}" target="_blank"><img src="${data.photo}" alt="${data.photo}" style="width: 100px; height: 100px;"></a>`);
-					}
-
+					$('#store-id-edit').val(data.store_id);
+					$('#name-edit').val(data.name);
+					$('#photo-preview').html(`<a href="${data.photo}" title="${data.photo}" target="_blank"><img src="${data.photo}" alt="${data.photo}" style="width: 100px; height: 100px;"></a>`);
 					// status
 					if (data.status == "ACTIVE") {
 						$('#active').prop('checked', true);
 					} else {
 						$('#non-active').prop('checked', true);
 					}
-				})
+				});
 			});
+
+			if ($("#form-edit").length > 0) {
+				$("#form-edit").validate({
+					submitHandler: function (form) {
+						let formData = new FormData(document.getElementById('form-edit'));
+						Swal.fire({
+							title: 'Are you sure?',
+							icon: 'info',
+							showCancelButton: true,
+							confirmButtonColor: '#3085d6',
+							cancelButtonColor: '#d33',
+							confirmButtonText: 'Yes, Save it!'
+							}).then((result) => {
+								if (result.isConfirmed) {
+									$(".modal-body").find("p").show();
+									let id = $("input[name=id]").val();
+									let url = "{{ route('category.update', ":id") }}";
+									url = url.replace(':id', id);
+									$.ajax({
+										type: 'POST',
+										enctype: 'multipart/form-data',
+										url: url,
+										data: formData,
+										dataType: 'json',
+										cache: false,
+										contentType: false,
+										processData: false,
+									beforeSend: function(){
+										$(document).find('p.error-text').text('');
+									},
+									success: function (data) {
+										if (data.code == 0) {
+											$.each(data.messages, function(prefix, val) {
+												Swal.fire(
+													`Error!`,
+													`${val}`,
+													'error'
+												);
+											});
+										} else if (data.code == 200){
+											$('#form-post').trigger("reset");
+											$('#modal-edit').modal('hide');
+											$('#table-data').DataTable().ajax.reload();
+											Swal.fire(
+												`${data.notif}`,
+												`${data.messages}`,
+												'success'
+											);
+										}
+									},
+									error: function (data) {
+										$.each(data.messages, function(prefix, val) {
+											Swal.fire(
+												`Error!`,
+												`${val}`,
+												'error'
+											);
+										});
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+			// method edit end
+
 
 			// method delete start
 			$(document).on('click', '.delete', function () {
@@ -432,7 +436,7 @@
 					}).then((result) => {
 						if (result.isConfirmed) {
 							$.ajax({
-								url: "product/" + dataId,
+								url: "/category/" + dataId,
 								type: 'DELETE',
 							success: function (data) {
 								$('#delete-modal').modal('hide');
@@ -453,19 +457,19 @@
 
 			$(document).on('click', 'input[name="main_checkbox"]', function() {
 				if (this.checked) {
-					$('input[name="product_checkbox"]').each(function () {
+					$('input[name="category_checkbox"]').each(function () {
 						this.checked = true;
 					});
 				} else {
-					$('input[name="product_checkbox"]').each(function () {
+					$('input[name="category_checkbox"]').each(function () {
 						this.checked = false;
 					});	
 				}
 				toggleDeleteAllBtn();
 			});
 
-			$(document).on('change', 'input[name="product_checkbox"]', function() {
-				if ($('input[name="product_checkbox"]').length == $('input[name="product_checkbox"]:checked').length) {
+			$(document).on('change', 'input[name="category_checkbox"]', function() {
+				if ($('input[name="category_checkbox"]').length == $('input[name="category_checkbox"]:checked').length) {
 					$('input[name="main_checkbox"]').prop('checked', true);
 				} else {
 					$('input[name="main_checkbox"]').prop('checked', false);
@@ -474,25 +478,24 @@
 			});
 
 			function toggleDeleteAllBtn() {
-				if ($('input[name="product_checkbox"]:checked').length > 0) {
-					$('#delete-all-btn').text('Delete ('+ $('input[name="product_checkbox"]:checked').length +')').removeClass('d-none');
+				if ($('input[name="category_checkbox"]:checked').length > 0) {
+					$('#delete-all-btn').text('Delete ('+ $('input[name="category_checkbox"]:checked').length +')').removeClass('d-none');
 				} else {
 					$('#delete-all-btn').addClass('d-none');
 				}
 			}
-			// method delete end
 
 			$('#delete-all-btn').click(function () {
-				let checkedProduct = [];
-				$('input[name="product_checkbox"]:checked').each(function () {
-					checkedProduct.push($(this).data('id'));
+				let checkedCategory = [];
+				$('input[name="category_checkbox"]:checked').each(function () {
+					checkedCategory.push($(this).data('id'));
 				});
 				
-				const url = "{{ route('delete-selected-product') }}";
-				if (checkedProduct.length > 0) {
+				const url = "{{ route('delete-selected-category') }}";
+				if (checkedCategory.length > 0) {
 					Swal.fire({
 						title: 'Are you sure?',
-						html: `You want to delete <b>(${checkedProduct.length})</b> product`,
+						html: `You want to delete <b>(${checkedCategory.length})</b> category`,
 						icon: 'info',
 						showCancelButton: true,
 						confirmButtonColor: '#3085d6',
@@ -501,10 +504,10 @@
 						allowOutsideClick: false,
 					}).then((result) => {
 						if (result.value) {
-							$.post(url, {id:checkedProduct}, function (data) {
+							$.post(url, {id:checkedCategory}, function (data) {
 								if (data.code == 1) {
 									Swal.fire(
-										'Saved!',
+										'Deleted!',
 										'Your Data has been Deleted.',
 										'success'
 									);
@@ -515,8 +518,8 @@
 					});
 				}
 			});
+			// method delete end
 		});
-
 	</script>
 
 @endpush
