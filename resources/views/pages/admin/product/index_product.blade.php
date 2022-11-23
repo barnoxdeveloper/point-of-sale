@@ -150,6 +150,10 @@
 									<label for="photo">Photo(1mb) : <span id="photo-preview"></span></label>
 									<input type="file" accept="image/*" name="photo" id="photo" class="form-control">
 									<p class="text-danger error-text photo_error"></p>
+									<div id="delete-photo">
+										<input type="checkbox" name="delete_photo" id="checkbox-delete-photo">
+										<label for="checkbox-delete-photo">Delete Photo</label>
+									</div>
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -324,6 +328,8 @@
 				$('#metode').val('create');
 				$(".modal-body").find("p").hide();
 				$('#name').focus();
+				$('#photo-preview').attr('hidden', true);
+				$('#delete-photo').attr('hidden', true);
 			});
 
 			if ($("#form-post").length > 0) {
@@ -384,6 +390,8 @@
 				let dataId = $(this).data('id');
 				$(".modal-body").find("p").hide();
 				$('#metode').val('edit');
+				$('#photo-preview').removeAttr("hidden");
+				$('#delete-photo').removeAttr("hidden");
 				$('.modal-title').text("Edit Data (* Required)");
 				$.get('product/' + dataId + '/edit', function (data) {
 					$('#modal-post').modal('show');

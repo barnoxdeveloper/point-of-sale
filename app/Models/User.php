@@ -59,7 +59,11 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->roles == "CASHIER";
     }
-    
+
+    public function getIsRolesEmployeeAttribute()
+    {
+        return $this->roles == "CASHIER" || $this->roles == "MANAGER";
+    }
 
     public function store()
     {

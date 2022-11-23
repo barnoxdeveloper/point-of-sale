@@ -72,8 +72,8 @@ Route::middleware(['auth', 'verified', 'active', 'admin', 'revalidate'])
 	// });
 });
 
-Route::middleware(['auth', 'verified', 'active', 'manager', 'revalidate'])
-->group(function()
+Route::middleware(['auth', 'verified', 'active', 'employee', 'revalidate'])
+    ->group(function()
 {
     // route for category
     Route::resource('category-user', CategoryUserController::class);
@@ -82,7 +82,6 @@ Route::middleware(['auth', 'verified', 'active', 'manager', 'revalidate'])
     Route::controller(ProductUserController::class)->group(function () {
         Route::get('product-user-where-category/{id}', 'productWhereCategory')->name('product-user-where-category');
         Route::post('print-barcode-user', 'printBarcode')->name('print-barcode-user');
-        // Route::get('test', 'test')->name('test');
     });
 
     Route::resource('order-user', OrderUserController::class);
@@ -92,12 +91,6 @@ Route::middleware(['auth', 'verified', 'active', 'manager', 'revalidate'])
 
     // route for Order Temporary
     Route::resource('order-temporary-user', OrderTemporaryUserController::class);
-});
-
-Route::middleware(['auth', 'verified', 'active', 'cashier', 'revalidate'])
-->group(function()
-{
-
 });
 
 require __DIR__.'/auth.php';

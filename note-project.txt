@@ -1,4 +1,4 @@
 ADMIN
-1. Create product lewat button data product by category, set category sesuai dengan category yang di pilih.
+1. Create product lewat button data product by category, set category sesuai dengan category yang di pilih. (OK)
 2. Create order lewat button data order by store, set store sesuai dengan store yang di pilih. (OK)
 3. Data Category & Product where store id, Button sudah di buat di data store. (OK)

@@ -21,7 +21,6 @@ class CategoryUserController extends Controller
     {
         $title = "Data Category";
         $items = Category::with('store')->where('store_id', Auth::user()->store_id)->get();
-        $stores = DB::table('stores')->orderBy('name', 'ASC')->get();
         if($request->ajax()){
             return datatables()->of($items)
                                 ->addColumn('name', function ($data) {
@@ -37,7 +36,7 @@ class CategoryUserController extends Controller
                                 })
                                 ->addColumn('action', function($data) {
                                     $url = route('product-user-where-category', encrypt($data->id));
-                                    $button = '<a href="'.$url.'" title="Data Product" class="btn btn-primary btn-md"><i class="fas fa-boxes"></i></a>';
+                                    $button = '<a href="'.$url.'" title="Data Products" class="btn btn-primary btn-md"><i class="fas fa-boxes"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
                                     $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
                                     // $button .= '&nbsp;&nbsp;';
@@ -48,7 +47,7 @@ class CategoryUserController extends Controller
                                 ->addIndexColumn()
                                 ->make(true);
         }
-        return view('pages.user.category.index_category', compact('title', 'stores'));
+        return view('pages.user.category.index_category', compact('title'));
     }
 
     /**

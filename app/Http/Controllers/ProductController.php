@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Product, Category};
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\{DB, Validator, File};
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Validation\Rule;
+use App\Models\{Product, Category};
+use Illuminate\Support\Facades\{DB, Validator, File};
 
 class ProductController extends Controller
 {
@@ -84,7 +85,7 @@ class ProductController extends Controller
         $type = $request->metode;
         $productCheck = Product::find($id);
         $validator = Validator::make( $request->all(),[
-            'product_code' => 'nullable|max:255',
+            'product_code' => ['nullable', 'max:255', Rule::unique('products')->ignore($id)],
             'name' => 'required|max:50',
             'category_id' => 'required|exists:categories,id',
             'old_price' => 'required|digits_between:0,11',
@@ -279,7 +280,10 @@ class ProductController extends Controller
 
     public function productWhereCategory(Request $request, $id)
     {
-        $items = Product::with('store', 'category')->where('category_id', decrypt($id))->get();
+        $items = Product::with('store', 'category')
+                        ->where('category_id', decrypt($id))
+                        ->orderBy('name', 'ASC')
+                        ->get();
         $category = DB::table('categories')->where('id', decrypt($id))->first();
         $title = "Data Products (Category : ". $category->name . ")";
         if($request->ajax()) {

@@ -5,10 +5,10 @@ namespace App\Http\Controllers\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Validation\Rule;
 use App\Models\{Product, Category};
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\{DB, Validator, File};
+use Illuminate\Support\Facades\{Auth, DB, Validator, File};
 
 class ProductUserController extends Controller
 {
@@ -19,8 +19,8 @@ class ProductUserController extends Controller
      */
     public function index(Request $request)
     {
-        $title = "All Products";
-        $categories = Category::where('store_id', Auth::user()->store_id)->get();
+        $title = "Data Products";
+        $categories = Category::where('store_id', Auth::user()->store_id)->orderBy('name', 'ASC')->get();
         foreach ($categories as $key => $item) {
             $categoryId[] = $item->id;
         }
@@ -87,7 +87,7 @@ class ProductUserController extends Controller
         $type = $request->metode;
         $productCheck = Product::find($id);
         $validator = Validator::make( $request->all(),[
-            'product_code' => 'nullable|max:255',
+            'product_code' => ['nullable', 'max:255', Rule::unique('products')->ignore($id)],
             'name' => 'required|max:50',
             'category_id' => 'required|exists:categories,id',
             'old_price' => 'required|digits_between:0,11',
@@ -112,7 +112,7 @@ class ProductUserController extends Controller
                 $fileName = Str::random(6).'-'.$file->getClientOriginalName();
                 $photo = $file->storeAs('assets/product',$fileName,'public');
                 $messages = "Data Saved Successfully!";
-            } else if ($type == "edit" && $request->photo !== NULL) { // create /edit with photo
+            } else if ($type == "edit" && $request->photo !== NULL) { // create / edit with photo
                 File::delete('storage/'. $productCheck->getRawOriginal('photo'));
                 $fileName = Str::random(6).'-'.$file->getClientOriginalName();
                 $photo = $file->storeAs('assets/product',$fileName,'public');
@@ -120,6 +120,10 @@ class ProductUserController extends Controller
             } else if ($type == "create" && $request->photo == NULL) { // edit without photo
                 $photo = NULL;
                 $messages = "Data Saved Without Photo Successfully!";
+            } else if ($request->delete_photo == 'on'){
+                File::delete('storage/'. $productCheck->getRawOriginal('photo'));
+                $photo = NULL;
+                $messages = "Data Updated With Deleted Photo Successfully!";
             } else if ($type == "edit" && $request->photo == NULL) { // edit without photo
                 $photo = $productCheck->getRawOriginal('photo');
                 $messages = "Data Updated Without Photo Successfully!";
@@ -231,7 +235,10 @@ class ProductUserController extends Controller
 
     public function productWhereCategory(Request $request, $id)
     {
-        $items = Product::with('store', 'category')->where('category_id', decrypt($id))->get();
+        $items = Product::with('store', 'category')
+                        ->where('category_id', decrypt($id))
+                        ->orderBy('name', 'ASC')
+                        ->get();
         $categories = DB::table('categories')->orderBy('name', 'ASC')->get();
         $category = DB::table('categories')->where('id', decrypt($id))->first();
         $title = "Data Products (Category : ". $category->name . ")";

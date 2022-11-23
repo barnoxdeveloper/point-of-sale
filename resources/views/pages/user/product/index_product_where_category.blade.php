@@ -27,7 +27,6 @@
 						<div class="row">
 							<div class="col-6">
 								<a href="javascript:void(0)" class="btn btn-sm btn-success" id="btn-create">+ Create Data</a>
-								<button class="btn btn-sm btn-danger d-none deleteAllBtn" id="delete-all-btn">Delete All</button>
 							</div>
 						</div>
 					</div>
@@ -66,10 +65,11 @@
 				<div class="modal-body">
 					<form action="" enctype="multipart/form-data" id="form-post">
 						@csrf
+						<input type="hidden" readonly name="id" id="id">
+						<input type="hidden" readonly name="metode" id="metode">
+						<input type="hidden" readonly name="category_id" id="category-id" value="{{ decrypt($id) }}">
 						<div class="row">
 							<div class="col-md-6">
-								<input type="hidden" readonly name="id" id="id">
-								<input type="hidden" readonly name="metode" id="metode">
 								<div class="form-group">
 									<label for="product-code">Product Code</label>
 									<input type="text" autofocus name="product_code" id="product-code" class="form-control" maxlength="255" placeholder="Product Code" value="{{ old('product_code') }}">
@@ -81,18 +81,6 @@
 									<label for="name">Name*</label>
 									<input type="text" name="name" id="name" required class="form-control" maxlength="255" placeholder="Name" value="{{ old('name') }}">
 									<p class="text-danger error-text name_error"></p>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="category-id">Category*</label>
-									<select class="form-control select2" name="category_id" id="category-id" required style="width: 100%;">
-										<option value="" selected disabled>Select Category</option>
-										@foreach($categories as $item)
-										<option {{ old('category_id') == $item->id ? "selected" : "" }} value="{{ $item->id }}">{{ $item->name }}</option>
-										@endforeach
-									</select>
-									<p class="text-danger error-text category_id_error"></p>
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -150,6 +138,10 @@
 									<label for="photo">Photo(1mb) : <span id="photo-preview"></span></label>
 									<input type="file" accept="image/*" name="photo" id="photo" class="form-control">
 									<p class="text-danger error-text photo_error"></p>
+									<div id="delete-photo">
+										<input type="checkbox" name="delete_photo" id="checkbox-delete-photo">
+										<label for="checkbox-delete-photo">Delete Photo</label>
+									</div>
 								</div>
 							</div>
 							<div class="col-md-6">
@@ -242,8 +234,7 @@
 					processing : true,
 					serverSide : true,
 					pageLength : 25,
-					order: [[3, 'asc']],
-					lengthMenu: [
+					lengthMenu : [
 						[10, 25, 50, -1],
 						[10, 25, 50, 'All'],
 					],
@@ -271,17 +262,6 @@
 		</script>
 @endpush
 
-@push('style-select2')
-
-		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-	
-@endpush
-
-@push('script-select2')
-
-		<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-@endpush
-
 @push('modal-post')
 	<script>
 		// method create
@@ -306,17 +286,14 @@
 			const myModal = new bootstrap.Modal($('#modal-post'));
 			$('#btn-create').click(function () {
 				myModal.show();
-				$(document).ready(function() {
-					$("#category-id").select2({
-						dropdownParent: $("#modal-post")
-					});
-				});
 				$('.modal-title').text("Create Data (* Required)");
 				$('#form-post').trigger("reset");
 				$('#id').val('');
 				$('#metode').val('create');
 				$(".modal-body").find("p").hide();
 				$('#name').focus();
+				$('#photo-preview').attr('hidden', true);
+				$('#delete-photo').attr('hidden', true);
 			});
 
 			if ($("#form-post").length > 0) {
@@ -377,14 +354,11 @@
 				let dataId = $(this).data('id');
 				$(".modal-body").find("p").hide();
 				$('#metode').val('edit');
+				$('#photo-preview').removeAttr("hidden");
+				$('#delete-photo').removeAttr("hidden");
 				$('.modal-title').text("Edit Data (* Required)");
 				$.get('/product-user/' + dataId + '/edit', function (data) {
 					$('#modal-post').modal('show');
-					$(document).ready(function() {
-						$("#category-id").select2({
-							dropdownParent: $("#modal-post")
-						});
-					});
 					// set value masing-masing id berdasarkan data yg diperoleh dari ajax get request diatas               
 					$('#id').val(data.id);
 					$('#product-code').val(data.product_code);

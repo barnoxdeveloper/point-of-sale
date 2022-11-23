@@ -66,6 +66,7 @@ class Kernel extends HttpKernel
         'admin' => \App\Http\Middleware\IsAdmin::class,
         'manager' => \App\Http\Middleware\IsManager::class,
         'cashier' => \App\Http\Middleware\IsCashier::class,
+        'employee' => \App\Http\Middleware\IsEmployee::class,
         'active' => \App\Http\Middleware\IsActive::class,
         'revalidate' => \App\Http\Middleware\RevalidateBackHistory::class,
     ];

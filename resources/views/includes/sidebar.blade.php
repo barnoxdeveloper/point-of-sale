@@ -58,7 +58,7 @@
                         <li class="nav-item {{ (request()->is('product')) ? 'active' : '' }}">
                             <a href="{{ route('product.index') }}" class="nav-link {{ (request()->is('product*')) ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-boxes"></i>
-                                <p>Product</p>
+                                <p>Products</p>
                             </a>
                         </li>
                         <div class="dropdown-divider"></div>
@@ -68,7 +68,7 @@
                                 <p>Orders</p>
                             </a>
                         </li>
-                        @elseif (Auth::user()->is_roles_manager)
+                        @elseif (Auth::user()->is_roles_employee)
                         <li class="nav-item {{ (request()->is('category-user')) ? 'active' : '' }}">
                             <a href="{{ route('category-user.index') }}" class="nav-link {{ (request()->is('category-user')) ? 'active' : '' }}">
                                 <i class="nav-icon fa fa-list"></i>
@@ -79,11 +79,16 @@
                         <li class="nav-item {{ (request()->is('product-user')) ? 'active' : '' }}">
                             <a href="{{ route('product-user.index') }}" class="nav-link {{ (request()->is('product-user*')) ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-boxes"></i>
-                                <p>Product</p>
+                                <p>Products</p>
                             </a>
                         </li>
-                        @elseif (Auth::user()->is_roles_cashier)
-                        
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item {{ (request()->is('order-user')) ? 'active' : '' }}">
+                            <a href="{{ route('order.index') }}" class="nav-link {{ (request()->is('order*')) ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-cash-register"></i>
+                                <p>Orders</p>
+                            </a>
+                        </li>
                         @endif
                         <div class="dropdown-divider"></div>
                     </ul>
