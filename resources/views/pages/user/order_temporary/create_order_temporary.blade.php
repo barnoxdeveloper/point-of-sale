@@ -12,7 +12,7 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('order.index') }}">Data Order</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('order-user.index') }}">Data Order</a></li>
                             <li class="breadcrumb-item active">{{ $title }}</li>
                         </ol>
                     </div>
@@ -31,7 +31,7 @@
 					</div>
 					<div class="card-body">
 						<div class="text-center mb-3 mt-3">
-							<form action="{{ route('order-temporary.store') }}" method="POST">
+							<form action="{{ route('order-temporary-user.store') }}" method="POST">
 								@csrf
 								<div class="row justify-content-center">
 									<div class="col-md-4">
@@ -77,7 +77,7 @@
 													<td>{{ $item->product_name }}</td>
 													<td>Rp. {{ number_format($item->price,0,",",".") }}</td>
 													<td>
-														<form action="{{ route('order-temporary.update', encrypt($item->id)) }}" method="POST">
+														<form action="{{ route('order-temporary-user.update', encrypt($item->id)) }}" method="POST">
 															@csrf
 															@method('PUT')
 															<div class="row">
@@ -94,7 +94,7 @@
 													</td>
 													<td>Rp. {{ number_format($item->sub_total,0,",",",") }}</td>
 													<td>
-														<form action="{{ route('order-temporary.destroy', encrypt($item->id)) }}" method="POST">
+														<form action="{{ route('order-temporary-user.destroy', encrypt($item->id)) }}" method="POST">
 															@csrf
 															@method('DELETE')
 															<button type="submit" title="Hapus" class="btn btn-sm btn-danger"><i class="far fa-2xs fa-trash-alt"></i></button>
@@ -124,7 +124,7 @@
 								</ul>
 							</div>
 						@endif --}}
-						<form action="{{ route('order.store') }}" method="POST">
+						<form action="{{ route('order-user.store') }}" method="POST">
 							@csrf
 							<div class="row">
 								<div class="col-md-3">
@@ -136,7 +136,8 @@
 								<div class="col-md-3">
 									<div class="form-group">
 										<label for="discount">Discount</label>
-										<input type="text" name="discount" id="discount" class="form-control" maxlength="11" placeholder="Discount" value="0">
+										<p class="form-control">Rp. {{ number_format(Auth::user()->store->discount,0,",",",") }}</p>
+										{{-- <input type="text" name="discount" id="discount" class="form-control" maxlength="11" placeholder="Discount" value="{{ Auth::user()->store->discount }}"> --}}
 										@error('discount')<div class="text-danger">{{ $message }}</div>@enderror
 									</div>
 								</div>
@@ -159,20 +160,6 @@
 										<input type="text" name="description" class="form-control" placeholder="Descriptions">
 									</div>
 								</div> --}}
-							</div>
-							<div class="row justify-content-center">
-								<div class="col-md-3">
-									<div class="form-group">
-										<label for="store-id">Store*</label>
-										<select class="form-control select2" name="store_id" id="store-id" required style="width: 100%;">
-											<option value="" selected disabled>Select Store</option>
-											@foreach($stores as $item)
-											<option {{ old('store_id') == $item->id ? "selected" : "" }} value="{{ $item->id }}">{{ $item->name }}</option>
-											@endforeach
-										</select>
-										<p class="text-danger error-text store_id_error"></p>
-									</div>
-								</div>
 							</div>
 							<div class="row justify-content-center">
 								<div class="col-md-3">
@@ -236,10 +223,10 @@
 							showCancelButton: true,
 							confirmButtonText: 'Data Order',
 							cancelButtonText: `Tetap Disini`,
-							html: `<a href="{{ route('print-invoice', session('success_invoices.order_id')) }}" class="btn btn-md btn-success" target="_blank"><i class="fa fa-print"></i></a>`,
+							html: `<a href="{{ route('print-invoice-user', session('success_invoices.order_id')) }}" class="btn btn-md btn-success" target="_blank"><i class="fa fa-print"></i></a>`,
 						}).then((result) => {
 							if (result.isConfirmed) {
-								window.location = "{{ route('order.index') }}";
+								window.location = "{{ route('order-user.index') }}";
 							}
 						});
 					@endif
@@ -276,15 +263,12 @@
 					$('#total-bayar, #discount').on("keyup", function () {
 						let totalBayar = $('#total-bayar').val();
 						let grandTotal = {{ $grandTotal }};
-						let discount = $('#discount').val();
+						let discount = {{ Auth::user()->store->discount }};
 						if (totalBayar == '') {
 							newTotalBayar = $('#total-bayar').val("0,0");
 							$('#kembalian-preview').text("Rp. 0");
 						}
-						if (discount == '') {
-							newDiscount = $('#discount').val("0,0");
-						}
-						let total = parseInt($('#total-bayar').val().replaceAll(",", "")) - (parseInt(grandTotal) - parseInt($('#discount').val().replaceAll(",", "")));
+						let total = parseInt(totalBayar.replaceAll(",", "")) - (parseInt(grandTotal) + parseInt(discount));
 						if($('#total-bayar').val() == '0,0') {
 							$('#kembalian-preview').text("Rp. 0");
 						} else if (!isNaN(total)) {
@@ -292,21 +276,5 @@
 						} 
 					});
 				});
-		</script>
-@endpush
-
-@push('style-select2')
-
-		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-	
-@endpush
-
-@push('script-select2')
-
-		<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-		<script>
-			$(document).ready(function() {
-				$('.select2').select2();
-			});
 		</script>
 @endpush

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\OrderTemporary;
 use Illuminate\Support\Facades\{Auth, DB};
@@ -34,10 +35,14 @@ class OrderTemporaryController extends Controller
                         ->where('status', 'ACTIVE')
                         ->where('stock','!=', 0)
                         ->get(['product_code', 'name']);
+                        // return $products;
         $items = DB::table('order_temporaries')->where('user_id', Auth::user()->id)->get();
-        $i = 1;;
+        $i = 1;
         $grandTotal = DB::table('order_temporaries')->where('user_id', Auth::user()->id)->sum('sub_total');
-        return view('pages.admin.order_temporary.create_order_temporary', compact('title', 'stores', 'products', 'items', 'i', 'grandTotal'));
+        // Get Invoice
+        $date = Carbon::now();
+        $orderId = 'INV'.'-'.str_replace(" ","-", $date);
+        return view('pages.admin.order_temporary.create_order_temporary', compact('title', 'stores', 'products', 'items', 'i', 'grandTotal', 'orderId'));
     }
 
     /**
@@ -55,20 +60,18 @@ class OrderTemporaryController extends Controller
         $product = DB::table('products')->where('product_code', $productCode)
                         ->orWhere('name', $productCode)
                         ->first();
-        if (!$product) {
+        if (!$product || $product->stock == 0) {
             return redirect()->back()->with('failed', 'Product Tidak Ada!');
-        }
-        else if ($product->stock == 0) {
-            return redirect()->back()->with('failed', 'Stock Product kosong!');
-        }
-        else if ($product) {
+        } else if ($product) {
             // $check = OrderTemporary::where('product_code', $productCode)->first();
-            $check = DB::table('order_temporaries')->where('product_code', $productCode)
-                        ->orWhere('product_name', $productCode)
-                        ->first();        
+            $check = DB::table('order_temporaries')
+                        ->where('product_code', $productCode)
+                        ->where('product_name', $productCode)
+                        ->where('user_id', Auth::user()->id)
+                        ->first();
             if ($check) {
                 return redirect()->back()->with('success', 'Product Sudah ada di keranjang, silahkan update quantity');
-            } elseif ($product->stock < 10) {
+            } else {
                 $data['user_id'] = Auth::user()->id;
                 $data['product_code'] = $product->product_code;
                 $data['product_name'] = $product->name;
@@ -76,19 +79,13 @@ class OrderTemporaryController extends Controller
                 $data['quantity'] = 1;
                 $data['sub_total'] = $product->new_price * 1;
                 OrderTemporary::create($data);
-                return redirect()->back()->with('success', 'Stock Product di bawah 10');   
-            } else{
-                $data['user_id'] = Auth::user()->id;
-                $data['product_code'] = $product->product_code;
-                $data['product_name'] = $product->name;
-                $data['price'] = $product->new_price;
-                $data['quantity'] = 1;
-                $data['sub_total'] = $product->new_price * 1;
-                OrderTemporary::create($data);
-                return redirect()->back()->with('success', 'Berhasil di Tambahkan');
+                if ($product->stock < 10) {
+                    return redirect()->back()->with('success', 'Stock Product di bawah 10');   
+                } else {
+                    return redirect()->back()->with('success', 'Berhasil di Tambahkan');
+                }
             }
-        }
-        else{
+        } else{
             return redirect()->back()->with('failed', 'Product Tidak di Temukan');
         }
     }
@@ -124,9 +121,8 @@ class OrderTemporaryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $dec = decrypt($id);
-        $this->validate($request, ['quantity' => 'required|not_in:0|digits_between:1,12']);
-        $item = OrderTemporary::findOrFail($dec);
+        $this->validate($request, ['quantity' => 'required|not_in:0|digits_between:1,11']);
+        $item = OrderTemporary::findOrFail(decrypt($id));
         if ($item->product->stock < $request->quantity) {
             return redirect()->back()->with('failed', 'Stock Product hanya : '.$item->product->stock);    
         } else {
@@ -145,8 +141,7 @@ class OrderTemporaryController extends Controller
      */
     public function destroy($id)
     {
-        $dec = decrypt($id);
-        $item = OrderTemporary::find($dec);
+        $item = OrderTemporary::find(decrypt($id));
         $item->delete();
         return redirect()->back()->with('success', 'Product Deleted!');
     }

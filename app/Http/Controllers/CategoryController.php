@@ -45,9 +45,9 @@ class CategoryController extends Controller
                                     $url = route('product-where-category', encrypt($data->id));
                                     $button = '<a href="'.$url.'" title="Data Product" class="btn btn-primary btn-md"><i class="fas fa-boxes"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" class="btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Deleted" data-id="'.$data->id.'" class="btn btn-danger btn-md delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
                                 ->rawColumns(['checkbox', 'name', 'storeName', 'photo', 'status', 'action'])

@@ -22,13 +22,15 @@
 		<section class="content">
 			<div class="container-fluid p-3">
 				<div class="card" data-aos="fade-up">
+					@if (Auth::user()->is_roles_manager)
 					<div class="card-header">
 						<div class="row">
 							<div class="col-6">
-								<a href="javascript:void(0)" class="btn btn-sm btn-success" id="btn-create">+ Create Category</a>
-                            </div>
+								<a href="javascript:void(0)" class="btn btn-sm btn-success" id="btn-create">+ Create Data</a>
+							</div>
 						</div>
 					</div>
+					@endif
 					<div class="card-body">
 						<div class="table-responsive">
 							<table id="table-data" class="table table-bordered table-striped w-100">

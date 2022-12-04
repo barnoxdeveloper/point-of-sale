@@ -53,9 +53,12 @@ class ProductUserController extends Controller
                                 ->addColumn('action', function($data) {
                                     $button = '<a href="javascript:void(0)" data-toggle="tooltip" title="Cetak Barcode" data-id="'.$data->id.'" data-original-title="Cetak Barcode" class="btn btn-success btn-md btn-barcode"><i class="fas fa-barcode"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
-                                    $button .= '&nbsp;&nbsp;';
-                                    // $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
+                                    if (Auth::user()->is_roles_manager) {
+                                        $button .= '&nbsp;&nbsp;';
+                                        $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" class="btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
+                                    }
+                                    // $button .= '&nbsp;&nbsp;';
+                                    // $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Deleted" data-id="'.$data->id.'" class="btn btn-danger btn-md delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
                                 ->rawColumns(['name', 'category', 'price', 'stock', 'photo', 'status', 'action'])
@@ -269,9 +272,12 @@ class ProductUserController extends Controller
                                 ->addColumn('action', function($data) {
                                     $button = '<a href="javascript:void(0)" data-toggle="tooltip" title="Cetak Barcode" data-id="'.$data->id.'" data-original-title="Cetak Barcode" class="btn btn-success btn-md btn-barcode"><i class="fas fa-barcode"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
-                                    $button .= '&nbsp;&nbsp;';
-                                    // $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
+                                    if (Auth::user()->is_roles_manager) {
+                                        $button .= '&nbsp;&nbsp;';
+                                        $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" class="btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
+                                    }
+                                    // $button .= '&nbsp;&nbsp;';
+                                    // $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Deleted" data-id="'.$data->id.'" class="btn btn-danger btn-md delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
                                 ->rawColumns(['name', 'category', 'price', 'stock', 'photo', 'status', 'action'])

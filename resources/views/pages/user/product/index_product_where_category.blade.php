@@ -6,10 +6,10 @@
 		<div class="content-header">
 			<div class="container-fluid">
                 <div class="row mb-2">
-                    <div class="col-sm-6">
+                    <div class="col-md-6 col-sm-12">
                         <h4 class="m-0">{{ $title }}</h4>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-md-6 col-sm-12">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('category-user.index') }}">Category</a></li>
@@ -22,7 +22,8 @@
 
 		<section class="content">
 			<div class="container-fluid p-3">
-				<div class="card" data-aos="fade-up">
+				<div class="card">
+					@if (Auth::user()->is_roles_manager)
 					<div class="card-header">
 						<div class="row">
 							<div class="col-6">
@@ -30,6 +31,7 @@
 							</div>
 						</div>
 					</div>
+					@endif
 					<div class="card-body">
 						<div class="table-responsive">
 							<table id="table-data" class="table table-bordered table-striped w-100">

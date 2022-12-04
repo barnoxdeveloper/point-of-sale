@@ -28,7 +28,7 @@ class CategoryUserController extends Controller
                                 })
                                 ->addColumn('photo', function ($data) {
                                     if ($data->getRawOriginal('photo') !== NULL) {
-                                        return '<a href="'.$data->photo.'" title="'.$data->photo.'" target="_blank><img src="'.$data->photo.'" alt="'.$data->photo.'" style="width: 100px; height: 100px;"><img src="'.$data->photo.'" alt="'.$data->photo.'" style="width: 100px; height: 100px;"></a>';    
+                                        return '<a href="'.$data->photo.'" title="'.$data->photo.'" target="_blank><img src="'.$data->photo.'" alt="'.$data->photo.'" style="width: 80px; height: 80px;"><img src="'.$data->photo.'" alt="'.$data->photo.'" style="width: 100px; height: 100px;"></a>';    
                                     }
                                 })
                                 ->addColumn('status', function($data) {
@@ -37,10 +37,12 @@ class CategoryUserController extends Controller
                                 ->addColumn('action', function($data) {
                                     $url = route('product-user-where-category', encrypt($data->id));
                                     $button = '<a href="'.$url.'" title="Data Products" class="btn btn-primary btn-md"><i class="fas fa-boxes"></i></a>';
-                                    $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
+                                    if (Auth::user()->is_roles_manager) {
+                                        $button .= '&nbsp;&nbsp;';
+                                        $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" class="btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
+                                    }
                                     // $button .= '&nbsp;&nbsp;';
-                                    // $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
+                                    // $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Deleted" data-id="'.$data->id.'" class="btn btn-danger btn-md delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
                                 ->rawColumns(['name', 'photo', 'status', 'action'])

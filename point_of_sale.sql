@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 20, 2022 at 04:13 PM
+-- Generation Time: Dec 04, 2022 at 04:41 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.1.6
 
@@ -43,16 +43,15 @@ CREATE TABLE `categories` (
 --
 
 INSERT INTO `categories` (`id`, `name`, `slug`, `store_id`, `photo`, `status`, `created_at`, `updated_at`) VALUES
-(58, 'Megan', 'megan-stanley', 2, 'assets/category/SeFZll-3.png', 'ACTIVE', '2022-10-20 16:34:41', '2022-11-19 16:36:01'),
-(59, 'Tatum edit', 'tatum-chang', 1, 'assets/category/ByhC6Z-2.png', 'ACTIVE', '2022-10-20 16:34:41', '2022-10-20 16:38:33'),
-(60, 'qwerty aaa', 'qwerty', 3, 'assets/category/EUUqbo-11.jpg', 'ACTIVE', '2022-11-19 16:29:36', '2022-11-20 05:13:36'),
-(61, '12345', '12345', 3, 'assets/category/rq8R5c-BJfEHS-4.png', 'NON-ACTIVE', '2022-11-19 16:29:36', '2022-11-19 16:29:36'),
-(62, 'Yolanda Moon', 'yolanda-moon', 2, 'assets/category/2mD4Zd-TM.png', 'NON-ACTIVE', '2022-11-19 16:30:59', '2022-11-19 16:30:59'),
-(63, 'Sierra Shaw', 'sierra-shaw', 2, 'assets/category/5gEKdP-NYEPI.png', 'NON-ACTIVE', '2022-11-19 16:30:59', '2022-11-19 16:30:59'),
-(64, 'Randall Leblanc', 'randall-leblanc', 2, 'assets/category/Phg1Gp-readymix-pesan.jpg', 'NON-ACTIVE', '2022-11-19 16:31:28', '2022-11-19 16:31:28'),
-(65, 'Raymond Barber', 'raymond-barber', 2, 'assets/category/8IcvaD-wetech-bg (1).jpg', 'NON-ACTIVE', '2022-11-19 16:31:28', '2022-11-19 16:31:28'),
-(66, 'Lani Mckay', 'lani-mckay', 2, 'assets/category/T0S9sG-BRSUR.jpg', 'NON-ACTIVE', '2022-11-19 16:36:29', '2022-11-19 16:36:29'),
-(67, 'Nichole Lee', 'nichole-lee', 2, 'assets/category/cTmTd2-BRSUR1.jpg', 'NON-ACTIVE', '2022-11-19 16:36:29', '2022-11-19 16:36:29');
+(1, 'Category 1', 'category-1', 1, 'assets/category/97ToMv-1.png', 'NON-ACTIVE', '2022-11-21 14:18:49', '2022-11-21 14:18:49'),
+(2, 'Category 2', 'category-2', 1, 'assets/category/SLeKot-2.png', 'NON-ACTIVE', '2022-11-21 14:18:49', '2022-11-21 14:18:49'),
+(3, 'Category 3', 'category-3', 1, 'assets/category/4NbwXP-3.png', 'NON-ACTIVE', '2022-11-21 14:18:49', '2022-11-21 14:18:49'),
+(4, 'Category 4', 'category-4', 2, 'assets/category/UnawyH-Untitled-5.png', 'NON-ACTIVE', '2022-11-21 14:18:49', '2022-11-21 14:18:49'),
+(5, 'Category 5', 'category-5', 2, 'assets/category/d7AOLq-wetech.jpg', 'NON-ACTIVE', '2022-11-21 14:18:49', '2022-11-21 14:18:49'),
+(6, 'Category 6', 'category-6', 2, 'assets/category/2po6tT-va.png', 'NON-ACTIVE', '2022-11-21 14:18:49', '2022-11-21 14:18:49'),
+(7, 'Category 7', 'category-7', 3, 'assets/category/OaH3bu-c.png', 'NON-ACTIVE', '2022-11-21 14:18:49', '2022-11-21 14:18:49'),
+(8, 'Category 8', 'category-8', 3, 'assets/category/XNyoFX-DO.jpeg', 'NON-ACTIVE', '2022-11-21 14:18:49', '2022-11-21 14:18:49'),
+(11, 'test ah', 'test-ah', 2, 'assets/category/zI1fNI-11.jpg', 'NON-ACTIVE', '2022-12-04 13:37:14', '2022-12-04 13:37:14');
 
 -- --------------------------------------------------------
 
@@ -124,9 +123,9 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `store_id`, `user_id`, `order_id`, `total`, `description`, `date`, `discount`, `total_bayar`, `kembalian`, `created_at`, `updated_at`) VALUES
-(1, 2, 1, 'INV-2022-11-20-22:05:00', 5000, NULL, '2022-11-20', 0, 5000, 0, '2022-11-20 15:05:00', '2022-11-20 15:05:00'),
-(2, 3, 1, 'INV-2022-11-20-22:06:36', 15000, NULL, '2022-11-20', 0, 20000, 5000, '2022-11-20 15:06:36', '2022-11-20 15:06:36'),
-(3, 1, 1, 'INV-2022-11-20-22:06:48', 2500, NULL, '2022-11-20', 0, 5000, 2500, '2022-11-20 15:06:48', '2022-11-20 15:06:48');
+(1, 2, 11, 'INV-2022-12-04-22:08:48', 17696, NULL, '2022-12-04', 1500, 20000, 3804, '2022-12-04 15:08:48', '2022-12-04 15:08:48'),
+(2, 2, 11, 'INV-2022-12-04-22:09:58', 32000, NULL, '2022-12-05', 1500, 50000, 19500, '2022-12-04 15:09:58', '2022-12-04 15:09:58'),
+(3, 1, 1, 'INV-2022-12-04-22:17:01', 11544, NULL, '2022-12-04', 1000, 15000, 4456, '2022-12-04 15:17:01', '2022-12-04 15:17:01');
 
 -- --------------------------------------------------------
 
@@ -151,11 +150,17 @@ CREATE TABLE `order_details` (
 --
 
 INSERT INTO `order_details` (`id`, `order_id`, `product_name`, `product_code`, `price`, `quantity`, `sub_total`, `created_at`, `updated_at`) VALUES
-(1, 'INV-2022-11-20-22:05:00', 'HEADSET 123456789', '6936678405431', 1000, 1, 1000, '2022-11-20 15:05:00', '2022-11-20 15:05:00'),
-(2, 'INV-2022-11-20-22:05:00', 'Rokok ae', '8998989100120', 1500, 1, 1500, '2022-11-20 15:05:00', '2022-11-20 15:05:00'),
-(3, 'INV-2022-11-20-22:05:00', 'KABEL USB 111111', '6957303861330', 2500, 1, 2500, '2022-11-20 15:05:00', '2022-11-20 15:05:00'),
-(4, 'INV-2022-11-20-22:06:36', 'Rokok ae', '8998989100120', 1500, 10, 15000, '2022-11-20 15:06:36', '2022-11-20 15:06:36'),
-(5, 'INV-2022-11-20-22:06:48', 'KABEL USB 111111', '6957303861330', 2500, 1, 2500, '2022-11-20 15:06:48', '2022-11-20 15:06:48');
+(1, 'INV-2022-12-04-22:08:48', 'Product 7', 'Product 7', 5000, 2, 10000, '2022-12-04 15:08:48', '2022-12-04 15:08:48'),
+(2, 'INV-2022-12-04-22:08:48', 'Product 8', 'Product 8', 3000, 2, 6000, '2022-12-04 15:08:48', '2022-12-04 15:08:48'),
+(3, 'INV-2022-12-04-22:08:48', 'Mechelle Sawyer', 'Recusandae Min', 424, 4, 1696, '2022-12-04 15:08:48', '2022-12-04 15:08:48'),
+(4, 'INV-2022-12-04-22:09:58', 'Product 9', 'Product 9', 2000, 6, 12000, '2022-12-04 15:09:58', '2022-12-04 15:09:58'),
+(5, 'INV-2022-12-04-22:09:58', 'Product 10', 'Product 10', 2000, 10, 20000, '2022-12-04 15:09:58', '2022-12-04 15:09:58'),
+(6, 'INV-2022-12-04-22:17:01', 'Product 1', 'Product 1', 1000, 1, 1000, '2022-12-04 15:17:01', '2022-12-04 15:17:01'),
+(7, 'INV-2022-12-04-22:17:01', 'Product 7', 'Product 7', 5000, 1, 5000, '2022-12-04 15:17:01', '2022-12-04 15:17:01'),
+(8, 'INV-2022-12-04-22:17:01', 'Product 8', 'Product 8', 3000, 1, 3000, '2022-12-04 15:17:01', '2022-12-04 15:17:01'),
+(9, 'INV-2022-12-04-22:17:01', 'Shelby Alford', 'NEW PRODUCT 20', 120, 1, 120, '2022-12-04 15:17:01', '2022-12-04 15:17:01'),
+(10, 'INV-2022-12-04-22:17:01', 'Product 9', 'Product 9', 2000, 1, 2000, '2022-12-04 15:17:01', '2022-12-04 15:17:01'),
+(11, 'INV-2022-12-04-22:17:01', 'Mechelle Sawyer', 'Recusandae Min', 424, 1, 424, '2022-12-04 15:17:01', '2022-12-04 15:17:01');
 
 -- --------------------------------------------------------
 
@@ -243,9 +248,21 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `product_code`, `name`, `slug`, `category_id`, `store_id`, `old_price`, `new_price`, `limit_stock`, `stock`, `type`, `description`, `photo`, `status`, `created_at`, `updated_at`) VALUES
-(6, '6936678405431', 'HEADSET 123456789', 'headset-123456789', 60, 2, 2000, 1000, 10, 37, 'PCS', 'Rerum impedit magna expedita minus iure', NULL, 'ACTIVE', '2022-10-30 15:59:47', '2022-11-20 15:05:00'),
-(10, '8998989100120', 'Rokok ae', 'rokok-ae', 58, 2, 2000, 1500, 10, 32, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-06 15:56:49', '2022-11-20 15:06:36'),
-(12, '6957303861330', 'KABEL USB 111111', 'kabel-usb-111111', 62, 2, 5000, 2500, 10, 55, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-13 14:40:05', '2022-11-20 15:06:48');
+(1, 'Product 1', 'Product 1', 'product-1', 1, 1, 2000, 1000, 10, 99, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-21 14:23:56', '2022-12-04 15:17:01'),
+(2, 'Product 2', 'Product 2', 'product-2', 1, 1, 2000, 1500, 5, 50, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-21 14:27:24', '2022-11-21 14:27:24'),
+(3, 'Product 3', 'Product 3', 'product-3', 2, 1, 10000, 5000, 10, 100, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-21 14:29:57', '2022-11-21 14:29:57'),
+(4, 'Product 4', 'Product 4', 'product-4', 2, 1, 6000, 3000, 10, 100, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-21 14:30:37', '2022-11-21 14:30:37'),
+(5, 'Product 5', 'Product 5', 'product-5', 3, 1, 8000, 4000, 10, 100, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-21 14:31:08', '2022-11-21 14:31:08'),
+(6, 'Product 6', 'Product 6', 'product-6', 3, 1, 2000, 1500, 10, 100, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-21 14:31:43', '2022-11-21 14:31:43'),
+(7, 'Product 7', 'Product 7', 'product-7', 4, 2, 7000, 5000, 10, 2, 'PACK', NULL, NULL, 'ACTIVE', '2022-11-21 14:33:45', '2022-12-04 15:17:01'),
+(8, 'Product 8', 'Product 8', 'product-8', 4, 2, 6000, 3000, 10, 97, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-21 14:34:12', '2022-12-04 15:17:01'),
+(9, 'Product 9', 'Product 9', 'product-9', 5, 2, 4000, 2000, 10, 93, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-21 14:34:43', '2022-12-04 15:17:01'),
+(10, 'Product 10', 'Product 10', 'product-10', 5, 2, 6000, 2000, 10, 90, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-21 14:35:06', '2022-12-04 15:09:58'),
+(11, 'NEW PRODUCT 1', 'NEW PRODUCT 1', 'new-product-1', 7, 3, 5000, 2500, 10, 100, 'PCS', NULL, NULL, 'ACTIVE', '2022-11-21 14:51:14', '2022-11-21 14:51:14'),
+(14, 'Product 100', 'Guy Gray', 'guy-gray', 1, 1, 405, 974, 74, 17, 'ROLL', 'Omnis necessitatibus ea illo quidem ad deserunt', NULL, 'NON-ACTIVE', '2022-11-23 13:42:55', '2022-11-23 13:42:55'),
+(15, 'NEW PRODUCT 20', 'Shelby Alford', 'shelby-alford', 5, 2, 815, 120, 72, 62, 'PACK', 'Minima quia quidem enim repellendus Sunt blanditiis voluptatibus fugiat dolor consequatur Non et adipisci rem sit quo vel nisi fugiat', NULL, 'ACTIVE', '2022-11-23 14:16:16', '2022-12-04 15:17:01'),
+(16, 'Recusandae Min', 'Mechelle Sawyer', 'mechelle-sawyer', 5, 2, 644, 424, 51, 13, 'METER', 'Animi in voluptatum labore ullam sunt aute', NULL, 'ACTIVE', '2022-11-23 14:18:06', '2022-12-04 15:17:01'),
+(17, 'Reprehenderit', 'Laurel Pollard', 'laurel-pollard', 6, 2, 579, 922, 25, 15, 'PCS', 'Laboris amet ut a perferendis commodo minima officia', NULL, 'ACTIVE', '2022-11-23 14:40:40', '2022-11-23 14:43:51');
 
 -- --------------------------------------------------------
 
@@ -271,9 +288,9 @@ CREATE TABLE `stores` (
 --
 
 INSERT INTO `stores` (`id`, `name`, `slug`, `store_code`, `location`, `description`, `discount`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'STORE-3', 'store-3', 'STORE-3', 'Consequatur Consequuntur tenetur nostrum officia neque ipsum quae dolor magna labore minima deleniti', 'Et qui iusto exercitation fugiat ipsa cupiditate labore sapiente et enim et', 0, 'ACTIVE', '2022-10-18 08:29:23', '2022-11-19 15:14:29'),
-(2, 'STORE-1', 'store-1', 'STORE-1', 'Molestiae sunt accusamus voluptas magnam reiciendis a aut est sit consequuntur a aut aliquip hic', 'Molestias dolores sit sit quis dolore molestias veniam fuga Ipsam voluptas temporibus non blanditiis in in inventore consequatur', 0, 'ACTIVE', '2022-10-18 08:29:28', '2022-11-19 15:14:18'),
-(3, 'STORE-2', 'store-2', 'STORE-2', 'Quia maxime aperiam molestiae obcaecati consectetur nobis minim nihil obcaecati occaecat non aliquip nisi blanditiis', 'Dolores ex illo doloribus dolores deserunt', 1500, 'ACTIVE', '2022-10-18 08:29:31', '2022-11-19 15:14:37');
+(1, 'STORE-1', 'store-1', 'STORE-1', 'Optio in porro incidunt molestiae rerum sint id', 'Ipsum aperiam voluptatem', 1000, 'ACTIVE', '2022-11-21 14:12:34', '2022-11-21 14:12:34'),
+(2, 'STORE-2', 'store-2', 'STORE-2', 'Et itaque officia ac', 'Aperiam sunt id aut deleniti est illum excepturi veniam', 1500, 'ACTIVE', '2022-11-21 14:13:30', '2022-12-04 14:59:11'),
+(3, 'STORE-3', 'store-3', 'STORE-3', 'Laboris ullamco accusantium', 'Voluptatem minima veritatis dolorem sit velit sunt similique quos minus eum', 0, 'ACTIVE', '2022-11-21 14:14:06', '2022-11-21 14:14:06');
 
 -- --------------------------------------------------------
 
@@ -303,7 +320,7 @@ INSERT INTO `users` (`id`, `name`, `email`, `store_id`, `email_verified_at`, `pa
 (1, 'ADMINISTRATOR', 'admin@admin.com', NULL, '2022-10-15 06:15:38', '$2y$10$Fxr/sMwi2/1h3.Mnzmn/a.uu/HhW3N5WosRcNlmjxfHleQZvTPmPS', 'ACTIVE', 'ADMINISTRATOR', NULL, '2022-10-15 06:13:09', '2022-10-15 06:15:38'),
 (9, 'Buckminster Weiss', 'manager@manager.com', 2, '2022-11-19 15:19:43', '$2y$10$qPBKtnOLQR2eMVkt4vtYdOejZQ1BAaL4i/W7zqyibbplY3pqSmrAW', 'ACTIVE', 'MANAGER', NULL, '2022-10-18 07:36:02', '2022-11-19 15:19:43'),
 (10, 'Barry Moon', 'dikof@mailinator.com', 3, NULL, '$2y$10$u88bvfg/l1Y7exLn69YlC.RMyV.0jhOCfXgRVTvHIZrj9YLyu90Mi', 'NON-ACTIVE', 'MANAGER', NULL, '2022-10-18 07:36:11', '2022-10-18 08:33:12'),
-(11, 'Merrill Swanson', 'nebyduxyf@mailinator.com', 2, NULL, '$2y$10$MqaI.wfunnurytpvVqXkH.TUywh6tvzd9DgK6hlF5uYG8Y9RKyrmu', 'ACTIVE', 'MANAGER', NULL, '2022-10-18 07:36:16', '2022-10-18 08:37:55');
+(11, 'Kasir 1', 'kasir@kasir.com', 2, '2022-12-04 08:24:44', '$2y$10$hdAnj8kiWQgMQtcI2BgBaOZA3RlL9LedN6J/L09FNHjdC/GGyIINC', 'ACTIVE', 'CASHIER', NULL, '2022-10-18 07:36:16', '2022-12-04 08:24:24');
 
 --
 -- Indexes for dumped tables
@@ -389,7 +406,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -413,13 +430,13 @@ ALTER TABLE `orders`
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `order_temporaries`
 --
 ALTER TABLE `order_temporaries`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
@@ -431,13 +448,13 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `stores`
 --
 ALTER TABLE `stores`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`

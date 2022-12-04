@@ -25,10 +25,11 @@
 					<div class="card-header">
 						<div class="row">
 							<div class="col-md-6">
-								<a href="{{ route('order-temporary.create') }}" class="btn btn-sm btn-success" id="btn-create">
+								@if (Auth::user()->is_roles_cashier)
+								<a href="{{ route('order-temporary-user.create') }}" class="btn btn-sm btn-success" id="btn-create">
 									+ Create Order
 								</a>
-								<button class="btn btn-sm btn-danger d-none deleteAllBtn" id="delete-all-btn">Delete All</button>
+								@endif
 							</div>
 							<div class="col-md-6">
 								<!-- Date range -->
@@ -68,11 +69,9 @@
 							<table id="table-data" class="table table-bordered table-striped w-100">
 								<thead>
 									<tr class="text-center">
-										<th width="5%"><input type="checkbox" name="main_checkbox"><label></label></th>
 										<th>#</th>
 										<th>Date</th>
 										<th>ID</th>
-										<th>Store</th>
 										<th>User</th>
 										<th>Total</th>
 										<th>Actions</th>
@@ -81,7 +80,7 @@
                                 <tbody></tbody>
                                 <tfoot>
 									<tr>
-										<th colspan="6">Total</th>
+										<th colspan="4">Total</th>
 										<th id="total-all"></th>
 										<th>-</th>
 									</tr>
@@ -159,22 +158,20 @@
 						serverSide : true,
 						pageLength : 25,
 						ajax : {
-							url : "{{ route('order.index') }}",
+							url : "{{ route('order-user.index') }}",
 							data : {startDate, endDate},
 							type : 'GET',
 						},
 						columns : [
-							{ data: 'checkbox', name: 'checkbox', className: "text-center"},
 							{ data: 'DT_RowIndex', name: 'DT_RowIndex', className: "text-center" },
 							{ data: 'date', name: 'date', className: "text-center" },
 							{ data: 'orderId', name: 'orderId', className: "text-center" },
-							{ data: 'store', name: 'store', className: "text-center" },
 							{ data: 'user', name: 'user', className: "text-center" },
 							{ data: 'total', name: 'total', className: "text-center", "render": $.fn.dataTable.render.number( '.', ',', 0, 'Rp ' ) },
 							{ data: 'action', name: 'action', className: "text-center" },
 						],
 						columnDefs : [{
-							"targets" : [0, 3 ,6],
+							"targets" : [1, 2, 5],
 							"orderable" : false,
 							"searchable" : false,
 						}],
@@ -183,15 +180,9 @@
 							[10, 25, 50, 'All'],
 						],
 						drawCallback: function () {
-							let sum = $('#table-data').DataTable().column(6).data().sum();
+							let sum = $('#table-data').DataTable().column(4).data().sum();
 							$('#total-all').html(`Rp. ${sum.toLocaleString('id-ID')}`);
 						}	
-					}).on('draw', function () {
-						$('input[name="order_checkbox"]').each(function () {
-							this.checked = false;
-						});
-						$('input[name="main_checkbox"]').prop('checked', false);
-						$('#delete-all-btn').addClass('d-none');
 					});
 				}
 
@@ -209,7 +200,8 @@
 					$('#reservation').val('');
 				});
 
-				$('#reservation').change(function() {
+				// $('#reservation').change(function() {
+				$('#reservation').on('apply.daterangepicker', function (ev, picker) {
 					let awal = $('#reservation').data('daterangepicker').startDate;
 					let akhir = $('#reservation').data('daterangepicker').endDate;
 					// format it 
@@ -261,7 +253,7 @@
 			// method detail
 			$(document).on('click', '.btn-detail', function () {
 				let dataId = $(this).data('id');
-				$.get('/order/' + dataId, function (data) {
+				$.get('/order-user/' + dataId, function (data) {
 					$('#detail-modal').modal('show');
 					$('.modal-title').text(`Detail Order : ${data.order_id}`);
 					const event = new Date(data.date);
@@ -294,7 +286,7 @@
 					}).then((result) => {
 						if (result.isConfirmed) {
 							$.ajax({
-								url: "order/" + dataId,
+								url: "/order-user/" + dataId,
 								type: 'DELETE',
 							success: function (data) {
 								$('#delete-modal').modal('hide');
@@ -312,71 +304,7 @@
 					}
 				});
 			});
-
-			$(document).on('click', 'input[name="main_checkbox"]', function() {
-				if (this.checked) {
-					$('input[name="order_checkbox"]').each(function () {
-						this.checked = true;
-					});
-				} else {
-					$('input[name="order_checkbox"]').each(function () {
-						this.checked = false;
-					});	
-				}
-				toggleDeleteAllBtn();
-			});
-
-			$(document).on('change', 'input[name="order_checkbox"]', function() {
-				if ($('input[name="order_checkbox"]').length == $('input[name="order_checkbox"]:checked').length) {
-					$('input[name="main_checkbox"]').prop('checked', true);
-				} else {
-					$('input[name="main_checkbox"]').prop('checked', false);
-				}
-				toggleDeleteAllBtn();
-			});
-
-			function toggleDeleteAllBtn() {
-				if ($('input[name="order_checkbox"]:checked').length > 0) {
-					$('#delete-all-btn').text('Delete ('+ $('input[name="order_checkbox"]:checked').length +')').removeClass('d-none');
-				} else {
-					$('#delete-all-btn').addClass('d-none');
-				}
-			}
 			// method delete end
-
-			$('#delete-all-btn').click(function () {
-				let checkedOrder = [];
-				$('input[name="order_checkbox"]:checked').each(function () {
-					checkedOrder.push($(this).data('id'));
-				});
-				
-				const url = "{{ route('delete-selected-order') }}";
-				if (checkedOrder.length > 0) {
-					Swal.fire({
-						title: 'Are you sure?',
-						html: `You want to delete <b>(${checkedOrder.length})</b> order`,
-						icon: 'info',
-						showCancelButton: true,
-						confirmButtonColor: '#3085d6',
-						cancelButtonColor: '#d33',
-						confirmButtonText: 'Yes, Delete!',
-						allowOutsideClick: false,
-					}).then((result) => {
-						if (result.value) {
-							$.post(url, {id:checkedOrder}, function (data) {
-								if (data.code == 1) {
-									Swal.fire(
-										'Saved!',
-										'Your Data has been Deleted.',
-										'success'
-									);
-									$('#table-data').DataTable().ajax.reload();
-								}
-							}, 'json');
-						}
-					});
-				}
-			});
 		});
 	</script>
 
