@@ -40,7 +40,7 @@ class StoreController extends Controller
                                     return $data->status;
                                 })
                                 ->addColumn('action', function($data) {
-                                    $urlProduct = route('product-where-store', encrypt($data->id));;
+                                    $urlProduct = route('product-where-store', encrypt($data->id));
                                     $urlCategory = route('category-where-store', encrypt($data->id));
                                     $urlOrderStore = route('order-where-store', encrypt($data->id));
                                     $button = '<a href="'.$urlProduct.'" title="Data Product by Store" class="btn btn-secondary btn-md"><i class="fas fa-boxes"></i></a>';
@@ -49,9 +49,9 @@ class StoreController extends Controller
                                     $button .= '&nbsp;&nbsp;';
                                     $button .= '<a href="'.$urlOrderStore.'" title="Data Order by Store" class="btn btn-primary btn-md"><i class="fas fa-cash-register"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" class="btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Deleted" data-id="'.$data->id.'" class="btn btn-danger btn-md delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
                                 ->rawColumns(['checkbox', 'storeCode', 'name', 'location', 'discount', 'status', 'action'])
@@ -92,8 +92,7 @@ class StoreController extends Controller
             $discount = 0;
         } else {
             $discount = str_replace(",","", $request->discount);
-        }
-        
+        }        
         if ($validator->fails()) {
             return response()->json([
                 'code' => 0,
@@ -111,11 +110,7 @@ class StoreController extends Controller
                 'description' => $request->description,
                 'status' => $request->status,
             ]); 
-            return response()->json([
-                'code' => 200,
-                'notif' => "Saved!",
-                'messages' => "Your Data has been Saved!",
-            ]);
+            return response()->json(['code' => 200]);
         }
     }
 
@@ -164,13 +159,13 @@ class StoreController extends Controller
     {
         $item = Store::find($id);
         $item->delete();
-        return response()->json(['code' => 1]);
+        return response()->json(['code' => 200]);
     }
 
     public function deleteSelectedStore(Request $request)
     {
         $id = $request->id;
         Store::whereIn('id', $id)->delete();
-        return response()->json(['code' => 1]);
+        return response()->json(['code' => 200]);
     }
 }

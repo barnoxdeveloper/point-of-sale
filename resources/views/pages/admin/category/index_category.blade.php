@@ -204,8 +204,8 @@
 					processing : true,
 					serverSide : true,
 					pageLength : 25,
-					order: [[3, 'asc']],
-					lengthMenu: [
+					order : [[3, 'asc']],
+					lengthMenu : [
 						[10, 25, 50, -1],
 						[10, 25, 50, 'All'],
 					],
@@ -218,7 +218,7 @@
 						url : "{{ route('category.index') }}",
 						type : 'GET',
 					},
-					columns: [
+					columns : [
 						{ data: 'checkbox', name: 'checkbox', className: "text-center"},
 						{ data: 'DT_RowIndex', name: 'DT_RowIndex', className: "text-center" },
 						{ data: 'name', name: 'name', className: "text-center" },
@@ -257,7 +257,6 @@
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
 				}
 			});
-
 			// method create start
 			$.fn.modal.Constructor.prototype.enforceFocus = function() {};
 			const myModal = new bootstrap.Modal(document.getElementById('modal-post'));
@@ -286,7 +285,6 @@
 					$(this).parents('tr').remove();
 				});
 			});
-
 			if ($("#form-post").length > 0) {
 				$("#form-post").validate({
 					submitHandler: function (form) {
@@ -348,7 +346,6 @@
 				});
 			}
 			// method create end
-
 			// method edit start
 			$(document).on('click', '.editPost', function () {
 				let dataId = $(this).data('id');
@@ -374,7 +371,6 @@
 					}
 				});
 			});
-
 			if ($("#form-edit").length > 0) {
 				$("#form-edit").validate({
 					submitHandler: function (form) {
@@ -440,8 +436,6 @@
 				});
 			}
 			// method edit end
-
-
 			// method delete start
 			$(document).on('click', '.delete', function () {
 				dataId = $(this).data('id');
@@ -460,12 +454,14 @@
 								type: 'DELETE',
 							success: function (data) {
 								$('#delete-modal').modal('hide');
-								Swal.fire(
-									'Deleted!',
-									'Your Data has been Deleted.',
-									'success'
-								);
-								$('#table-data').DataTable().ajax.reload();
+								if (data.code == 200) {
+									Swal.fire(
+										'Deleted!',
+										'Your Data has been Deleted.',
+										'success'
+									);
+									$('#table-data').DataTable().ajax.reload();
+								}
 							},
 							error: function (data) {
 								console.log('Error: ', data);
@@ -474,7 +470,6 @@
 					}
 				});
 			});
-
 			$(document).on('click', 'input[name="main_checkbox"]', function() {
 				if (this.checked) {
 					$('input[name="category_checkbox"]').each(function () {
@@ -487,7 +482,6 @@
 				}
 				toggleDeleteAllBtn();
 			});
-
 			$(document).on('change', 'input[name="category_checkbox"]', function() {
 				if ($('input[name="category_checkbox"]').length == $('input[name="category_checkbox"]:checked').length) {
 					$('input[name="main_checkbox"]').prop('checked', true);
@@ -496,7 +490,6 @@
 				}
 				toggleDeleteAllBtn();
 			});
-
 			function toggleDeleteAllBtn() {
 				if ($('input[name="category_checkbox"]:checked').length > 0) {
 					$('#delete-all-btn').text('Delete ('+ $('input[name="category_checkbox"]:checked').length +')').removeClass('d-none');
@@ -504,7 +497,6 @@
 					$('#delete-all-btn').addClass('d-none');
 				}
 			}
-
 			$('#delete-all-btn').click(function () {
 				let checkedCategory = [];
 				$('input[name="category_checkbox"]:checked').each(function () {
@@ -525,7 +517,7 @@
 					}).then((result) => {
 						if (result.value) {
 							$.post(url, {id:checkedCategory}, function (data) {
-								if (data.code == 1) {
+								if (data.code == 200) {
 									Swal.fire(
 										'Deleted!',
 										'Your Data has been Deleted.',

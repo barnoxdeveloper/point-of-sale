@@ -19,7 +19,6 @@
                 </div>
             </div>
 		</div>
-
 		<section class="content">
 			<div class="container-fluid p-3">
 				<div class="card">
@@ -273,7 +272,6 @@
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
 				}
 			});
-
 			$.fn.modal.Constructor.prototype.enforceFocus = function() {};
 			// function print barcode start
 			const modalPrintBarcode = new bootstrap.Modal($('#modal-print-barcode'));
@@ -284,7 +282,6 @@
 				$(".modal-body").find("p").hide();
 				$('#quantity-barcode').focus();
 			});
-
 			const myModal = new bootstrap.Modal($('#modal-post'));
 			$('#btn-create').click(function () {
 				myModal.show();
@@ -297,7 +294,6 @@
 				$('#photo-preview').attr('hidden', true);
 				$('#delete-photo').attr('hidden', true);
 			});
-
 			if ($("#form-post").length > 0) {
 				$("#form-post").validate({
 					submitHandler: function (form) {
@@ -350,7 +346,6 @@
 					}
 				});
 			}
-
 			// method edit data
 			$(document).on('click', '.editPost', function () {
 				let dataId = $(this).data('id');

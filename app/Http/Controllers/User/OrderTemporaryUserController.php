@@ -38,8 +38,7 @@ class OrderTemporaryUserController extends Controller
         $grandTotal = DB::table('order_temporaries')->where('user_id', Auth::user()->id)->sum('sub_total');
         // Get Invoice
         $date = Carbon::now();
-        $orderId = 'INV'.'-'.str_replace(" ","-", $date);
-        
+        $orderId = 'INV'.'-'.str_replace(" ","-", $date);        
         return view('pages.user.order_temporary.create_order_temporary', compact('title', 'products', 'items', 'i', 'grandTotal', 'orderId'));
     }
 

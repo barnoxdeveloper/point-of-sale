@@ -8,12 +8,6 @@
                     <div class="col-sm-6">
                         <h1 class="m-0">Dashboard</h1>
                     </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            {{-- <li class="breadcrumb-item"><a href="#">Home</a></li> --}}
-                            <li class="breadcrumb-item active">Dashboard</li>
-                        </ol>
-                    </div>
                 </div>
             </div>
         </div>
@@ -70,8 +64,44 @@
                             <a href="{{ route('product.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
-                    @elseif (Auth::user()->is_roles_manager)
-                    @elseif (Auth::user()->is_roles_cashier)
+                    @elseif (Auth::user()->is_roles_employee)
+                    <div class="col-lg-4 col-4">
+                        <div class="small-box bg-warning">
+                            <div class="inner">
+                                <h3>{{ $categories }}</h3>
+                                <p>Category</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fa fa fa-list"></i>
+                            </div>
+                            <a href="{{ route('category-user.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-4">
+                        <div class="small-box bg-danger">
+                            <div class="inner">
+                                <h3>{{ $products }}</h3>
+                                <p>Products</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                            <a href="{{ route('product-user.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-4">
+                        <div class="small-box bg-primary">
+                            <div class="inner">
+                                <h3>{{ $users }}</h3>
+                                <p>Orders</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-cash-register"></i>
+                            </div>
+                            <a href="{{ route('order-user.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    {{-- @elseif (Auth::user()->is_roles_cashier) --}}
                     @endif
                 </div>
             </div>

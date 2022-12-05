@@ -58,9 +58,7 @@ class OrderUserController extends Controller
                                     return $data->order_id;
                                 })
                                 ->addColumn('user', function($data) {
-                                    if ($data->user !== NULL) {
-                                        return $data->user->name;
-                                    }
+                                    return $data->user !== null ? $data->user->name : '';
                                 })
                                 ->addColumn('total', function($data) {
                                     return $data->total;
@@ -114,13 +112,10 @@ class OrderUserController extends Controller
         $totalBayar = str_replace(",","", $request->total_bayar);
         $discount = Auth::user()->store->discount;
         $kembalian = $totalBayar - ($grandTotal - $discount);
-        // return $totalBayar;
-        
         // Return Back If Total Bayar Kurang
         if ($totalBayar < ($grandTotal - $discount)) {
             return redirect()->back()->with('failed', 'Uang yang dibayarkan Kurang!!');
         }
-
         // Get Invoice
         $date = Carbon::now();
         $orderId = 'INV'.'-'.str_replace(" ","-", $date);
@@ -136,7 +131,6 @@ class OrderUserController extends Controller
         $success = Order::create($data);
         if ($success) {
             $items = OrderTemporary::where('user_id', $userId)->get();
-            // return $items;
             foreach ($items as $item) {
                 $data = array();
                 $orderDetail['order_id'] = $success->order_id;
@@ -205,16 +199,16 @@ class OrderUserController extends Controller
      */
     public function destroy($id)
     {
-        $item = Order::find($id);
-        OrderDetail::where('order_id', $item->order_id)->delete();
-        $item->delete();
-        return response()->json($item);
+        // $item = Order::find($id);
+        // OrderDetail::where('order_id', $item->order_id)->delete();
+        // $item->delete();
+        // return response()->json(['code' => 200]);
     }
 
     public function printInvoice($id)
     {
         $order = Order::where('order_id', $id)->first();
         $orderDetail = OrderDetail::where('order_id', $order->order_id)->get();
-        return view('pages.admin.order.print_invoice', compact('order', 'orderDetail'));
+        return view('pages.user.order.print_invoice', compact('order', 'orderDetail'));
     }
 }

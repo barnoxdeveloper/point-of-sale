@@ -77,10 +77,10 @@ class CategoryUserController extends Controller
         // return $request->file('photo');
         if ($validator->fails()) {
             return response()->json([
-                    'code' => 0,
-                    'notif' => "Error!",
-                    'messages' => $validator->errors(),
-                ]);    
+                'code' => 0,
+                'notif' => "Error!",
+                'messages' => $validator->errors(),
+            ]);    
         } else {
             if ($request->hasfile('photo')) {
                 $slug = str_replace(' ', '-', array_map('strtolower', $request->name));
@@ -180,20 +180,20 @@ class CategoryUserController extends Controller
      */
     public function destroy($id)
     {
-        $item = Category::find($id);
-        File::delete('storage/'. $item->getRawOriginal('photo'));
-        $item->delete();
-        return response()->json(['code' => 1]);
+        // $item = Category::find($id);
+        // File::delete('storage/'. $item->getRawOriginal('photo'));
+        // $item->delete();
+        // return response()->json(['code' => 200]);
     }
 
     public function deleteSelectedCategory(Request $request)
     {
-        $id = $request->id;
-        $items = Category::whereIn('id', $id)->get();
-        foreach ($items as $key => $item) {
-            File::delete('storage/'. $item->getRawOriginal('photo'));
-            Category::whereIn('id', $id)->delete();
-        }
-        return response()->json(['code' => 1]);
+        // $id = $request->id;
+        // $items = Category::whereIn('id', $id)->get();
+        // foreach ($items as $key => $item) {
+        //     File::delete('storage/'. $item->getRawOriginal('photo'));
+        //     Category::whereIn('id', $id)->delete();
+        // }
+        // return response()->json(['code' => 200]);
     }
 }

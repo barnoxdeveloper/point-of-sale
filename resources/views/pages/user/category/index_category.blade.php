@@ -18,7 +18,6 @@
                 </div>
             </div>
 		</div>
-
 		<section class="content">
 			<div class="container-fluid p-3">
 				<div class="card" data-aos="fade-up">
@@ -242,7 +241,6 @@
 				$('.modal-title').text("Create Data (* Required)");
 				$('#form-post').trigger("reset");
 				$(".modal-body").find("p").hide();
-
 				$('#add').click(function() {
 					$(document).ready(function() {
 						$(".store_id").select2({
@@ -251,12 +249,10 @@
 					});
 					$("#dynamic-table").append(`<tr class="text-center"><td><input type="text" name="name[]" required class="form-control" placeholder="Name"></td><td><input type="file" accept="image/*" name="photo[]" required class="form-control"></td><td><button type="button" class="btn btn-danger remove-tr">-</button></td></tr>`);
 				});
-			
 				$(document).on('click', '.remove-tr', function(){  
 					$(this).parents('tr').remove();
 				});
 			});
-
 			if ($("#form-post").length > 0) {
 				$("#form-post").validate({
 					submitHandler: function (form) {

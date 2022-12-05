@@ -57,6 +57,7 @@ Route::middleware(['auth', 'verified', 'active', 'admin', 'revalidate'])
     Route::resource('order', OrderController::class);
     Route::controller(OrderController::class)->group(function () {
         Route::get('order-where-store/{id}', 'orderWhereStore')->name('order-where-store');
+        Route::get('order-where-user/{id}', 'orderWhereUser')->name('order-where-user');
 		Route::get('print-invoice/{id}', 'printInvoice')->name('print-invoice');
 		Route::post('delete-selected-order', 'deleteSelectedOrder')->name('delete-selected-order');
 	});
@@ -83,12 +84,11 @@ Route::middleware(['auth', 'verified', 'active', 'employee', 'revalidate'])
         Route::get('product-user-where-category/{id}', 'productWhereCategory')->name('product-user-where-category');
         Route::post('print-barcode-user', 'printBarcode')->name('print-barcode-user');
     });
-
+    // route for order
     Route::resource('order-user', OrderUserController::class);
     Route::controller(OrderUserController::class)->group(function () {
 		Route::get('print-invoice-user/{id}', 'printInvoice')->name('print-invoice-user');
 	});
-
     // route for Order Temporary
     Route::resource('order-temporary-user', OrderTemporaryUserController::class);
 });

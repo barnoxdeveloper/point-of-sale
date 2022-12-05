@@ -19,7 +19,6 @@
                 </div>
             </div>
 		</div>
-
 		<section class="content">
 			<div class="container-fluid p-3">
 				<div class="card" data-aos="fade-up">
@@ -159,7 +158,7 @@
 						serverSide : true,
 						pageLength : 25,
 						ajax : {
-							url : "{{ route('order-where-store', $id) }}",
+							url : "{{ route('order-where-user', $id) }}",
 							data : {startDate, endDate},
 							type : 'GET',
 						},
@@ -193,7 +192,6 @@
 						$('#delete-all-btn').addClass('d-none');
 					});
 				}
-
 				$('#reservation').daterangepicker({
 					// autoUpdateInput: false,
 					locale: {
@@ -202,22 +200,19 @@
 						cancelLabel: 'Clear'
 					}
 				});
-
 				$('#reservation').on('cancel.daterangepicker', function(ev, picker) {
 					//do something, like clearing an input
 					$('#reservation').val('');
 				});
-
-				$('#reservation').change(function() {
-					let awal = $('#reservation').data('daterangepicker').startDate;
-					let akhir = $('#reservation').data('daterangepicker').endDate;
+				$('#reservation').on('apply.daterangepicker', function (ev, picker) {
+					let startDate = picker.startDate;
+					let endDate = picker.endDate;
 					// format it 
-					let start = awal.format('YYYY-MM-DD');
-					let end = akhir.format('YYYY-MM-DD');
+					let start = startDate.format('YYYY-MM-DD');
+					let end = endDate.format('YYYY-MM-DD');
 					$('#start-date').val(start);
 					$('#end-date').val(end);
 				});
-
 				$('#filter').click(function() {
 					let startDate = $('#start-date').val();
 					let endDate = $('#end-date').val();	
@@ -232,7 +227,6 @@
 						});
 					}
 				});
-	
 				$('#refresh').click(function() {
 					$('#reservation').val('');
 					$('#start-date').val('');
@@ -243,7 +237,6 @@
 					loadData();
 				});
 			});
-
 		</script>
 @endpush
 
@@ -256,7 +249,6 @@
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
 				}
 			});
-
 			// method detail
 			$(document).on('click', '.btn-detail', function () {
 				let dataId = $(this).data('id');
@@ -279,7 +271,6 @@
 					$('#detail-order').html(html);
 				});
 			});
-
 			// method delete start
 			$(document).on('click', '.delete', function () {
 				dataId = $(this).data('id');
@@ -312,7 +303,6 @@
 					}
 				});
 			});
-
 			$(document).on('click', 'input[name="main_checkbox"]', function() {
 				if (this.checked) {
 					$('input[name="order_checkbox"]').each(function () {
@@ -325,7 +315,6 @@
 				}
 				toggleDeleteAllBtn();
 			});
-
 			$(document).on('change', 'input[name="order_checkbox"]', function() {
 				if ($('input[name="order_checkbox"]').length == $('input[name="order_checkbox"]:checked').length) {
 					$('input[name="main_checkbox"]').prop('checked', true);
@@ -334,22 +323,18 @@
 				}
 				toggleDeleteAllBtn();
 			});
-
 			function toggleDeleteAllBtn() {
 				if ($('input[name="order_checkbox"]:checked').length > 0) {
 					$('#delete-all-btn').text('Delete ('+ $('input[name="order_checkbox"]:checked').length +')').removeClass('d-none');
 				} else {
 					$('#delete-all-btn').addClass('d-none');
 				}
-			}
-			// method delete end
-
+			}			
 			$('#delete-all-btn').click(function () {
 				let checkedOrder = [];
 				$('input[name="order_checkbox"]:checked').each(function () {
 					checkedOrder.push($(this).data('id'));
 				});
-				
 				const url = "{{ route('delete-selected-order') }}";
 				if (checkedOrder.length > 0) {
 					Swal.fire({
@@ -377,6 +362,7 @@
 					});
 				}
 			});
+			// method delete end
 		});
 	</script>
 

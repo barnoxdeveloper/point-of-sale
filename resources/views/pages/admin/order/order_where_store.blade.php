@@ -7,11 +7,12 @@
 			<div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">{{ $title }}</h1>
+                        <h4 class="m-0">{{ $title }}</h4>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('store.index') }}">Store</a></li>
                             <li class="breadcrumb-item active">{{ $title }}</li>
                         </ol>
                     </div>
@@ -71,7 +72,6 @@
 										<th>#</th>
 										<th>Date</th>
 										<th>ID</th>
-										<th>Store</th>
 										<th>User</th>
 										<th>Total</th>
 										<th>Actions</th>
@@ -80,7 +80,7 @@
                                 <tbody></tbody>
                                 <tfoot>
 									<tr>
-										<th colspan="6">Total</th>
+										<th colspan="5">Total</th>
 										<th id="total-all"></th>
 										<th>-</th>
 									</tr>
@@ -103,8 +103,8 @@
 				</div>
 				<div class="modal-body">
 					<p id="detail-date"></p>
-					<p id="detail-store"></p>
 					<p id="detail-user"></p>
+					<p id="detail-order-id"></p>
 					<p id="detail-total"></p>
 					<p id="detail-discount"></p>
 					<p id="detail-grand-total"></p>
@@ -158,7 +158,7 @@
 						serverSide : true,
 						pageLength : 25,
 						ajax : {
-							url : "{{ route('order.index') }}",
+							url : "{{ route('order-where-store', $id) }}",
 							data : {startDate, endDate},
 							type : 'GET',
 						},
@@ -167,12 +167,11 @@
 							{ data: 'DT_RowIndex', name: 'DT_RowIndex', className: "text-center" },
 							{ data: 'date', name: 'date', className: "text-center" },
 							{ data: 'orderId', name: 'orderId', className: "text-center" },
-							{ data: 'store', name: 'store', className: "text-center" },
 							{ data: 'user', name: 'user', className: "text-center" },
 							{ data: 'total', name: 'total', className: "text-center", "render": $.fn.dataTable.render.number( '.', ',', 0, 'Rp ' ) },
 							{ data: 'action', name: 'action', className: "text-center" },
 						],
-						columnDefs : [{
+						columnDefs : [ {
 							"targets" : [0, 3 ,6],
 							"orderable" : false,
 							"searchable" : false,
@@ -182,7 +181,7 @@
 							[10, 25, 50, 'All'],
 						],
 						drawCallback: function () {
-							let sum = $('#table-data').DataTable().column(6).data().sum();
+							let sum = $('#table-data').DataTable().column(5).data().sum();
 							$('#total-all').html(`Rp. ${sum.toLocaleString('id-ID')}`);
 						}	
 					}).on('draw', function () {
@@ -202,6 +201,7 @@
 					}
 				});
 				$('#reservation').on('cancel.daterangepicker', function(ev, picker) {
+					//do something, like clearing an input
 					$('#reservation').val('');
 				});
 				$('#reservation').on('apply.daterangepicker', function (ev, picker) {
@@ -226,7 +226,7 @@
 							text: 'Both Date is Required!'
 						});
 					}
-				});	
+				});
 				$('#refresh').click(function() {
 					$('#reservation').val('');
 					$('#start-date').val('');
@@ -238,7 +238,6 @@
 				});
 			});
 		</script>
-
 @endpush
 
 @push('modal-post')
@@ -255,11 +254,12 @@
 				let dataId = $(this).data('id');
 				$.get('/order/' + dataId, function (data) {
 					$('#detail-modal').modal('show');
-					$('.modal-title').text(`Detail Order : ${data.order_id}`);
+					$('.modal-title').text("Detail Order");
 					const event = new Date(data.date);
 					const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 					$('#detail-date').text(`Date : ${event.toLocaleDateString('id-ID', options)}`);
 					$('#detail-user').text(`User : ${data.user.name}`);
+					$('#detail-order-id').text(`ID : ${data.order_id}`);
 					$('#detail-total').text(`Total : Rp. ${data.total.toLocaleString()}`);
 					$('#detail-discount').text(`Discount : Rp. ${data.discount.toLocaleString()}`);
 					$('#detail-grand-total').text(`Grand Total : Rp. ${(data.total - data.discount).toLocaleString()}`);
@@ -285,18 +285,16 @@
 					}).then((result) => {
 						if (result.isConfirmed) {
 							$.ajax({
-								url: "order/" + dataId,
+								url: "/order/" + dataId,
 								type: 'DELETE',
 							success: function (data) {
 								$('#delete-modal').modal('hide');
-								if (data.code == 200) {
-									Swal.fire(
-										'Saved!',
-										'Your Data has been Deleted.',
-										'success'
-									);
-									$('#table-data').DataTable().ajax.reload();
-								}
+								Swal.fire(
+									'Saved!',
+									'Your Data has been Deleted.',
+									'success'
+								);
+								$('#table-data').DataTable().ajax.reload();
 							},
 							error: function (data) {
 								console.log('Error: ', data);
@@ -331,13 +329,12 @@
 				} else {
 					$('#delete-all-btn').addClass('d-none');
 				}
-			}
+			}			
 			$('#delete-all-btn').click(function () {
 				let checkedOrder = [];
 				$('input[name="order_checkbox"]:checked').each(function () {
 					checkedOrder.push($(this).data('id'));
 				});
-				
 				const url = "{{ route('delete-selected-order') }}";
 				if (checkedOrder.length > 0) {
 					Swal.fire({
@@ -352,7 +349,7 @@
 					}).then((result) => {
 						if (result.value) {
 							$.post(url, {id:checkedOrder}, function (data) {
-								if (data.code == 200) {
+								if (data.code == 1) {
 									Swal.fire(
 										'Saved!',
 										'Your Data has been Deleted.',

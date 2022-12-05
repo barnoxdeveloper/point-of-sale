@@ -32,9 +32,7 @@ class ProductUserController extends Controller
                                     return $data->product_code.' - '.$data->name;
                                 })
                                 ->addColumn('category', function($data){
-                                    if ($data->category !== NULL) {
-                                        return Str::upper($data->category->name);
-                                    }
+                                    return $data->category !== null ? $data->category->name : '';
                                 })
                                 ->addColumn('price', function($data) {
                                     return '<del>'.number_format($data->old_price,0,",",".").'</del> | '.number_format($data->new_price,0,",",".").'';
@@ -102,7 +100,6 @@ class ProductUserController extends Controller
             'photo' => 'nullable|max:1000',
             'status' => 'required|in:ACTIVE,NON-ACTIVE',
         ]);
-
         if ($validator->fails()) {
             return response()->json([
                 'code' => 0,
@@ -131,7 +128,6 @@ class ProductUserController extends Controller
                 $photo = $productCheck->getRawOriginal('photo');
                 $messages = "Data Updated Without Photo Successfully!";
             }
-
             $category = Category::where('id', $request->category_id)->first();
             if ($request->product_code == "") {
                 $productCode = 'PRD-'.Str::random(6);
@@ -139,21 +135,21 @@ class ProductUserController extends Controller
                 $productCode = $request->product_code;
             }
             Product::updateOrCreate(['id' => $id],
-                    [
-                        'product_code' => $productCode,
-                        'name' => $request->name,
-                        'slug' => Str::slug($request->name),
-                        'category_id' => $request->category_id,
-                        'store_id' => $category->store_id,
-                        'old_price' => $request->old_price,
-                        'new_price' => $request->new_price,
-                        'limit_stock' => $request->limit_stock,
-                        'stock' => $request->stock,
-                        'type' => $request->type,
-                        'description' => $request->description,
-                        'photo' => $photo,
-                        'status' => $request->status,
-                    ]); 
+            [
+                'product_code' => $productCode,
+                'name' => $request->name,
+                'slug' => Str::slug($request->name),
+                'category_id' => $request->category_id,
+                'store_id' => $category->store_id,
+                'old_price' => $request->old_price,
+                'new_price' => $request->new_price,
+                'limit_stock' => $request->limit_stock,
+                'stock' => $request->stock,
+                'type' => $request->type,
+                'description' => $request->description,
+                'photo' => $photo,
+                'status' => $request->status,
+            ]); 
             return response()->json([
                 'code' => 200,
                 'icon' => "success",
@@ -209,7 +205,7 @@ class ProductUserController extends Controller
         $item = Product::find($id);
         File::delete('storage/'. $item->getRawOriginal('photo'));
         $item->delete();
-        return response()->json(['code' => 1]);
+        return response()->json(['code' => 200]);
     }
 
     public function deleteSelectedProduct(Request $request)
@@ -220,7 +216,7 @@ class ProductUserController extends Controller
             File::delete('storage/'. $item->getRawOriginal('photo'));
             Product::whereIn('id', $id)->delete();
         }
-        return response()->json(['code' => 1]);
+        return response()->json(['code' => 200]);
     }
 
     public function printBarcode(Request $request)

@@ -35,7 +35,6 @@ class OrderTemporaryController extends Controller
                         ->where('status', 'ACTIVE')
                         ->where('stock','!=', 0)
                         ->get(['product_code', 'name']);
-                        // return $products;
         $items = DB::table('order_temporaries')->where('user_id', Auth::user()->id)->get();
         $i = 1;
         $grandTotal = DB::table('order_temporaries')->where('user_id', Auth::user()->id)->sum('sub_total');

@@ -171,11 +171,11 @@
 					processing : true,
 					serverSide : true,
 					pageLength : 25,
-					lengthMenu: [
+					lengthMenu : [
 						[10, 25, 50, -1],
 						[10, 25, 50, 'All'],
 					],
-					columnDefs: [ {
+					columnDefs : [ {
 						"targets" : [0, 3, 7],
 						"orderable" : false,
 						"searchable" : false,
@@ -225,7 +225,6 @@
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
 				}
 			});
-
 			$.fn.modal.Constructor.prototype.enforceFocus = function() {};
 			const myModal = new bootstrap.Modal(document.getElementById('modal-post'));
 			$('#btn-create').click(function () {
@@ -242,7 +241,6 @@
 				$(".modal-body").find("p").hide();
 				$('#checkbox-password').attr("style", "display: none;");
 			});
-
 			if ($("#form-post").length > 0) {
 				$("#form-post").validate({
 					submitHandler: function (form) {
@@ -295,7 +293,6 @@
 					}
 				});
 			}
-
 			// method edit data
 			$(document).on('click', '.editPost', function () {
 				let dataId = $(this).data('id');
@@ -330,7 +327,6 @@
 					}
 				})
 			});
-
 			// method delete start
 			$(document).on('click', '.delete', function () {
 				dataId = $(this).data('id');
@@ -349,12 +345,14 @@
 								type: 'DELETE',
 							success: function (data) {
 								$('#delete-modal').modal('hide');
-								Swal.fire(
-									'Saved!',
-									'Your Data has been Deleted.',
-									'success'
-								);
-								$('#table-data').DataTable().ajax.reload();
+								if (data.code == 200) {
+									Swal.fire(
+										'Saved!',
+										'Your Data has been Deleted.',
+										'success'
+									);
+									$('#table-data').DataTable().ajax.reload();
+								}
 							},
 							error: function (data) {
 								console.log('Error: ', data);
@@ -363,7 +361,6 @@
 					}
 				});
 			});
-
 			$(document).on('click', 'input[name="main_checkbox"]', function() {
 				if (this.checked) {
 					$('input[name="user_checkbox"]').each(function () {
@@ -376,7 +373,6 @@
 				}
 				toggleDeleteAllBtn();
 			});
-
 			$(document).on('change', 'input[name="user_checkbox"]', function() {
 				if ($('input[name="user_checkbox"]').length == $('input[name="user_checkbox"]:checked').length) {
 					$('input[name="main_checkbox"]').prop('checked', true);
@@ -385,7 +381,6 @@
 				}
 				toggleDeleteAllBtn();
 			});
-
 			function toggleDeleteAllBtn() {
 				if ($('input[name="user_checkbox"]:checked').length > 0) {
 					$('#delete-all-btn').text('Delete ('+ $('input[name="user_checkbox"]:checked').length +')').removeClass('d-none');
@@ -394,7 +389,6 @@
 				}
 			}
 			// method delete end
-
 			$('#delete-all-btn').click(function () {
 				let checkedUser = [];
 				$('input[name="user_checkbox"]:checked').each(function () {
@@ -415,7 +409,7 @@
 					}).then((result) => {
 						if (result.value) {
 							$.post(url, {id:checkedUser}, function (data) {
-								if (data.code == 1) {
+								if (data.code == 200) {
 									Swal.fire(
 										'Saved!',
 										'Your Data has been Deleted.',
@@ -428,7 +422,6 @@
 					});
 				}
 			});
-
 			$('#change-password').click(function() {
 				if( $(this).is(':checked')) {
 					$('#password').prop({readonly : false, required : true, minlength: "6"});
@@ -441,7 +434,6 @@
 				}
 			});
 		});
-
 		function showPassword() {
 			let x = document.getElementById("password");
 			if (x.type === "password") {

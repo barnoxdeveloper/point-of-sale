@@ -26,7 +26,6 @@
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <div class="dropdown-divider"></div>
-                        @if(Auth::user()->is_roles_admin)
                         <li class="nav-item {{ (request()->is('dashboard')) ? 'active' : '' }}">
                             <a href="{{ route('dashboard') }}" class="nav-link {{ (request()->is('dashboard')) ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-home"></i>
@@ -34,6 +33,7 @@
                             </a>
                         </li>
                         <div class="dropdown-divider"></div>
+                        @if(Auth::user()->is_roles_admin)
                         <li class="nav-item {{ (request()->is('user')) ? 'active' : '' }}">
                             <a href="{{ route('user.index') }}" class="nav-link {{ (request()->is('user')) ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-users"></i>

@@ -30,9 +30,7 @@ class ProductController extends Controller
                                     return $data->product_code.' - '.$data->name;
                                 })
                                 ->addColumn('category', function($data){
-                                    if ($data->category !== NULL) {
-                                        return Str::upper($data->category->name);
-                                    }
+                                    return $data->category !== null ? $data->category->name : '';
                                 })
                                 ->addColumn('price', function($data) {
                                     return '<del>'.number_format($data->old_price,0,",",".").'</del> | '.number_format($data->new_price,0,",",".").'';
@@ -51,9 +49,9 @@ class ProductController extends Controller
                                 ->addColumn('action', function($data) {
                                     $button = '<a href="javascript:void(0)" data-toggle="tooltip" title="Cetak Barcode" data-id="'.$data->id.'" data-original-title="Cetak Barcode" class="btn btn-success btn-md btn-barcode"><i class="fas fa-barcode"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" class="btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Deleted" data-id="'.$data->id.'" class="btn btn-danger btn-md delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
                                 ->rawColumns(['checkbox', 'name', 'category', 'price', 'stock', 'photo', 'status', 'action'])
@@ -97,7 +95,6 @@ class ProductController extends Controller
             'photo' => 'nullable|max:1000',
             'status' => 'required|in:ACTIVE,NON-ACTIVE',
         ]);
-
         if ($validator->fails()) {
             return response()->json([
                 'code' => 0,
@@ -122,7 +119,6 @@ class ProductController extends Controller
                 $photo = $productCheck->getRawOriginal('photo');
                 $messages = "Data Updated Without Photo Successfully!";
             }
-
             $category = Category::where('id', $request->category_id)->first();
             if ($request->product_code == "") {
                 $productCode = 'PRD-'.Str::random(6);
@@ -130,21 +126,21 @@ class ProductController extends Controller
                 $productCode = $request->product_code;
             }
             Product::updateOrCreate(['id' => $id],
-                    [
-                        'product_code' => $productCode,
-                        'name' => $request->name,
-                        'slug' => Str::slug($request->name),
-                        'category_id' => $request->category_id,
-                        'store_id' => $category->store_id,
-                        'old_price' => $request->old_price,
-                        'new_price' => $request->new_price,
-                        'limit_stock' => $request->limit_stock,
-                        'stock' => $request->stock,
-                        'type' => $request->type,
-                        'description' => $request->description,
-                        'photo' => $photo,
-                        'status' => $request->status,
-                    ]); 
+            [
+                'product_code' => $productCode,
+                'name' => $request->name,
+                'slug' => Str::slug($request->name),
+                'category_id' => $request->category_id,
+                'store_id' => $category->store_id,
+                'old_price' => $request->old_price,
+                'new_price' => $request->new_price,
+                'limit_stock' => $request->limit_stock,
+                'stock' => $request->stock,
+                'type' => $request->type,
+                'description' => $request->description,
+                'photo' => $photo,
+                'status' => $request->status,
+            ]);
             return response()->json([
                 'code' => 200,
                 'icon' => "success",
@@ -200,7 +196,7 @@ class ProductController extends Controller
         $item = Product::find($id);
         File::delete('storage/'. $item->getRawOriginal('photo'));
         $item->delete();
-        return response()->json(['code' => 1]);
+        return response()->json(['code' => 200]);
     }
 
     public function deleteSelectedProduct(Request $request)
@@ -211,7 +207,7 @@ class ProductController extends Controller
             File::delete('storage/'. $item->getRawOriginal('photo'));
             Product::whereIn('id', $id)->delete();
         }
-        return response()->json(['code' => 1]);
+        return response()->json(['code' => 200]);
     }
 
     public function printBarcode(Request $request)
@@ -223,7 +219,6 @@ class ProductController extends Controller
             // echo $number++.' '.$item->name.'<br>';
             $barcodeName[] = $item;
         }
-
         $pdf = Pdf::setOptions(['isRemoteEnabled' => TRUE, 'enable_javascript' => TRUE]);
         $pdf = Pdf::loadView('pages.admin.product.print_barcode', compact('number', 'barcodeName'));
         $pdf->setPaper('a4', 'protait'); 
@@ -266,9 +261,9 @@ class ProductController extends Controller
                                 ->addColumn('action', function($data) {
                                     $button = '<a href="javascript:void(0)" data-toggle="tooltip" title="Cetak Barcode" data-id="'.$data->id.'" data-original-title="Cetak Barcode" class="btn btn-success btn-md btn-barcode"><i class="fas fa-barcode"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" class="btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Deleted" data-id="'.$data->id.'" class="btn btn-danger btn-md delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
                                 ->rawColumns(['checkbox', 'name', 'category', 'price', 'stock', 'photo', 'status', 'action'])
@@ -316,9 +311,9 @@ class ProductController extends Controller
                                 ->addColumn('action', function($data) {
                                     $button = '<a href="javascript:void(0)" data-toggle="tooltip" title="Cetak Barcode" data-id="'.$data->id.'" data-original-title="Cetak Barcode" class="btn btn-success btn-md btn-barcode"><i class="fas fa-barcode"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" class="btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Deleted" data-id="'.$data->id.'" class="btn btn-danger btn-md delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
                                 ->rawColumns(['checkbox', 'name', 'category', 'price', 'stock', 'photo', 'status', 'action'])

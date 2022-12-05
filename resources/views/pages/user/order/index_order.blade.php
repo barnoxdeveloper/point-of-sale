@@ -185,7 +185,6 @@
 						}	
 					});
 				}
-
 				$('#reservation').daterangepicker({
 					// autoUpdateInput: false,
 					locale: {
@@ -194,23 +193,19 @@
 						cancelLabel: 'Clear'
 					}
 				});
-
 				$('#reservation').on('cancel.daterangepicker', function(ev, picker) {
 					//do something, like clearing an input
 					$('#reservation').val('');
 				});
-
-				// $('#reservation').change(function() {
 				$('#reservation').on('apply.daterangepicker', function (ev, picker) {
-					let awal = $('#reservation').data('daterangepicker').startDate;
-					let akhir = $('#reservation').data('daterangepicker').endDate;
+					let startDate = picker.startDate;
+					let endDate = picker.endDate;
 					// format it 
-					let start = awal.format('YYYY-MM-DD');
-					let end = akhir.format('YYYY-MM-DD');
+					let start = startDate.format('YYYY-MM-DD');
+					let end = endDate.format('YYYY-MM-DD');
 					$('#start-date').val(start);
 					$('#end-date').val(end);
 				});
-
 				$('#filter').click(function() {
 					let startDate = $('#start-date').val();
 					let endDate = $('#end-date').val();	
@@ -225,7 +220,6 @@
 						});
 					}
 				});
-	
 				$('#refresh').click(function() {
 					$('#reservation').val('');
 					$('#start-date').val('');
@@ -236,7 +230,6 @@
 					loadData();
 				});
 			});
-
 		</script>
 @endpush
 
@@ -249,7 +242,6 @@
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
 				}
 			});
-
 			// method detail
 			$(document).on('click', '.btn-detail', function () {
 				let dataId = $(this).data('id');
@@ -271,7 +263,6 @@
 					$('#detail-order').html(html);
 				});
 			});
-
 			// method delete start
 			$(document).on('click', '.delete', function () {
 				dataId = $(this).data('id');
@@ -290,12 +281,14 @@
 								type: 'DELETE',
 							success: function (data) {
 								$('#delete-modal').modal('hide');
-								Swal.fire(
-									'Saved!',
-									'Your Data has been Deleted.',
-									'success'
-								);
-								$('#table-data').DataTable().ajax.reload();
+								if (data.code == 200) {
+									Swal.fire(
+										'Saved!',
+										'Your Data has been Deleted.',
+										'success'
+									);
+									$('#table-data').DataTable().ajax.reload();
+								}
 							},
 							error: function (data) {
 								console.log('Error: ', data);

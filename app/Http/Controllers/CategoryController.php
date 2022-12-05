@@ -29,9 +29,7 @@ class CategoryController extends Controller
                                     return $data->name;
                                 })
                                 ->addColumn('storeName', function ($data) {
-                                    if ($data->store !== NULL) {
-                                        return $data->store->store_code.' | '.$data->store->name;
-                                    }
+                                    return $data->store !== null ? $data->store->name.' | '.$data->store->name : '';
                                 })
                                 ->addColumn('photo', function ($data) {
                                     if ($data->getRawOriginal('photo') !== NULL) {
@@ -83,10 +81,10 @@ class CategoryController extends Controller
         // return $request->file('photo');
         if ($validator->fails()) {
             return response()->json([
-                    'code' => 0,
-                    'notif' => "Error!",
-                    'messages' => $validator->errors(),
-                ]);    
+                'code' => 0,
+                'notif' => "Error!",
+                'messages' => $validator->errors(),
+            ]);
         } else {
             if ($request->hasfile('photo')) {
                 $slug = str_replace(' ', '-', array_map('strtolower', $request->name));
@@ -102,11 +100,7 @@ class CategoryController extends Controller
                 }
             }
             Category::insert($data);
-            return response()->json([
-                'code' => 200,
-                'notif' => "Saved!",
-                'messages' => "Your Data has been Saved!",
-            ]);
+            return response()->json(['code' => 200]);
         }
     }
 
@@ -151,10 +145,10 @@ class CategoryController extends Controller
         ]);
         if ($validator->fails()) {
             return response()->json([
-                    'code' => 0,
-                    'notif' => "Error!",
-                    'messages' => $validator->errors(),
-                ]);    
+                'code' => 0,
+                'notif' => "Error!",
+                'messages' => $validator->errors(),
+            ]);
         } else {
             $data = $request->all();
             $photo = $request->file('photo');
@@ -167,16 +161,11 @@ class CategoryController extends Controller
                 $data = $request->all();
                 // jika photo di rubah, maka unlink photo yang lama
                 File::delete('storage/'. $item->getRawOriginal('photo'));
-                $date = Carbon::now();
                 $fileName = Str::random(6).'-'.$photo->getClientOriginalName();
                 $data['photo'] = $photo->storeAs('assets/category',$fileName,'public');
                 $item->update($data);
             }
-            return response()->json([
-                'code' => 200,
-                'notif' => "Updated!",
-                'messages' => "Your Data has been Updated!",
-            ]);
+            return response()->json(['code' => 200]);
         }
     }
 
@@ -191,7 +180,7 @@ class CategoryController extends Controller
         $item = Category::find($id);
         File::delete('storage/'. $item->getRawOriginal('photo'));
         $item->delete();
-        return response()->json(['code' => 1]);
+        return response()->json(['code' => 200]);
     }
 
     public function deleteSelectedCategory(Request $request)
@@ -202,7 +191,7 @@ class CategoryController extends Controller
             File::delete('storage/'. $item->getRawOriginal('photo'));
             Category::whereIn('id', $id)->delete();
         }
-        return response()->json(['code' => 1]);
+        return response()->json(['code' => 200]);
     }
 
     public function categoryWhereStore(Request $request, $id)

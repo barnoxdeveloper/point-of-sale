@@ -28,27 +28,28 @@ class UserController extends Controller
                                 ->addColumn('checkbox', function($data) {
                                     return '<input type="checkbox" name="user_checkbox" data-id="'.$data['id'].'"><label></label>';
                                 })
-                                ->addColumn('name', function($data){
+                                ->addColumn('name', function($data) {
                                     return $data->name;
                                 })
-                                ->addColumn('email', function($data){
+                                ->addColumn('email', function($data) {
                                     return '<a href="mailto:'.$data->email.'">'.$data->email.'</a>';
                                 })
-                                ->addColumn('roles', function($data){
+                                ->addColumn('roles', function($data) {
                                     return $data->roles;
                                 })
-                                ->addColumn('store', function($data){
-                                    if ($data->store !== NULL) {
-                                        return Str::upper($data->store->name);
-                                    }
+                                ->addColumn('store', function($data) {
+                                    return $data->store !== null ? $data->store->name : '';
                                 })
-                                ->addColumn('status', function($data){
+                                ->addColumn('status', function($data) {
                                     return $data->status;
                                 })
-                                ->addColumn('action', function($data){
-                                    $button = '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" data-original-title="Edit" class="edit btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
+                                ->addColumn('action', function($data) {
+                                    $urlOrderUser = route('order-where-user', encrypt($data->id));
+                                    $button = '<a href="'.$urlOrderUser.'" title="Data Order by User" class="btn btn-primary btn-md"><i class="fas fa-cash-register"></i></a>';
                                     $button .= '&nbsp;&nbsp;';
-                                    $button .= '<a href="#" title="Deleted" class="btn btn-danger delete" data-id="'.$data->id.'" data-toggle="modal" data-target="#delete"><i class="far fa-trash-alt"></i></a>';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Edit" data-id="'.$data->id.'" class="btn btn-warning btn-md editPost"><i class="far fa-edit"></i></a>';
+                                    $button .= '&nbsp;&nbsp;';
+                                    $button .= '<a href="javascript:void(0)" data-toggle="tooltip" title="Deleted" data-id="'.$data->id.'" class="btn btn-danger btn-md delete"><i class="far fa-trash-alt"></i></a>';
                                     return $button;
                                 })
                                 ->rawColumns(['checkbox', 'name', 'email', 'roles', 'status', 'action'])
@@ -85,8 +86,7 @@ class UserController extends Controller
         } else if($userCheck !== NULL && $password == NULL) {
             $pass = $userCheck->password;
         }
-
-        $validator = Validator::make( $request->all(),[
+        $validator = Validator::make( $request->all(), [
             'name' => 'required|max:50',
             'email' => ['required', 'email', 'max:50', Rule::unique('users')->ignore($id)],
             'store_id' => 'nullable|exists:stores,id',
@@ -94,7 +94,6 @@ class UserController extends Controller
             'roles' => 'required|not_in:0|in:ADMINISTRATOR,MANAGER,CASHIER',
             'status' => 'required|in:ACTIVE,NON-ACTIVE',
         ]);
-
         if ($validator->fails()) {
             return response()->json([
                 'code' => 0,
@@ -103,19 +102,15 @@ class UserController extends Controller
             ]);
         } else {
             User::updateOrCreate(['id' => $id],
-                    [
-                        'name' => $request->name,
-                        'email' => $request->email,
-                        'password' => $pass,
-                        'store_id' => $request->store_id,
-                        'roles' => $request->roles,
-                        'status' => $request->status,
-                    ]); 
-            return response()->json([
-                'code' => 200,
-                'notif' => "Saved!",
-                'messages' => "Your Data has been Saved!",
-            ]);
+            [
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => $pass,
+                'store_id' => $request->store_id,
+                'roles' => $request->roles,
+                'status' => $request->status,
+            ]); 
+            return response()->json(['code' => 200]);
         }
     }
 
@@ -164,13 +159,13 @@ class UserController extends Controller
     {
         $item = User::find($id);
         $item->delete();
-        return response()->json($item);
+        return response()->json(['code' => 200]);
     }
 
     public function deleteSelectedUser(Request $request)
     {
         $id = $request->id;
         User::whereIn('id', $id)->delete();
-        return response()->json(['code' => 1]);
+        return response()->json(['code' => 200]);
     }
 }

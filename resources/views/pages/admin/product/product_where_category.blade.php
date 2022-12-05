@@ -19,7 +19,6 @@
                 </div>
             </div>
 		</div>
-
 		<section class="content">
 			<div class="container-fluid p-3">
 				<div class="card" data-aos="fade-up">
@@ -161,7 +160,6 @@
 								</div>
 							</div>
 						</div>
-
 						<div class="form-group text-center">
 							<button type="submit" class="btn btn-primary" id="btn-save">
 								<i class="far fa-paper-plane"></i>
@@ -249,7 +247,7 @@
 						url : "{{ route('product-where-category', $id) }}",
 						type : 'GET',
 					},
-					columns: [
+					columns : [
 						{ data: 'checkbox', name: 'checkbox', className: "text-center"},
 						{ data: 'DT_RowIndex', name: 'DT_RowIndex', className: "text-center" },
 						{ data: 'name', name: 'name', className: "text-center" },
@@ -280,7 +278,6 @@
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
 				}
 			});
-
 			$.fn.modal.Constructor.prototype.enforceFocus = function() {};
 			// function print barcode start
 			const modalPrintBarcode = new bootstrap.Modal($('#modal-print-barcode'));
@@ -291,7 +288,6 @@
 				$(".modal-body").find("p").hide();
 				$('#quantity-barcode').focus();
 			});
-
 			const myModal = new bootstrap.Modal($('#modal-post'));
 			$('#btn-create').click(function () {
 				myModal.show();
@@ -304,7 +300,6 @@
 				$('#photo-preview').attr('hidden', true);
 				$('#delete-photo').attr('hidden', true);
 			});
-
 			if ($("#form-post").length > 0) {
 				$("#form-post").validate({
 					submitHandler: function (form) {
@@ -357,7 +352,6 @@
 					}
 				});
 			}
-
 			// method edit data
 			$(document).on('click', '.editPost', function () {
 				let dataId = $(this).data('id');
@@ -384,7 +378,6 @@
 					} else {
 						$('#photo-preview').html(`<a href="${data.photo}" title="${data.photo}" target="_blank"><img src="${data.photo}" alt="${data.photo}" style="width: 100px; height: 100px;"></a>`);
 					}
-
 					// status
 					if (data.status == "ACTIVE") {
 						$('#active').prop('checked', true);
@@ -393,7 +386,6 @@
 					}
 				})
 			});
-
 			// method delete start
 			$(document).on('click', '.delete', function () {
 				dataId = $(this).data('id');
@@ -412,12 +404,14 @@
 								type: 'DELETE',
 							success: function (data) {
 								$('#delete-modal').modal('hide');
-								Swal.fire(
-									'Deleted!',
-									'Your Data has been Deleted.',
-									'success'
-								);
-								$('#table-data').DataTable().ajax.reload();
+								if (data.code == 200) {
+									Swal.fire(
+										'Saved!',
+										'Your Data has been Deleted.',
+										'success'
+									);
+									$('#table-data').DataTable().ajax.reload();
+								}
 							},
 							error: function (data) {
 								console.log('Error: ', data);
@@ -426,7 +420,6 @@
 					}
 				});
 			});
-
 			$(document).on('click', 'input[name="main_checkbox"]', function() {
 				if (this.checked) {
 					$('input[name="product_checkbox"]').each(function () {
@@ -439,7 +432,6 @@
 				}
 				toggleDeleteAllBtn();
 			});
-
 			$(document).on('change', 'input[name="product_checkbox"]', function() {
 				if ($('input[name="product_checkbox"]').length == $('input[name="product_checkbox"]:checked').length) {
 					$('input[name="main_checkbox"]').prop('checked', true);
@@ -448,7 +440,6 @@
 				}
 				toggleDeleteAllBtn();
 			});
-
 			function toggleDeleteAllBtn() {
 				if ($('input[name="product_checkbox"]:checked').length > 0) {
 					$('#delete-all-btn').text('Delete ('+ $('input[name="product_checkbox"]:checked').length +')').removeClass('d-none');
@@ -456,14 +447,11 @@
 					$('#delete-all-btn').addClass('d-none');
 				}
 			}
-			// method delete end
-
 			$('#delete-all-btn').click(function () {
 				let checkedProduct = [];
 				$('input[name="product_checkbox"]:checked').each(function () {
 					checkedProduct.push($(this).data('id'));
 				});
-				
 				const url = "{{ route('delete-selected-product') }}";
 				if (checkedProduct.length > 0) {
 					Swal.fire({
@@ -478,7 +466,7 @@
 					}).then((result) => {
 						if (result.value) {
 							$.post(url, {id:checkedProduct}, function (data) {
-								if (data.code == 1) {
+								if (data.code == 200) {
 									Swal.fire(
 										'Saved!',
 										'Your Data has been Deleted.',
@@ -491,6 +479,7 @@
 					});
 				}
 			});
+			// method delete end
 		});
 
 	</script>

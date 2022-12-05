@@ -209,7 +209,6 @@
 						searching: false,
 						paging: false,
 					});
-
 					@if (session('success'))
 						Swal.fire({
 							position: 'top-end',
@@ -218,7 +217,6 @@
 							timer: 1500
 						});
 					@endif
-
 					@if (session('failed'))
 						Swal.fire({
 							position: 'top-end',
@@ -227,7 +225,6 @@
 							timer: 1500
 						});
 					@endif
-
 					// sweet alert success start
 					@if(session('success_invoices'))
 						Swal.fire({
@@ -244,7 +241,6 @@
 						});
 					@endif
 					// sweet alert success end
-
 					function updateTextView(_obj) {
 						let num = getNumber(_obj.val());
 						if (num == 0) {
@@ -253,7 +249,6 @@
 							_obj.val(num.toLocaleString());
 						}
 					}
-
 					function getNumber(_str) {
 						let arr = _str.split("");
 						let out = new Array();
@@ -264,11 +259,9 @@
 						}
 						return Number(out.join(""));
 					}
-
 					$("input[type=text]").on("keyup", function () {
 						updateTextView($(this));
 					});
-
 					$('#total-bayar').on("keyup", function () {
 						
 					});
@@ -297,8 +290,7 @@
 
 @push('style-select2')
 
-		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-	
+	<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 @endpush
 
 @push('script-select2')
