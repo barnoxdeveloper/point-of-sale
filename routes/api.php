@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\{UserController, ProductController};
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +15,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware('auth:sanctum')->group(function () {
+    // route for logout
+    Route::post('logout', [UserController::class, 'logout']);
+    // route for fetch-user
+    Route::get('user/fetch', [UserController::class, 'fetch'])->name('user/fetch');
+    // route for create-products
+    // Route::get('product/create', [ProductController::class, 'create'])->name('product');
+    // // route for edit-products
+    // Route::get('product/edit', [ProductController::class, 'edit'])->name('product');
+    // // route for update-products
+    // Route::get('product/update', [ProductController::class, 'update'])->name('product');
 });
+
+// route for login
+Route::post('login', [UserController::class, 'login']);
+// route for fetch-products
+Route::get('product', [ProductController::class, 'all'])->name('product');
