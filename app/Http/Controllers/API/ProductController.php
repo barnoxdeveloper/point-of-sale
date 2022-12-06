@@ -12,13 +12,12 @@ class ProductController extends Controller
     public function all(Request $request)
     {
         $id = $request->input('id');
-        // $limit = $request->input('limit', 6);
         $slug = $request->input('slug');
         $name = $request->input('name');
+        // $limit = $request->input('limit', 6);
         
         if ($id) {
             $product = Product::where('status', 'ACTIVE')->find($id);
-
             if ($product) {
                 return ResponseFormatter::success(
                     $product,

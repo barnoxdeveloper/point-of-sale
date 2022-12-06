@@ -324,8 +324,8 @@
 											$('#modal-post').modal('hide');
 											$('#table-data').DataTable().ajax.reload();
 											Swal.fire(
-												`${data.notif}`,
-												`${data.messages}`,
+												'Success!',
+												'Your Data has been Saved.',
 												'success'
 											);
 										}
@@ -414,8 +414,8 @@
 											$('#modal-edit').modal('hide');
 											$('#table-data').DataTable().ajax.reload();
 											Swal.fire(
-												`${data.notif}`,
-												`${data.messages}`,
+												'Success!',
+												'Your Data has been Saved.',
 												'success'
 											);
 										}

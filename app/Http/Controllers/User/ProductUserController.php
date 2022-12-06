@@ -21,18 +21,17 @@ class ProductUserController extends Controller
     {
         $title = "Data Products";
         $categories = Category::where('store_id', Auth::user()->store_id)->orderBy('name', 'ASC')->get();
-        foreach ($categories as $key => $item) {
-            $categoryId[] = $item->id;
-        }
-        $items = Product::with('category')->whereIn('category_id', $categoryId)->get();
-        
+        // foreach ($categories as $key => $item) {
+        //     $categoryId[] = $item->id;
+        // }
+        $items = Product::with('category')->where('store_id', Auth::user()->store_id)->get();
         if($request->ajax()) {
             return datatables()->of($items)
                                 ->addColumn('name', function($data) {
                                     return $data->product_code.' - '.$data->name;
                                 })
                                 ->addColumn('category', function($data){
-                                    return $data->category !== null ? $data->category->name : '';
+                                    return $data->category !== null ? $data->category->name : 'Not Found';
                                 })
                                 ->addColumn('price', function($data) {
                                     return '<del>'.number_format($data->old_price,0,",",".").'</del> | '.number_format($data->new_price,0,",",".").'';

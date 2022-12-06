@@ -7,8 +7,7 @@ use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\{DB, Validator, File};
+use Illuminate\Support\Facades\{Auth, Validator, File};
 
 class CategoryUserController extends Controller
 {
@@ -154,16 +153,14 @@ class CategoryUserController extends Controller
             //jika photo tidak di rubah
             if($photo == "") {
                 $data['photo'] = $item->getRawOriginal('photo');
-                $item->update($data);
             } else if ($photo !== "") {
                 $data = $request->all();
                 // jika photo di rubah, maka unlink photo yang lama
                 File::delete('storage/'. $item->getRawOriginal('photo'));
-                $date = Carbon::now();
                 $fileName = Str::random(6).'-'.$photo->getClientOriginalName();
                 $data['photo'] = $photo->storeAs('assets/category',$fileName,'public');
-                $item->update($data);
             }
+            $item->update($data);
             return response()->json([
                 'code' => 200,
                 'notif' => "Updated!",

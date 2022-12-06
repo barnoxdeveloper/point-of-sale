@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\{UserController, ProductController};
+use App\Http\Controllers\API\{UserController, ProductController, CategoryController};
 
 /*
 |--------------------------------------------------------------------------
@@ -19,13 +19,17 @@ Route::middleware('auth:sanctum')->group(function () {
     // route for logout
     Route::post('logout', [UserController::class, 'logout']);
     // route for fetch-user
-    Route::get('user/fetch', [UserController::class, 'fetch'])->name('user/fetch');
+    Route::get('user/fetch', [UserController::class, 'fetch']);
     // route for create-products
     // Route::get('product/create', [ProductController::class, 'create'])->name('product');
     // // route for edit-products
     // Route::get('product/edit', [ProductController::class, 'edit'])->name('product');
     // // route for update-products
     // Route::get('product/update', [ProductController::class, 'update'])->name('product');
+    Route::resource('category', CategoryController::class)->except(['edit', 'create']);
+    // Route::post('category', [CategoryController::class, 'store']);
+    // Route::put('category/{id}', [CategoryController::class, 'update']);
+    // Route::delete('category/{id}', [CategoryController::class, 'delete']);
 });
 
 // route for login
