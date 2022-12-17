@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Store, User, Category, Product};
+use App\Models\{Store, Supplier, User, Category, Product};
 
 class HomeController extends Controller
 {
@@ -24,9 +24,10 @@ class HomeController extends Controller
     public function index()
     {
         $users = User::whereNotIn('roles', ['ADMINISTRATOR'])->count();
+        $supplier = Supplier::count();
         $stores = Store::count();
         $categories = Category::count();
         $products = Product::count();
-        return view('pages.dashboard', compact('users', 'stores', 'categories', 'products'));
+        return view('pages.dashboard', compact('users', 'supplier', 'stores', 'categories', 'products'));
     }
 }

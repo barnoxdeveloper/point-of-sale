@@ -41,6 +41,13 @@
                             </a>
                         </li>
                         <div class="dropdown-divider"></div>
+                        <li class="nav-item {{ (request()->is('supplier')) ? 'active' : '' }}">
+                            <a href="{{ route('supplier.index') }}" class="nav-link {{ (request()->is('supplier')) ? 'active' : '' }}">
+                                <i class="nav-icon fa fa-store"></i>
+                                <p>Supplier</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
                         <li class="nav-item {{ (request()->is('store')) ? 'active' : '' }}">
                             <a href="{{ route('store.index') }}" class="nav-link {{ (request()->is('store')) ? 'active' : '' }}">
                                 <i class="nav-icon fa fa-store"></i>

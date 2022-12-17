@@ -26,7 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::get('product/edit', [ProductController::class, 'edit'])->name('product');
     // // route for update-products
     // Route::get('product/update', [ProductController::class, 'update'])->name('product');
-    Route::resource('category', CategoryController::class)->except(['edit', 'create']);
+    Route::resource('categories', CategoryController::class)->except(['edit', 'create']);
     // Route::post('category', [CategoryController::class, 'store']);
     // Route::put('category/{id}', [CategoryController::class, 'update']);
     // Route::delete('category/{id}', [CategoryController::class, 'delete']);

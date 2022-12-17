@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{HomeController, UserController, StoreController, CategoryController, ProductController, OrderController, OrderDetailController, OrderTemporaryController};
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\User\{CategoryUserController, ProductUserController, OrderUserController, OrderTemporaryUserController};
+use App\Http\Controllers\{HomeController, UserController, StoreController, CategoryController, ProductController, OrderController, SupplierController, OrderTemporaryController};
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,11 @@ Route::middleware(['auth', 'verified', 'active', 'admin', 'revalidate'])
     Route::resource('user', UserController::class);
     Route::controller(UserController::class)->group(function () {
         Route::post('delete-selected-user', 'deleteSelectedUser')->name('delete-selected-user');
+	});
+    // route for supplier
+    Route::resource('supplier', SupplierController::class);
+    Route::controller(SupplierController::class)->group(function () {
+		Route::post('delete-selected-supplier', 'deleteSelectedSupplier')->name('delete-selected-supplier');
 	});
     // route for store
     Route::resource('store', StoreController::class);
@@ -91,6 +97,16 @@ Route::middleware(['auth', 'verified', 'active', 'employee', 'revalidate'])
 	});
     // route for Order Temporary
     Route::resource('order-temporary-user', OrderTemporaryUserController::class);
+});
+
+Route::get('/clear', function() {
+	Artisan::call('config:clear');
+	Artisan::call('config:cache');
+	Artisan::call('cache:clear');
+    Artisan::call('route:clear');
+    Artisan::call('route:cache');
+    Artisan::call('view:clear');
+	return "All cache is cleared!";
 });
 
 require __DIR__.'/auth.php';

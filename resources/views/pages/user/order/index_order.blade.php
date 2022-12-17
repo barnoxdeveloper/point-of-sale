@@ -182,7 +182,7 @@
 						drawCallback: function () {
 							let sum = $('#table-data').DataTable().column(4).data().sum();
 							$('#total-all').html(`Rp. ${sum.toLocaleString('id-ID')}`);
-						}	
+						}
 					});
 				}
 				$('#reservation').daterangepicker({
